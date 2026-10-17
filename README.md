@@ -1,3 +1,12 @@
+# Sunflower group (Hadi Nasooti, Jia): CNH Data Collection project
+
+Group repository, based on the course repository below. Start here:
+- [`docs/group/STATUS_AND_PLAN.md`](docs/group/STATUS_AND_PLAN.md): what is done, results so far, plan and who does what
+- [`docs/group/PROCEDURE.md`](docs/group/PROCEDURE.md): the written data collection procedure (tasks 1, 4 and 6)
+- [`docs/group/lab_log.md`](docs/group/lab_log.md): every measurement with its time
+
+---
+
 # Course project: estimate the weight of grain from a photo
 
 > Photo of grain  ->  count / pixels  ->  weight (g)
