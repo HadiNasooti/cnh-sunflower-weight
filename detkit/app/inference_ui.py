@@ -78,7 +78,8 @@ def build_inference_tab(project, wd: Path, ckpt: str | None, device: str) -> Non
         save_b = gr.Button("Save as samples (photos + boxes go to the Review tab, unreviewed)")
     items = gr.State([])
 
-    with gr.Accordion("Model constants (weight_config.json)", open=False):
+    with gr.Accordion("Model constants (weight_config.json; crop_count / crop_area constants are set by "
+                      "`detkit weight calibrate` and not shown here)", open=False):
         const_tbl = gr.Dataframe(headers=I.CONST_COLUMNS, datatype=["str", "number", "number"],
                                  value=_df(I.constants_rows(project), I.CONST_COLUMNS),
                                  interactive=True, static_columns=[0], row_count=(0, "fixed"),

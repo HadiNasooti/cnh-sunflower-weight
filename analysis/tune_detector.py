@@ -85,8 +85,9 @@ def main():
     for k in keys:
         e = np.array([r["rel_err"] for r in rows if (r["tile"], r["score"], r["mode"]) == k])
         summ.append((float(np.abs(e).mean()), float(e.mean()), float(e.std(ddof=1)) if len(e) > 1 else 0.0, *k))
-    summ.sort()
-    print("\nbest settings (mean |error|, bias, sd, tile, score, mode):")
+    # rank by the SPREAD of the error: a constant bias is absorbed by the calibrated constant
+    summ.sort(key=lambda r: (r[2], r[0]))
+    print("\nsettings ranked by sd of the relative error (mean |error|, bias, sd, tile, score, mode):")
     for s in summ[:15]:
         print(f"  {100 * s[0]:5.1f} %  bias {100 * s[1]:+5.1f} %  sd {100 * s[2]:4.1f} %  tile {s[3]}  score {s[4]}  {s[5]}")
     (out / "summary.json").write_text(json.dumps(summ, indent=1))

@@ -65,9 +65,10 @@ def cmd_predict(a) -> int:
         print(ex)
         return 1
     print(f"model={name}  photos={len(recs)}")
-    print(f"{'file':34s} {'crop':10s} {'count':>5s} {'est_g':>8s} {'true_g':>8s} {'err_%':>7s}")
+    ck = "crop_count" if name.startswith("crop_") else "count"
+    print(f"{'file':34s} {'crop':10s} {ck[:5]:>5s} {'est_g':>8s} {'true_g':>8s} {'err_%':>7s}")
     for r in recs:
-        print(f"{r['file'][-34:]:34s} {str(r['crop']):10s} {r['count']:5d} {r['est_g']:8.3f} "
+        print(f"{r['file'][-34:]:34s} {str(r['crop']):10s} {r[ck]:5d} {r['est_g']:8.3f} "
               f"{_f(r['true_g']):>8s} {_f(r['error_pct'], '{:.1f}'):>7s}")
     ev = evaluate_model(model, samples)
     if ev["n"]:
@@ -90,6 +91,9 @@ def cmd_calibrate(a) -> int:
 
     cfg = load_config(a.workdir)
     samples = _samples(a).with_weight()
+    no_crop = sum(1 for s in samples if not s.crop)
+    if no_crop and a.model.startswith("crop_"):
+        print(f"note: {no_crop} weighed photos have no crop and are skipped by {a.model}")
     model = configured_model(cfg, a.model).fit(samples)
     cfg.update({"model": a.model, model.config_key: model.constants})
     if hasattr(model, "bounds_key"):
