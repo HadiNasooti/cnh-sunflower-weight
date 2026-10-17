@@ -180,7 +180,12 @@ class FeatureTimesConstant(WeightModel):
         f = self.feature_value(features, crop)
         w = (f or 0) * c
         if not f:
-            return Estimate(0.0, note=(note + "; " if note else "") + "no detections: no bounds")
+            if features.get("count"):            # boxes exist, but none of the feature's kind
+                why = (f"photo has no crop: {self.name} needs it" if not crop else
+                       f"no {crop!r} boxes ({features['count']} boxes of other classes ignored)")
+            else:
+                why = "no detections: no bounds"
+            return Estimate(0.0, note=(note + "; " if note else "") + why)
         # an unknown crop uses the default constant, which is a guess for that crop: no bounds then
         b = self.bounds.get(crop) if known else None
         if b is None:
@@ -220,8 +225,13 @@ class CropCountTimesConstant(FeatureTimesConstant):
     """weight = number of boxes labelled as the photo's OWN crop x grams per kernel.
 
     Why: on our sunflower photos the detector also draws boxes on the ruler digits and on handwriting,
-    labelled as other crops. Counting all boxes over-counted by 6-26 %; counting only the sunflower
-    boxes was within 1-3 % of the hand count (3 batches of 200 seeds). Needs the crop of the photo."""
+    labelled as other crops. At tile 1500 / score 0.38 (the checkpoint's tiling and the course's best-F1
+    score; this combination was picked on these same 6 photos, so in-sample), counting all boxes
+    over-counted by 5.5-26.5 %; counting only the sunflower boxes was 1.0-3.0 % above the hand count
+    (3 batches of 200 seeds, 2 camera heights). Other tiles behave differently (tile 800: -18..+14 %).
+    Needs the crop of the photo. Note: in a project whose classes are only the crop, the app already
+    drops boxes of other labels, so there this model equals count_x_constant; our project keeps all
+    six classes, so the false boxes reach the features and this model matters."""
     name = "crop_count_x_constant"
     description = "weight = boxes of the photo's own crop x g/kernel (other classes ignored)"
     feature = "count_<crop>"

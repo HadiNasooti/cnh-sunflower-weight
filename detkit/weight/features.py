@@ -29,7 +29,7 @@ def image_features(detections: list[dict], meta: dict | None = None) -> dict:
     out: dict = {"count": len(areas)}
     for lab in sorted({lab for lab in labels if lab}):
         out[f"count_{lab}"] = labels.count(lab)
-        out[f"area_px_{lab}"] = sum(a for a, l in zip(areas, labels) if l == lab)
+        out[f"area_px_{lab}"] = sum(a for a, lb in zip(areas, labels) if lb == lab)
     out["total_area_px"] = sum(areas)
     out["mean_area_px"] = statistics.fmean(areas) if areas else 0.0
     out["median_area_px"] = statistics.median(areas) if areas else 0.0
