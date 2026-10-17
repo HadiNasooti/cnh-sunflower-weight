@@ -51,7 +51,8 @@ def cmd_predict(a) -> int:
         recs = []
         for s in samples:
             e = model.predict(s.features, s.crop)
-            r = {"file": s.file, "crop": s.crop, "count": s.features["count"], "est_g": round(e.weight_g, 3),
+            r = {"file": s.file, "crop": s.crop, "count": s.features["count"],
+                 "crop_count": s.features.get(f"count_{s.crop}", 0), "est_g": round(e.weight_g, 3),
                  "true_g": s.weight_g, "error_g": None, "error_pct": None, "note": e.note}
             if s.weight_g:
                 r["error_g"] = round(e.weight_g - s.weight_g, 3)
@@ -122,10 +123,12 @@ def register(sub) -> None:
 
     p = ws.add_parser("predict", help="per-photo count and estimated weight (+ error vs balance)")
     common(p)
-    p.add_argument("--model", help="count_x_constant | area_x_constant (default: weight_config.json)")
+    p.add_argument("--model", help="count_x_constant | area_x_constant | crop_count_x_constant | "
+                                   "crop_area_x_constant (default: weight_config.json)")
     p.add_argument("--out", help="write CSV")
     p.set_defaults(fn=cmd_predict)
     p = ws.add_parser("calibrate", help="fit a model's constants on this project, save weight_config.json")
     common(p)
-    p.add_argument("--model", default="count_x_constant", choices=["count_x_constant", "area_x_constant"])
+    p.add_argument("--model", default="count_x_constant",
+                   choices=["count_x_constant", "area_x_constant", "crop_count_x_constant", "crop_area_x_constant"])
     p.set_defaults(fn=cmd_calibrate)

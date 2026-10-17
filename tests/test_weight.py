@@ -78,7 +78,7 @@ def test_count_times_constant(tmp_path):
 
 
 def test_area_times_constant(tmp_path):
-    assert set(MODELS) == {"count_x_constant", "area_x_constant"}
+    assert {"count_x_constant", "area_x_constant"} <= set(MODELS)   # + group's crop-only models
     m = AreaTimesConstant()
     with pytest.raises(ValueError, match="calibrate"):                  # no default: camera-dependent
         m.predict({"total_area_px": 100}, "wheat")
@@ -114,3 +114,20 @@ def test_cli(tmp_path, capsys):
     cfg = load_config(w)
     assert cfg["model"] == "area_x_constant" and cfg["area_constants"]["wheat"] > 0 and cfg["constants"]["wheat"] > 0
     assert main(["weight", "predict", "--workdir", w]) == 0
+
+
+def test_crop_only_models_ignore_other_classes():
+    """Group extension: boxes of other classes (e.g. false boxes on a ruler) do not change the estimate."""
+    from detkit.weight import CropCountTimesConstant, CropAreaTimesConstant, SampleTable
+    t = SampleTable()
+    for i in range(6):
+        k = 10 + 5 * i
+        boxes = [{"bbox": [j * 30, 0, j * 30 + 20, 20], "label": "sunflower", "score": 0.9} for j in range(k)]
+        boxes += [{"bbox": [0, 100, 5, 105], "label": "wheat", "score": 0.5}] * 3      # false boxes
+        t.add(f"s{i}.jpg", boxes, {"crop": "sunflower", "total_weight_g": 0.055 * k, "pile_id": f"p{i}"})
+    m = CropCountTimesConstant().fit(t)
+    assert abs(m.constants["sunflower"] - 0.055) < 1e-9
+    e = m.predict(t.rows[0].features, "sunflower")
+    assert abs(e.weight_g - 0.055 * 10) < 1e-9
+    a = CropAreaTimesConstant().fit(t)
+    assert abs(a.predict(t.rows[0].features, "sunflower").weight_g - 0.55) < 1e-9

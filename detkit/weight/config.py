@@ -14,6 +14,8 @@ DEFAULT_CONFIG: dict = {
     "model": "count_x_constant",
     "constants": {"default": 0.04, "wheat": 0.04, "sunflower": 0.05},
     "area_constants": {},
+    "crop_count_constants": {},     # crop_count_x_constant: grams per box of the photo's own crop
+    "crop_area_constants": {},      # crop_area_x_constant: grams per px^2 of the crop's boxes
 }
 
 

@@ -10,10 +10,11 @@ The `TODO(student)` markers show what to implement. Tasks are listed in docs/STU
 
 from .config import load_config, save_config
 from .features import Sample, SampleTable, image_features
-from .models import (MODELS, AreaTimesConstant, CountTimesConstant, Estimate, FeatureTimesConstant,
+from .models import (MODELS, AreaTimesConstant, CountTimesConstant, CropAreaTimesConstant,
+                     CropCountTimesConstant, Estimate, FeatureTimesConstant,
                      WeightModel, get_model)
 from .stats import bootstrap_ci, evaluate_model, learning_curve, propagate
 
 __all__ = ["image_features", "Sample", "SampleTable", "Estimate", "WeightModel", "FeatureTimesConstant",
-           "CountTimesConstant", "AreaTimesConstant", "MODELS", "get_model",
+           "CountTimesConstant", "AreaTimesConstant", "CropCountTimesConstant", "CropAreaTimesConstant", "MODELS", "get_model",
            "evaluate_model", "learning_curve", "bootstrap_ci", "propagate", "load_config", "save_config"]

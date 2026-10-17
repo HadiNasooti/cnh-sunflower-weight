@@ -30,12 +30,17 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from detkit.project import Project                                   # noqa: E402
-from detkit.weight import (AreaTimesConstant, CountTimesConstant, SampleTable, bootstrap_ci,  # noqa: E402
-                           evaluate_model, learning_curve, propagate)
+from detkit.weight import (AreaTimesConstant, CountTimesConstant, CropAreaTimesConstant,  # noqa: E402
+                           CropCountTimesConstant, SampleTable, bootstrap_ci, evaluate_model,
+                           learning_curve, propagate)
+# main models: count / area of the SUNFLOWER boxes only (false boxes on ruler and note ignored);
+# the two course models (all classes) are kept for comparison
+MODEL_SET = ((CropCountTimesConstant, "count_sunflower"), (CropAreaTimesConstant, "area_px_sunflower"),
+             (CountTimesConstant, "count"), (AreaTimesConstant, "total_area_px"))
 from detkit.weight.stats import pile_key, pile_points                # noqa: E402
 
-FEATURES = ["count", "total_area_px", "mean_area_px", "median_area_px", "mean_diag_px",
-            "total_area_mm2", "mean_area_mm2"]
+FEATURES = ["count_sunflower", "area_px_sunflower", "area_mm2_sunflower", "count", "total_area_px",
+            "mean_area_px", "median_area_px", "mean_diag_px", "total_area_mm2", "mean_area_mm2"]
 CROP = "sunflower"
 
 
@@ -175,7 +180,7 @@ def stage_errors(t: SampleTable, lab: dict, model_feature: str, top_rel_sd: floa
         u = max(u_round, u_rep)
         out["balance"] = (u / w_mean, f"max(rounding {u_round:.3f} g, repeat sd {u_rep:.3f} g) "
                                       f"/ mean main weight {w_mean:.1f} g")
-    is_count = model_feature == "count"
+    is_count = model_feature.startswith("count")
     batches = lab.get("seed_batches") or []
     if is_count and len(batches) > 1:
         per_seed = [b["weight_g"] / b["n_seeds"] for b in batches]
@@ -184,7 +189,7 @@ def stage_errors(t: SampleTable, lab: dict, model_feature: str, top_rel_sd: floa
         var_batch = (statistics.stdev(per_seed) / statistics.fmean(per_seed)) ** 2
         var_round = ((res or 0) / math.sqrt(12) / w_b) ** 2
         cv_seed = math.sqrt(max(var_batch - var_round, 0.0) * n_b)
-        n_main = statistics.fmean([s.features["count"] for s in main]) if len(main) else None
+        n_main = statistics.fmean([s.features.get(model_feature, 0) for s in main]) if len(main) else None
         if n_main:
             note = "" if var_batch > var_round else "; batch spread not above rounding"
             out["kernel_weight"] = (cv_seed / math.sqrt(n_main),
@@ -193,7 +198,8 @@ def stage_errors(t: SampleTable, lab: dict, model_feature: str, top_rel_sd: floa
                                     f"/ sqrt(mean count {n_main:.0f}){note}")
     counted = [s for s in t if s.meta.get("manual_count") not in (None, "")]
     if is_count and len(counted) > 1:
-        rel = [(s.features["count"] - float(s.meta["manual_count"])) / float(s.meta["manual_count"]) for s in counted]
+        rel = [(s.features.get(model_feature, 0) - float(s.meta["manual_count"])) / float(s.meta["manual_count"])
+               for s in counted]
         out["detector"] = (statistics.stdev(rel),
                            f"sd of (count - hand count) / hand count on {len(rel)} photos "
                            f"(mean bias {100 * statistics.fmean(rel):+.1f} %, absorbed by the calibration)")
@@ -202,12 +208,12 @@ def stage_errors(t: SampleTable, lab: dict, model_feature: str, top_rel_sd: floa
         if wb["within_pile_rel_sd"] is not None:
             out["photo"] = (wb["within_pile_rel_sd"], f"photo-to-photo spread of {model_feature} within a pile "
                                                       f"({wb['piles_with_repeats']} piles)")
-    if model_feature.endswith("_px") and not is_count:
+    if ("_px" in model_feature) and not is_count:
         sc = [float(s.meta["scale_mm_per_px"]) for s in t if s.meta.get("scale_mm_per_px")]
         if len(sc) > 1:
             out["scale"] = (2 * statistics.stdev(sc) / statistics.fmean(sc),
                             f"2 x relative sd of scale_mm_per_px over {len(sc)} photos (camera distance)")
-    elif model_feature.endswith("mm2") and lab.get("scale_read_rel"):
+    elif ("mm2" in model_feature) and lab.get("scale_read_rel"):
         out["scale"] = (2 * float(lab["scale_read_rel"]), "2 x relative error of reading the ruler")
     if top_rel_sd is not None and out:
         bottom = math.sqrt(sum(v[0] ** 2 for v in out.values()))
@@ -251,7 +257,8 @@ def run(workdir: str, lab_path: str | None, out_dir: str, use: str = "reviewed")
                      f"{r['ratio_mean']:.4g} | {_f(r['ratio_rel_sd'], pct=True)} |")
     # task 2b: learning curve on count and total area
     lines += ["", "### How many piles do we need", ""]
-    for f in ("count", "total_area_mm2" if any(r["feature"] == "total_area_mm2" for r in ft) else "total_area_px"):
+    for f in ("count_sunflower",
+              "area_mm2_sunflower" if any(r["feature"] == "area_mm2_sunflower" for r in ft) else "area_px_sunflower"):
         x, _, _ = pile_points(t, f, crop=CROP)
         sizes = list(range(3, len(x) + 1))
         lc = learning_curve(t, f, sizes=sizes, crop=CROP, repeats=500) or []
@@ -266,7 +273,7 @@ def run(workdir: str, lab_path: str | None, out_dir: str, use: str = "reviewed")
         _plot_lc(lc, f, out / f"learning_curve_{f}.png")
     # task 2c: photos per pile
     wb = [within_between(with_condition(t_all, REPEATS), f)
-          for f in ("count", "total_area_px")]
+          for f in ("count_sunflower", "area_px_sunflower")]
     res["within_between"] = wb
     lines += ["### How many photos of the same pile", "",
               "| feature | piles with repeats | photo-to-photo spread (same pile) | pile-to-pile spread of weight/feature |",
@@ -277,7 +284,7 @@ def run(workdir: str, lab_path: str | None, out_dir: str, use: str = "reviewed")
 
     # calibrate both models + honest errors
     lines += ["", "## Calibrated models", ""]
-    for cls in (CountTimesConstant, AreaTimesConstant):
+    for cls, _ in MODEL_SET:
         m = cls().fit(t)
         ev = evaluate_model(m, t)
         lo = leave_one_pile_out(t, cls)
@@ -293,7 +300,7 @@ def run(workdir: str, lab_path: str | None, out_dir: str, use: str = "reviewed")
 
     # task 3: bottom-up vs top-down
     lines += ["## Task 3: error budget", ""]
-    for cls, feat in ((CountTimesConstant, "count"), (AreaTimesConstant, "total_area_px")):
+    for cls, feat in MODEL_SET[:2]:
         top = res[cls.name]["bounds"].get("rel_sd")
         st = stage_errors(t_all, lab, feat, top_rel_sd=top)
         if not st:
