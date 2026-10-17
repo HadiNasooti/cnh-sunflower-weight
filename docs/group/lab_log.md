@@ -19,3 +19,8 @@ Photos: IMG_4138 B1-40cm, IMG_4139 B1-25cm, IMG_4140 B2-40, IMG_4141 B2-25, IMG_
 40 cm, tile 1500, score 0.38, sunflower only: 202, 206, 203 (+1.8 % mean). 25 cm same settings: 203, 203, 202.
 Decision: camera height 40 cm (fits more seeds), default detector settings, count = sunflower boxes only.
 Cross-check: pilot 25 g / 457 sunflower boxes = 0.0547 g/seed vs batches 11 g / 200 = 0.055 g/seed.
+16:20 Photos cropped to the table area (trousers, floor, hand, other objects removed), turned upright, location data removed; not resized. Crop boxes: data/photos/crop_log_2026-10-17.json. The cropped files replace the originals.
+Detector on cropped photos (tile 1500, score 0.38): pilot apart 460 (sunflower 452), retake 472 (466), touching 310 (308).
+Batches, sunflower boxes: B1-40 205, B2-40 199, B3-40 206, B1-25 206, B2-25 199, B3-25 205 (bias +1.7 %, sd 1.7 %). All boxes: 210, 212, 217, 229, 234, 257.
+Before cropping, B2-40 had 6 sunflower boxes on the trousers at the photo edge, and B3-40 had 1 on the phone at the top. Rule: only the table in the photo.
+Counts also change by a few seeds when the same photo is stored differently (other tile layout), e.g. B1-40: 202 before, 205 after.
