@@ -226,9 +226,8 @@ class CropCountTimesConstant(FeatureTimesConstant):
 
     Why: on our sunflower photos the detector also draws boxes on the ruler digits and on handwriting,
     labelled as other crops. At tile 1500 / score 0.38 (the checkpoint's tiling and the course's best-F1
-    score; this combination was picked on these same 6 photos, so in-sample), counting all boxes
-    over-counted by 5.5-26.5 %; counting only the sunflower boxes was 1.0-3.0 % above the hand count
-    (3 batches of 200 seeds, 2 camera heights). Other tiles behave differently (tile 800: -18..+14 %).
+    score) on our 6 hand-counted batch photos (3 batches of 200 seeds, 2 camera heights), counting all boxes
+    over-counted by 5.0-28.5 %; counting only the sunflower boxes was -0.5 to +3.0 % off.
     Needs the crop of the photo. Note: in a project whose classes are only the crop, the app already
     drops boxes of other labels, so there this model equals count_x_constant; our project keeps all
     six classes, so the false boxes reach the features and this model matters."""

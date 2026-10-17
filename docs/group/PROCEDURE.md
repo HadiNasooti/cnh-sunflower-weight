@@ -27,13 +27,14 @@ the phone is level.
 
 1. **Press TARE right before every weighing.** Without it, the scale read 1 g too high (zero drift, coin test).
 2. **No seed may touch another seed.** With seeds touching, the detector found one third fewer seeds
-   (457 vs 306 sunflower boxes, same 25 g).
+   (452 vs 308 sunflower boxes, same 25 g).
 3. **Camera straight down at 40 cm**, crosshair yellow. At 40 cm the detector counted 200 hand-counted seeds
-   as 202, 206 and 203 (sunflower boxes only).
+   as 205, 199 and 206 (sunflower boxes only).
 4. **Ruler and note in the photo, but at least 3 cm away from the seeds.** The detector puts false boxes on
    ruler digits and handwriting; they are labelled as other crops and are not counted (rule 6), but keeping
    them away from the seeds avoids mixing.
-5. **All seeds, the ruler and the note inside the photo.**
+5. **All seeds, the ruler and the note inside the photo, and nothing else**: no feet, legs, hands, clothes,
+   phones or other objects. The detector put false seed boxes on trousers at the edge of one photo.
 6. **Only boxes labelled `sunflower` are counted** (model `crop_count_x_constant`). This is done by the
    software, nothing to do by hand.
 7. **Keep the seeds as they come**: whole seeds and the small broken hull pieces stay in the sample (a real
