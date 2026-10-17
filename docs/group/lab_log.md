@@ -10,7 +10,7 @@ Conclusion: +1 g came from zero drift (no tare); after tare reading matches nomi
 14:04 IMG_4133 photo 3, seeds pushed together (touching, some may overlap).
 After: seeds back in bowl, weighed 5 times (lift off / put back): 25, 25, 25, 25, 25 g.
 Observation: sample contains broken hull pieces / chaff (brown fragments) besides whole seeds.
-14:20 Detector (tile 1500, score 0.38) on pilot: photo1 482 (sunflower 457, wheat 25), photo2 476 (468/6/2), photo3 touching 324 (306 ...).
+14:20 Detector (tile 1500, score 0.38) on pilot: photo1 482 (sunflower 457, wheat 25), photo2 476 (468/6/2), photo3 touching 324 (sunflower 306, popcorn_corn 10, wheat 6, peanuts 1, pumpkin 1).
 Seed box median ~80x82 px (training sunflower median 110x120 px): seeds look smaller than in training.
 Tile 1000 -> 558 (sunflower 488, popcorn_corn 64); tile 750 -> 620 (sunflower 490, popcorn_corn 115). Ground truth unknown -> batches of 200 needed.
 14:56-15:17 Seed batches, 200 hand-counted whole seeds each (10 groups of 20), bowl tared: B1 = 11 g, B2 = 11 g, B3 = 11 g.

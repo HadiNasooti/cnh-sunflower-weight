@@ -22,8 +22,9 @@ device, unique IDs, collector recorded). Four gaps were closed, mainly because t
 for every stage:
 
 1. **Seed weight variation was in the error list but not measured.** Now measured: 3 batches of exactly
-   200 hand-counted seeds were weighed (all 11 g).
-2. **Detector error "cannot be isolated without a manual count".** The same 3 hand-counted batches give
+   200 hand-counted seeds were weighed (all 11 g, so any difference between batches is smaller than the 1 g
+   scale step).
+2. **Detector error could not be isolated without a manual count of the true number of seeds.** The same 3 hand-counted batches give
    the detector error directly (true count = 200).
 3. **Scale calibration was not concrete.** Now: a steel ruler in every photo and the camera at 40 cm, checked
    with the ruler standing upright.
@@ -61,18 +62,20 @@ Touching seeds: about one third of the seeds are missed. Rule: no seed may touch
 | B2, 25 cm | 221 | +10.5 % | 203 | +1.5 % |
 | B3, 25 cm | 253 | +26.5 % | 202 | +1.0 % |
 
-- The extra boxes sit on the ruler digits and the handwriting, labelled as other crops (corn, wheat, ...).
+- The extra boxes sit on the ruler digits and the handwriting, labelled as other crops (mostly popcorn corn, pumpkin and wheat).
   Counting only the `sunflower` boxes removes them. New weight models were added for this:
   `crop_count_x_constant` and `crop_area_x_constant`.
-- Over 28 combinations of tile size, score threshold and counting mode (`analysis/tune_detector.py`), the
+- Over 84 combinations (4 tile sizes x 7 score thresholds x 3 counting modes) (`analysis/tune_detector.py`), the
   standard setting (tile 1500, score 0.38, sunflower boxes only) has the smallest spread of the count error
   (sd 0.7 %). The mean bias (+1.6 %) is absorbed when the grams-per-seed constant is calibrated. Note: this
   was chosen on these same 6 photos (3 independent batches), so it is an in-sample result.
-- Chosen camera height: **40 cm** (about as accurate as 25 cm, and about twice as many seeds fit in a photo).
+- Chosen camera height: **40 cm** (about as accurate as 25 cm, and the photo covers about 2.5 times the area: (40/25)^2 = 2.56, from geometry, not measured).
 
 **Grams per seed, two independent ways**
 - Batches: 11 g / 200 seeds = 0.055 g per seed.
 - Pilot: 25 g / 457 sunflower boxes = 0.0547 g per seed.
+- Note: the batches were whole seeds only, while the piles keep the broken hull pieces (procedure rule 7),
+  so the two numbers measure slightly different material.
 
 ## 4. Plan and who does what
 
@@ -105,6 +108,7 @@ This is the course repository (`niru-5/manama_data_collection_course`) with our 
 - `analysis/tune_detector.py`: detector settings against hand-counted photos
 - `docs/group/`: this file, the procedure and the lab log
 
-On a Mac: install as in the main `README.md` (Quick start, Linux/macOS), but clone this repository instead
-of the course one. Photos and the model weights are not in the repository (too big). The photos are in a Google Drive folder
+On a Mac: install as in the main `README.md` (Quick start, Linux/macOS), but clone this repository
+(https://github.com/HadiNasooti/cnh-sunflower-weight, private: Hadi adds you as a collaborator) instead of the
+course one. Photos and the model weights are not in the repository (too big). The photos are in a Google Drive folder
 that Hadi shares with you.
