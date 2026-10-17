@@ -3,8 +3,8 @@
 The `TODO(student)` markers show what to implement. Tasks are listed in docs/STUDENT_TASKS.md.
 
     features.py  image_features, Sample, SampleTable   (working)
-    models.py    WeightModel, CountTimesConstant, AreaTimesConstant (working; bounds TODO)
-    stats.py     evaluate_model (working); learning_curve, bootstrap_ci, propagate (TODO)
+    models.py    WeightModel, CountTimesConstant, AreaTimesConstant (working; bounds = 95 % prediction interval)
+    stats.py     evaluate_model (working); learning_curve, bootstrap_ci, propagate (task 2/3, done)
     config.py    load_config / save_config (weight_config.json)
 """
 

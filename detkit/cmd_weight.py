@@ -24,8 +24,14 @@ def configured_model(cfg: dict, name: str):
     """Model *name* with its constants from weight_config.json (models without a config_key: fresh)."""
     from .weight import MODELS, get_model
 
-    key = getattr(MODELS.get(name), "config_key", None)
-    return get_model(name, constants=cfg[key]) if key else get_model(name)
+    cls = MODELS.get(name)
+    key = getattr(cls, "config_key", None)
+    if not key:
+        return get_model(name)
+    bkey = cls.bounds_key() if hasattr(cls, "bounds_key") else None
+    if bkey:                                   # bounds of the prediction interval (task 3), if calibrated
+        return get_model(name, constants=cfg[key], bounds=cfg.get(bkey))
+    return get_model(name, constants=cfg[key])
 
 
 def cmd_predict(a) -> int:
@@ -85,10 +91,20 @@ def cmd_calibrate(a) -> int:
     samples = _samples(a).with_weight()
     model = configured_model(cfg, a.model).fit(samples)
     cfg.update({"model": a.model, model.config_key: model.constants})
+    if hasattr(model, "bounds_key"):
+        cfg[model.bounds_key()] = model.bounds
     p = save_config(a.workdir, cfg)
     print(f"calibrated {a.model} on {len(samples)} weighed photos -> {p} (default model is now {a.model})")
     for k, v in model.constants.items():
-        print(f"  {k:10s} {v:.6g} {model.unit}")
+        b = getattr(model, "bounds", {}).get(k)
+        fitted = any((s.crop or "default") == k for s in samples) or k == "default"
+        extra = (f"   +/- {100 * b['rel_halfwidth']:.1f} % ({100 * b['level']:.0f} % prediction interval, "
+                 f"{b['n_piles']} piles, {b['n_photos']} photos)") if b else (
+                 "   (no bounds: < 3 piles)" if fitted else "   (not calibrated in this run)")
+        print(f"  {k:10s} {v:.6g} {model.unit}{extra}")
+        if b and b["n_piles"] == b["n_photos"] and b["n_photos"] > 1:
+            print(f"  WARNING {k}: as many piles as photos - is pile_id filled in? Photos of one pile are "
+                  f"not independent.")
     return 0
 
 

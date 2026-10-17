@@ -14,7 +14,8 @@ from . import proposals as P
 PHOTO_COLS = ["file", "crop", "total_weight_g"]
 
 TODO_TEXT = (
-    "**Student tasks** - `low_g` / `high_g` (the bounds of each estimate) stay empty until task 3. "
+    "`low_g` / `high_g` = 95 % prediction interval of each estimate (task 3), saved by "
+    "`detkit weight calibrate` (needs >= 3 weighed piles). "
     "Calibrate the constants on your own weighed photos first (`detkit weight calibrate`, task 2). "
     "See `docs/STUDENT_TASKS.md`."
 )

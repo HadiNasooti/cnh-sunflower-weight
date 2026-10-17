@@ -60,8 +60,11 @@ def model_choices() -> list[tuple[str, str]]:
 def load_weight_model(workdir: Path, name: str, cfg: dict) -> W.WeightModel:
     """Model by name; feature x constant models use the (editable) constants of the config; other models
     are restored from ``W/models/<name>.json`` when a student saved one."""
-    key = getattr(W.MODELS.get(name), "config_key", None)
+    cls = W.MODELS.get(name)
+    key = getattr(cls, "config_key", None)
     if key:
+        if hasattr(cls, "bounds_key"):         # prediction-interval bounds saved by `detkit weight calibrate`
+            return W.get_model(name, constants=cfg[key], bounds=cfg.get(cls.bounds_key()))
         return W.get_model(name, constants=cfg[key])
     f = Path(workdir) / SAMPLE_DIR / f"{name}.json"
     return W.WeightModel.load(f) if f.exists() else W.get_model(name)
@@ -185,7 +188,7 @@ def save_samples(project, items: list[dict], proposer: str = "rfdetr") -> list[s
         name = L.import_photos([it["path"]], project.photos_dir)[0]
         with Image.open(project.photos_dir / name) as im:
             size = im.size
-        meta = {k: it["meta"].get(k) for k in ("crop", "total_weight_g")
+        meta = {k: it["meta"].get(k) for k in ("crop", "total_weight_g", "pile_id")
                 if it["meta"].get(k) is not None}
         boxes = [{"bbox": d["bbox"], "class": d["label"], "origin": "rfdetr", "score": d["score"]}
                  for d in it["dets"] if d["label"] in project.classes]
@@ -208,10 +211,11 @@ def save_constants(project, rows) -> str:
         if not c:
             continue
         try:
-            if g not in (None, "") and g == g:
-                cfg["constants"][c] = float(g)
-            if a not in (None, "") and a == a:
-                cfg["area_constants"][c] = float(a)
+            for key, val in (("constants", g), ("area_constants", a)):
+                if val not in (None, "") and val == val:
+                    if cfg[key].get(c) != float(val):          # constant edited by hand: its fitted
+                        cfg.get(f"{key}_bounds", {}).pop(c, None)   # bounds no longer apply
+                    cfg[key][c] = float(val)
         except (TypeError, ValueError):
             return f"Could not read the numbers for '{c}'."
     W.save_config(project.workdir, cfg)
