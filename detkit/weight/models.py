@@ -102,6 +102,10 @@ class FeatureTimesConstant(WeightModel):
         self.constants = dict(DEFAULT_CONFIG[self.config_key] if constants is None else constants)
         self.bounds: dict = {k: dict(v) for k, v in (bounds or {}).items()}
 
+    def feature_value(self, features: dict, crop: str | None):
+        """The feature this model multiplies by its constant (subclasses may make it crop-specific)."""
+        return features.get(self.feature)
+
     @classmethod
     def bounds_key(cls) -> str:
         return f"{cls.config_key}_bounds"
@@ -121,7 +125,7 @@ class FeatureTimesConstant(WeightModel):
         photo_r: dict[str, list[float]] = {}
         pile_r: dict[str, dict[str, list[tuple[float, float]]]] = {}
         for s in samples.with_weight():
-            f = s.features.get(self.feature)
+            f = self.feature_value(s.features, s.crop)
             if not f:
                 continue
             crop = s.crop or "default"
@@ -173,8 +177,9 @@ class FeatureTimesConstant(WeightModel):
                              f"run `detkit weight calibrate --model {self.name}`")
         c = self.constants[crop] if known else self.constants["default"]
         note = "" if known or crop is None else f"no constant for crop {crop!r}, used default"
-        w = features.get(self.feature, 0) * c
-        if not features.get(self.feature):
+        f = self.feature_value(features, crop)
+        w = (f or 0) * c
+        if not f:
             return Estimate(0.0, note=(note + "; " if note else "") + "no detections: no bounds")
         # an unknown crop uses the default constant, which is a guess for that crop: no bounds then
         b = self.bounds.get(crop) if known else None
@@ -211,8 +216,37 @@ class AreaTimesConstant(FeatureTimesConstant):
     config_key = "area_constants"
 
 
+class CropCountTimesConstant(FeatureTimesConstant):
+    """weight = number of boxes labelled as the photo's OWN crop x grams per kernel.
+
+    Why: on our sunflower photos the detector also draws boxes on the ruler digits and on handwriting,
+    labelled as other crops. Counting all boxes over-counted by 6-26 %; counting only the sunflower
+    boxes was within 1-3 % of the hand count (3 batches of 200 seeds). Needs the crop of the photo."""
+    name = "crop_count_x_constant"
+    description = "weight = boxes of the photo's own crop x g/kernel (other classes ignored)"
+    feature = "count_<crop>"
+    unit = "g/kernel"
+    config_key = "crop_count_constants"
+
+    def feature_value(self, features, crop):
+        return features.get(f"count_{crop}") if crop else None
+
+
+class CropAreaTimesConstant(FeatureTimesConstant):
+    """weight = box area of the photo's own crop (px^2) x grams per px^2 (other classes ignored).
+    Same camera-distance caveat as area_x_constant."""
+    name = "crop_area_x_constant"
+    description = "weight = box area of the photo's own crop (px^2) x g/px^2"
+    feature = "area_px_<crop>"
+    unit = "g/px^2"
+    config_key = "crop_area_constants"
+
+    def feature_value(self, features, crop):
+        return features.get(f"area_px_{crop}") if crop else None
+
+
 MODELS: dict[str, type[WeightModel]] = {
-    m.name: m for m in (CountTimesConstant, AreaTimesConstant)
+    m.name: m for m in (CountTimesConstant, AreaTimesConstant, CropCountTimesConstant, CropAreaTimesConstant)
 }
 
 

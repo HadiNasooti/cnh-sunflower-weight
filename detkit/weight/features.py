@@ -15,7 +15,7 @@ def image_features(detections: list[dict], meta: dict | None = None) -> dict:
 
     ``detections``: ``[{"bbox": [x1,y1,x2,y2], "score": .., "label": "wheat"}]`` in source pixels
     (the format of predictions.json; store boxes with ``"class"`` instead of ``"label"`` also work).
-    Keys: count, count_<label>, total_area_px, mean_area_px, median_area_px, mean_diag_px and, when
+    Keys: count, count_<label>, area_px_<label> (box area of that class only), total_area_px, mean_area_px, median_area_px, mean_diag_px and, when
     ``meta["scale_mm_per_px"]`` is set, total_area_mm2, mean_area_mm2. Area = box area (w*h), a proxy
     for the grain's true outline area (a box around a tilted grain over-estimates it).
     """
@@ -29,6 +29,7 @@ def image_features(detections: list[dict], meta: dict | None = None) -> dict:
     out: dict = {"count": len(areas)}
     for lab in sorted({lab for lab in labels if lab}):
         out[f"count_{lab}"] = labels.count(lab)
+        out[f"area_px_{lab}"] = sum(a for a, l in zip(areas, labels) if l == lab)
     out["total_area_px"] = sum(areas)
     out["mean_area_px"] = statistics.fmean(areas) if areas else 0.0
     out["median_area_px"] = statistics.median(areas) if areas else 0.0
@@ -37,6 +38,8 @@ def image_features(detections: list[dict], meta: dict | None = None) -> dict:
     if scale:
         out["total_area_mm2"] = out["total_area_px"] * scale ** 2
         out["mean_area_mm2"] = out["mean_area_px"] * scale ** 2
+        for lab in sorted({lab for lab in labels if lab}):
+            out[f"area_mm2_{lab}"] = out[f"area_px_{lab}"] * scale ** 2
     return out
 
 
