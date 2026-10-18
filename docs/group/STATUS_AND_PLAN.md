@@ -100,17 +100,42 @@ Rule: no seed may touch another.
 | After Monday | Both | Task 4 analysis, report and presentation. Draft by Thu 22 Oct, final Sat 24 Oct, send before the 26 Oct session. |
 | Mon 26 Oct | Both | Presentation and live demo (app on Hadi's laptop over a phone hotspot). |
 
-## 5. Questions for CNH on Monday 19 October
+## 5. Weak spots we found ourselves, and how we close them
+
+| # | Weak spot | Why it matters for the grade | What we do | Who, when |
+|---|---|---|---|---|
+| 1 | Task 4 mixes person, phone and seeds: if Jia's results differ we cannot say why | Lecture "Gauge R and R": repeatability (same person, again) vs reproducibility (other person, same thing) | Mini Gauge R&R on Monday: one small pile, the ruler and the scale; both of us photograph the SAME pile, each with our own phone and with the other's phone (4 photos), and both weigh it | Both, Mon 19 Oct, about 15 min |
+| 2 | The demo phone of CNH may have another resolution (12 MP instead of 24 MP), so seeds have fewer pixels and the count can change | Task 6 is done with their phone; the result must not depend on the phone | (a) Test: shrink our photos to 12 MP and 8 MP and count again; (b) standardise every photo to the same millimetres per pixel before detection (see section 6) | Hadi |
+| 3 | Seed weight spread is only an upper limit: all 3 batches weighed 11 g on a scale with 1 g steps | "Measure the errors": the kernel weight stage in task 3 needs a number, not only a limit | If a 0.01 g scale can be borrowed: weigh about 30 single seeds. If not: say so, and use the pile-to-pile spread (top-down) instead | Hadi or Jia |
+| 4 | No business case on the first slide yet | Lecture starts with "identify the business case": why CNH needs kernel weight (harvest losses, seed planning) | One slide at the start of the presentation | Jia |
+| 5 | No datasheet for our dataset | Lecture "Datasheets for datasets" | One page in `data/`: who collected, how, when, conditions, limits | Hadi |
+| 6 | Possible bias: one bucket of seeds, one table, one light, one person | Lecture "Bias while data collection" | Slide on where the method may not hold (other varieties, piles, other light, other background) | Both |
+| 7 | Scattered seeds only; real samples can be piles | Assignment asks for scattered kernels; still a limit of the method | State the validity range; touching photos (pilot, P03-T, P08-T, P13-T) show how fast it breaks down; piles would need another feature or a retrained detector | Both (report) |
+
+## 6. Making the result independent of the phone (standardised scale)
+
+The detector cuts each photo into tiles and shrinks every tile to the same size before looking at it, so
+what matters is how many pixels one seed covers. That depends on the phone resolution and on the camera
+height. Plan: measure millimetres per pixel in every photo from a reference of known size (ruler, or a
+printed marker that a program can find automatically), then resize every photo to the same millimetres per
+pixel before detection. Then 12 MP, 24 MP and small changes of camera height all give the detector seeds of
+the same pixel size. Resizing can only throw away detail, never add it, so the standard is set at the level
+of an ordinary phone at 40 cm. To be tested on our own photos (original vs shrunk to 12 MP and 8 MP, with
+and without standardising).
+
+## 7. Questions for CNH on Monday 19 October
 
 1. How big is the sample you bring for the demo (task 6), roughly in grams? If it is more than fits in one
    photo with all seeds apart, may it be split over several photos?
 2. Will you photograph with your own phone, at the height our procedure says, with our ruler in the photo?
 3. The deliverables slide says "Github repo with your code (6/10/2026)". Which date is meant, and should
    the repository be shared with you (user names), or made public?
-4. Is it fine that we added two weight models (count and area of the photo's own crop only) and changed two
+4. For the demo: may we give you a printed marker (or our ruler) to put next to the seeds, so that the
+   program can measure millimetres per pixel in your photos?
+5. Is it fine that we added two weight models (count and area of the photo's own crop only) and changed two
    course tests that listed the models?
 
-## 6. Using this repository
+## 8. Using this repository
 
 This is the course repository (`niru-5/manama_data_collection_course`) with our changes on top:
 - `detkit/weight/stats.py`, `detkit/weight/models.py`: tasks 2 and 3
