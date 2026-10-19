@@ -91,6 +91,9 @@ def cmd_calibrate(a) -> int:
 
     cfg = load_config(a.workdir)
     samples = _samples(a).with_weight()
+    if getattr(a, "main_only", False):
+        from .weight import SampleTable              # experiments (touching, re-spread, batches) are not fitted
+        samples = SampleTable([s for s in samples if s.meta.get("condition") in (None, "", "main")])
     no_crop = sum(1 for s in samples if not s.crop)
     if no_crop and a.model.startswith("crop_"):
         print(f"note: {no_crop} weighed photos have no crop and are skipped by {a.model}")
@@ -135,4 +138,7 @@ def register(sub) -> None:
     common(p)
     p.add_argument("--model", default="count_x_constant",
                    choices=["count_x_constant", "area_x_constant", "crop_count_x_constant", "crop_area_x_constant"])
+    p.add_argument("--main-only", action="store_true",
+                   help="fit only photos with condition main (or no condition): leaves out experiments such as "
+                        "touching or re-spread photos")
     p.set_defaults(fn=cmd_calibrate)

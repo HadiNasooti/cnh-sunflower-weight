@@ -8,6 +8,7 @@ from pathlib import Path
 import gradio as gr
 import pandas as pd
 
+from ..scale import DEFAULT_TARGET_MM_PER_PX
 from . import inference as I
 from . import proposals as P
 
@@ -60,13 +61,21 @@ def build_inference_tab(project, wd: Path, ckpt: str | None, device: str) -> Non
         with gr.Column(scale=2):
             ck_dd = gr.Dropdown(choices=cks, value=cks[0] if cks else None, allow_custom_value=True,
                                 label="RF-DETR checkpoint")
-            model_dd = gr.Dropdown(choices=I.model_choices(), value="count_x_constant", label="weight model")
+            model_dd = gr.Dropdown(choices=I.model_choices(), value=I.W.load_config(wd).get("model", "count_x_constant"),
+                                   label="weight model (default: the one saved by `detkit weight calibrate`)")
             with gr.Row():
                 score = gr.Slider(0.05, 0.95, score0, step=0.01, label="score threshold", info=score_note)
                 tile = gr.Slider(200, 1600, d0["tile"], step=50, label="tile (px)")
                 overlap = gr.Slider(0.0, 0.5, d0["overlap"], step=0.05, label="overlap")
             with gr.Row():
-                max_side = gr.Slider(0, 6000, 0, step=100, label="downscale longest side to (0 = off; faster on CPU)")
+                std_on = gr.Checkbox(value=True, label="Fixed scale from the marker sheet",
+                                     info="measure mm per pixel from the printed markers and resize the photo "
+                                          "to the same scale before detection (any phone, any height)")
+                std_mm = gr.Number(value=DEFAULT_TARGET_MM_PER_PX, label="fixed scale (mm per pixel)",
+                                   precision=3)
+            with gr.Row():
+                max_side = gr.Slider(0, 6000, 0, step=100, label="downscale longest side to (0 = off; faster on "
+                                                                 "CPU; ignored with the fixed scale)")
                 roi = gr.Textbox(label="ROI x0,y0,x1,y1 (original px, optional)")
             run_b = gr.Button("Run inference", variant="primary")
     status = gr.Markdown("")
@@ -109,7 +118,8 @@ def build_inference_tab(project, wd: Path, ckpt: str | None, device: str) -> Non
                 paths, per, project, ckpt=d[ck_dd], device=device, score=d[score], tile=int(d[tile]),
                 overlap=float(d[overlap]), max_side=int(d[max_side] or 0), roi_text=d[roi] or "",
                 model_name=d[model_dd], cache=cache,
-                on_photo=lambda i, n, name: progress((i, n), desc=f"detecting {name}", unit="photos"))
+                on_photo=lambda i, n, name: progress((i, n), desc=f"detecting {name}", unit="photos"),
+                std_mm_per_px=float(d[std_mm]) if d[std_on] and d[std_mm] else None)
         except (ValueError, FileNotFoundError, OSError) as e:
             raise gr.Error(str(e))
         csv_path = I.write_results_csv(rows, cache / "results.csv")
@@ -119,7 +129,7 @@ def build_inference_tab(project, wd: Path, ckpt: str | None, device: str) -> Non
         return ovs, _df([[r.get(c) for c in I.RESULT_COLUMNS] for r in rows], I.RESULT_COLUMNS), str(csv_path), \
             msg, its
 
-    run_b.click(run, inputs={files, photo_tbl, ck_dd, score, tile, overlap, max_side, roi, model_dd},
+    run_b.click(run, inputs={files, photo_tbl, ck_dd, score, tile, overlap, max_side, roi, model_dd, std_on, std_mm},
                 outputs=[gallery, res, csv_f, status, items], api_name=False)
 
     def save(its):

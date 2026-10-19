@@ -80,13 +80,29 @@ def dets_from_boxes(boxes: list[dict]) -> list[dict]:
 
 
 def detect_photo(path: Path, bundle, project, *, crop: str | None, score: float, tile: int, overlap: float,
-                 max_side: int = 0, roi_text: str = "") -> list[dict]:
-    """Tiled RF-DETR detections for one photo as ``[{bbox, score, label}]`` (project class names)."""
+                 max_side: int = 0, roi_text: str = "", std_mm_per_px: float | None = None,
+                 scale_info: dict | None = None) -> list[dict]:
+    """Tiled RF-DETR detections for one photo as ``[{bbox, score, label}]`` (project class names), boxes in
+    original photo pixels. ``std_mm_per_px``: resize the photo to this scale (measured from the printed
+    marker sheet, ``detkit/scale.py``) before detection; it replaces ``max_side``. The measured scale is
+    written into ``scale_info`` when a dict is given."""
     with Image.open(path) as im:
         im = im.convert("RGB")
         roi = P.parse_roi(roi_text, im.size)
+        factor = 1.0
+        if std_mm_per_px:
+            from ..scale import standardise
+            im, factor, info = standardise(im, std_mm_per_px)
+            if scale_info is not None:
+                scale_info.update(info)
+            if roi and factor != 1.0:
+                roi = tuple(round(v * factor) for v in roi)
+            max_side = 0
         boxes, _info = P.propose_rfdetr(im, bundle, project.classes, crop or None, score=score, tile=tile,
                                         overlap=overlap, max_side=max_side, roi=roi)
+    if factor != 1.0:
+        from ..scale import boxes_to_original
+        boxes = boxes_to_original(boxes, factor)
     return dets_from_boxes(boxes)
 
 
@@ -149,8 +165,8 @@ def overlay(path: Path, dets: list[dict], classes: list[str], out: Path, maxside
 
 def run_inference(paths: list[Path], per_photo: dict[str, dict], project, *, ckpt: str, device: str,
                   score: float, tile: int, overlap: float, max_side: int, roi_text: str, model_name: str,
-                  cache: Path, on_photo: Callable[[int, int, str], None] | None = None
-                  ) -> tuple[list[dict], list[dict], list[str]]:
+                  cache: Path, on_photo: Callable[[int, int, str], None] | None = None,
+                  std_mm_per_px: float | None = None) -> tuple[list[dict], list[dict], list[str]]:
     """Run all photos. ``per_photo[file] = {crop, total_weight_g}`` (optional). ``on_photo(i, n, name)``
     is called before photo *i* (progress). Returns ``(rows, items, overlay_paths)``; *items* keep the
     detections for Save as samples."""
@@ -163,15 +179,23 @@ def run_inference(paths: list[Path], per_photo: dict[str, dict], project, *, ckp
             on_photo(i, len(paths), p.name)
         meta = {k: v for k, v in (per_photo.get(p.name) or {}).items() if v not in (None, "")}
         crop = meta.get("crop")
+        sc: dict = {}
         try:
             dets = detect_photo(p, bundle, project, crop=crop, score=score, tile=tile, overlap=overlap,
-                                max_side=max_side, roi_text=roi_text)
+                                max_side=max_side, roi_text=roi_text, std_mm_per_px=std_mm_per_px,
+                                scale_info=sc)
         except ValueError as e:                              # e.g. single-class model needs the crop
             rows.append({"file": p.name, "counts": "-", "count": None, "note": str(e)})
             continue
         if not meta.get("crop") and dets and len(project.classes) > 1:
             meta["crop"] = dominant_class(dets)
+        if sc.get("scale_mm_per_px"):                        # boxes are in original pixels: their scale
+            meta.setdefault("scale_mm_per_px", round(sc["scale_mm_per_px"], 5))
         row = estimate_row(p.name, dets, meta, model, cfg)
+        if std_mm_per_px:
+            sn = (f"scale {sc['scale_mm_per_px']:.3f} mm/px, resized x{sc.get('std_factor', 1):.2f}"
+                  if sc.get("scale_mm_per_px") else sc.get("note", ""))
+            row["note"] = "; ".join(v for v in (row.get("note"), sn) if v)
         rows.append(row)
         items.append({"path": str(p), "dets": dets, "meta": meta})
         overlays.append(str(overlay(p, dets, project.classes, Path(cache) / f"{p.stem}_pred.jpg")))
@@ -188,7 +212,7 @@ def save_samples(project, items: list[dict], proposer: str = "rfdetr") -> list[s
         name = L.import_photos([it["path"]], project.photos_dir)[0]
         with Image.open(project.photos_dir / name) as im:
             size = im.size
-        meta = {k: it["meta"].get(k) for k in ("crop", "total_weight_g", "pile_id")
+        meta = {k: it["meta"].get(k) for k in ("crop", "total_weight_g", "pile_id", "scale_mm_per_px")
                 if it["meta"].get(k) is not None}
         boxes = [{"bbox": d["bbox"], "class": d["label"], "origin": "rfdetr", "score": d["score"]}
                  for d in it["dets"] if d["label"] in project.classes]
