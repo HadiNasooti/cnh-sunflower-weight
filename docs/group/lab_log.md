@@ -40,3 +40,7 @@ P01 after standardising: 182 / 185 (was 185 / 164). P08: 462 / 467. Counts per p
 P06 is the largest outlier (0.0574 g per seed): about 7 seeds lying close together not found, and 2 sunflower boxes on the handwritten note.
 Decision: stop at 8 piles (constant rel. standard error 1.5 % with 8 piles, about 1.1 % with 15; prediction interval about +-10.7 %, set by pile-to-pile spread).
 Hadi confirmed the order for P08: normal photos, then touching, then re-spread.
+
+Phone resolution test (same day): main photos shrunk to 12 MP and 8 MP, counted as they are and after resizing to 0.110 mm/px.
+As they are: 12 MP -17.8 % seeds on average (range -33.0 to -7.5 %), 8 MP -42.6 % (-68.1 to -26.1 %), compared with full resolution at 0.110 mm/px.
+After resizing to 0.110 mm/px: 12 MP +0.1 % (-1.9 to +2.2 %), 8 MP +0.2 % (-1.7 to +1.7 %). Counts in analysis/results/2026-10-19_megapixel_test_counts.csv.
