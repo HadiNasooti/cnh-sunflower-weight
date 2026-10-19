@@ -47,7 +47,8 @@ def main():
                 seed_mm.append(m * float(k["scale_mm_per_px"]))
     seed_mm = np.array(seed_mm)
     typical = float(seed_mm.mean())
-    print(f"typical seed length {typical:.2f} mm (sd {seed_mm.std(ddof=1):.2f} mm over {len(seed_mm)} photos with markers)")
+    print(f"median box long side {typical:.2f} mm on average (sd {seed_mm.std(ddof=1):.2f} mm over {len(seed_mm)} photos "
+          f"with markers)")
     for folder in a.folders.split(","):
         rows = []
         for r in samples:
@@ -56,8 +57,8 @@ def main():
             m = median_long_side(preds[r["file"]]["detections"])
             if m:
                 rows.append({"file": r["file"], "scale_mm_per_px": round(typical / m, 5),
-                             "scale_source": f"ESTIMATE from seed size: {typical:.2f} mm typical seed length / "
-                                             f"{m:.1f} px median box length"})
+                             "scale_source": f"ESTIMATE from seed size: {typical:.2f} mm (mean median box long "
+                                             f"side, marker photos) / {m:.1f} px median box long side"})
         out = data / "photos" / folder / "scale.csv"
         with open(out, "w", newline="", encoding="utf-8") as fh:
             w = csv.DictWriter(fh, fieldnames=["file", "scale_mm_per_px", "scale_source"])

@@ -47,7 +47,7 @@ After resizing to 0.110 mm/px: 12 MP +0.1 % (-1.9 to +2.2 %), 8 MP +0.2 % (-1.7 
 
 # Analysis with the fixed scale built in (Mon 19 Oct, evening)
 Fixed scale (0.110 mm/px from the markers) built into `detkit predict` and the app. All 33 seed photos counted this way (analysis/results/main_std).
-Pilot and batch photos (17 Oct) have no markers: scale ESTIMATED from seed size (typical seed length 11.25 mm, sd 0.17 mm over the 24 main photos): batches at 40 cm 0.095 to 0.101 mm/px, at 25 cm 0.062 to 0.073 mm/px.
+Pilot and batch photos (17 Oct) have no markers: scale ESTIMATED from seed size (median long side of the sunflower boxes 11.25 mm on average, sd 0.17 mm over the 24 main photos): batches at 40 cm 0.095 to 0.101 mm/px, at 25 cm 0.062 to 0.073 mm/px.
 Batches at the fixed scale, sunflower boxes: 197, 196, 198, 198, 202, 199 (true 200): mean -0.8 %, sd 1.0 %.
 Main photos at the fixed scale: grams per seed 0.0529, rel sd 4.0 %, photo A vs B 1.2 %. Constant crop_count_x_constant 0.05294 g per seed, 95 % bounds +-10.0 % (8 piles, 16 photos), saved with detkit weight calibrate --main-only.
 Leave one pile out: mean absolute error 3.3 %, 14 of 16 photos inside their bounds = 7 of 8 piles (both P06 photos outside); with 8 piles this test is weak.

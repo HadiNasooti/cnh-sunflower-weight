@@ -83,10 +83,12 @@ def upright_copy(path: Path, folder: Path) -> Path:
     with Image.open(path) as im:
         if im.getexif().get(0x0112, 1) in (None, 1):
             return Path(path)
+        import hashlib
         folder = Path(folder)
         folder.mkdir(parents=True, exist_ok=True)
-        out = folder / Path(path).name
-        ImageOps.exif_transpose(im).convert("RGB").save(out, quality=95)
+        tag = hashlib.sha1(str(Path(path).resolve()).encode()).hexdigest()[:8]
+        out = folder / f"{Path(path).stem}_{tag}.png"           # PNG: no second JPEG compression
+        ImageOps.exif_transpose(im).convert("RGB").save(out)
     return out
 
 
