@@ -2,14 +2,51 @@
   "balance": "kitchen scale, max 3000 g, steps of 1 g",
   "balance_resolution_g": 1,
   "reference_check": [
-    {"items": "2 x 2-euro coins", "nominal_g": 17.0, "reading_g": 18, "tare_just_before": false},
-    {"items": "4 x 1-euro coins", "nominal_g": 30.0, "reading_g": 31, "tare_just_before": false},
-    {"items": "2 x 2-euro + 4 x 1-euro coins", "nominal_g": 47.0, "reading_g": 47, "tare_just_before": true}
+    {
+      "items": "2 x 2-euro coins",
+      "nominal_g": 17.0,
+      "reading_g": 18,
+      "tare_just_before": false
+    },
+    {
+      "items": "4 x 1-euro coins",
+      "nominal_g": 30.0,
+      "reading_g": 31,
+      "tare_just_before": false
+    },
+    {
+      "items": "2 x 2-euro + 4 x 1-euro coins",
+      "nominal_g": 47.0,
+      "reading_g": 47,
+      "tare_just_before": true
+    }
   ],
-  "balance_repeats": {"PILOT-1": [25, 25, 25, 25, 25]},
+  "balance_repeats": {
+    "PILOT-1": [
+      25,
+      25,
+      25,
+      25,
+      25
+    ]
+  },
   "seed_batches": [
-    {"batch": "B1", "n_seeds": 200, "weight_g": 11},
-    {"batch": "B2", "n_seeds": 200, "weight_g": 11},
-    {"batch": "B3", "n_seeds": 200, "weight_g": 11}
-  ]
+    {
+      "batch": "B1",
+      "n_seeds": 200,
+      "weight_g": 11
+    },
+    {
+      "batch": "B2",
+      "n_seeds": 200,
+      "weight_g": 11
+    },
+    {
+      "batch": "B3",
+      "n_seeds": 200,
+      "weight_g": 11
+    }
+  ],
+  "scale_read_rel": 0.0114,
+  "scale_read_rel_how": "main collection 19 Oct: the two 50 mm markers in one photo differ by 2.29 % (root mean square over 19 photos with both markers); the scale is their mean, so its relative error is taken as half of that"
 }

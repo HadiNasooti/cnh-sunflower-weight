@@ -56,9 +56,13 @@ def predict_paths(ckpt: str | Path, inputs: list[str | Path], out_dir: str | Pat
                   tile: int | None = None, overlap: float | None = None, crop=None,
                   score: float = 0.5, device: str | None = None, batch: int = 4,
                   threads: int | None = None, max_side: int | None = None,
-                  overlay: bool = True) -> dict:
+                  overlay: bool = True, std_mm_per_px: float | None = None,
+                  known_scales: dict[str, float] | None = None) -> dict:
     """``max_side`` downscales the photo before tiling (boxes are scaled back; ``tile``/``crop`` are
-    then in downscaled pixels - use it for speed on CPU). ``threads`` sets torch CPU threads."""
+    then in downscaled pixels - use it for speed on CPU). ``threads`` sets torch CPU threads.
+    ``std_mm_per_px`` resizes every photo to this many mm per pixel, measured from the printed marker sheet
+    (``detkit/scale.py``), before tiling; it replaces ``max_side``. ``known_scales`` = {file name: mm per pixel}
+    for photos without markers (e.g. measured from a ruler). Boxes are always in original pixels."""
     import torch
 
     if threads:
@@ -79,7 +83,11 @@ def predict_paths(ckpt: str | Path, inputs: list[str | Path], out_dir: str | Pat
             im = im.convert("RGB")
             orig_size = im.size
             work = im
-            if max_side and max(im.size) > max_side:
+            info: dict = {}
+            if std_mm_per_px:
+                from .scale import standardise
+                work, _f, info = standardise(im, std_mm_per_px, (known_scales or {}).get(f.name))
+            elif max_side and max(im.size) > max_side:
                 k = max_side / max(im.size)
                 work = im.resize((round(im.width * k), round(im.height * k)), Image.LANCZOS)
             dets = predict_image(work, model, proc, device, tile=tile, overlap=overlap,
@@ -95,6 +103,12 @@ def predict_paths(ckpt: str | Path, inputs: list[str | Path], out_dir: str | Pat
                            width=max(3, round(max(im.size) / 250)), maxside=1600, names=names)
         result[f.name] = {"count": len(dets), "per_class": dict(Counter(d["label"] for d in dets)),
                           "detections": dets}
-        print(f"{f.name}: {len(dets)} {dict(Counter(d['label'] for d in dets))}", flush=True)
+        if std_mm_per_px:
+            result[f.name].update({"scale_mm_per_px": info.get("scale_mm_per_px"),
+                                   "std_factor": info.get("std_factor"), "scale_note": info.get("note", "")})
+        print(f"{f.name}: {len(dets)} {dict(Counter(d['label'] for d in dets))}"
+              + ((f"  scale {info['scale_mm_per_px']:.4f} mm/px" if info.get("scale_mm_per_px")
+                  else f"  {info.get('note', '')}") if std_mm_per_px else ""),
+              flush=True)
     (out_dir / "predictions.json").write_text(json.dumps(result, indent=1), encoding="utf-8")
     return result

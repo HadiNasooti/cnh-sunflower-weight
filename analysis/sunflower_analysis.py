@@ -33,9 +33,27 @@ from detkit.project import Project                                   # noqa: E40
 from detkit.weight import (AreaTimesConstant, CountTimesConstant, CropAreaTimesConstant,  # noqa: E402
                            CropCountTimesConstant, SampleTable, bootstrap_ci, evaluate_model,
                            learning_curve, propagate)
-# main models: count / area of the SUNFLOWER boxes only (false boxes on ruler and note ignored);
-# the two course models (all classes) are kept for comparison
-MODEL_SET = ((CropCountTimesConstant, "count_sunflower"), (CropAreaTimesConstant, "area_px_sunflower"),
+
+
+class CropAreaMm2TimesConstant(CropAreaTimesConstant):
+    """Analysis only: weight = box area of the photo's own crop in mm^2 (needs scale_mm_per_px) x g/mm^2.
+    With the scale measured from the markers, the area no longer depends on the camera distance."""
+    name = "crop_area_mm2_x_constant"
+    description = "weight = box area of the photo's own crop (mm^2) x g/mm^2"
+    feature = "area_mm2_<crop>"
+    unit = "g/mm^2"
+    config_key = "crop_area_mm2_constants"
+
+    def feature_value(self, features, crop):
+        return features.get(f"area_mm2_{crop}") if crop else None
+
+    def __init__(self, constants=None, bounds=None):
+        super().__init__(constants={} if constants is None else constants, bounds=bounds)
+
+
+# main models: count / area (mm^2) of the SUNFLOWER boxes only (false boxes on ruler and note ignored);
+# the two course models (all classes, area in px^2) are kept for comparison
+MODEL_SET = ((CropCountTimesConstant, "count_sunflower"), (CropAreaMm2TimesConstant, "area_mm2_sunflower"),
              (CountTimesConstant, "count"), (AreaTimesConstant, "total_area_px"))
 from detkit.weight.stats import pile_key, pile_points                # noqa: E402
 
@@ -214,7 +232,7 @@ def stage_errors(t: SampleTable, lab: dict, model_feature: str, top_rel_sd: floa
             out["scale"] = (2 * statistics.stdev(sc) / statistics.fmean(sc),
                             f"2 x relative sd of scale_mm_per_px over {len(sc)} photos (camera distance)")
     elif ("mm2" in model_feature) and lab.get("scale_read_rel"):
-        out["scale"] = (2 * float(lab["scale_read_rel"]), "2 x relative error of reading the ruler")
+        out["scale"] = (2 * float(lab["scale_read_rel"]), "2 x relative error of the scale from the markers (lab: scale_read_rel)")
     if top_rel_sd is not None and out:
         bottom = math.sqrt(sum(v[0] ** 2 for v in out.values()))
         if top_rel_sd > bottom:
@@ -273,7 +291,7 @@ def run(workdir: str, lab_path: str | None, out_dir: str, use: str = "reviewed")
         _plot_lc(lc, f, out / f"learning_curve_{f}.png")
     # task 2c: photos per pile
     wb = [within_between(with_condition(t_all, REPEATS), f)
-          for f in ("count_sunflower", "area_px_sunflower")]
+          for f in ("count_sunflower", "area_mm2_sunflower")]
     res["within_between"] = wb
     lines += ["### How many photos of the same pile", "",
               "| feature | piles with repeats | photo-to-photo spread (same pile) | pile-to-pile spread of weight/feature |",

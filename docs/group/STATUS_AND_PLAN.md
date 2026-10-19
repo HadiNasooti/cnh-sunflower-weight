@@ -7,11 +7,11 @@ Last update: Monday 19 October 2026. CNH Data Collection module, KU Leuven MAIBI
 | Task | Status |
 |---|---|
 | 1. Plan the data collection | Jia's plan reviewed; pilot done; procedure written: [`PROCEDURE.md`](PROCEDURE.md); main collection done (8 piles, 19 Oct) |
-| 2. Feature + number of samples (code) | Code done (`learning_curve`, `bootstrap_ci`); main data in; full analysis run still to do |
-| 3. Bounds + error propagation (code) | Code done (`low_g`/`high_g`, `propagate`); main data in; full analysis run still to do |
+| 2. Feature + number of samples (code) | Done: count of sunflower boxes, 8 piles enough (section 3c) |
+| 3. Bounds + error propagation (code) | Done: +-10.0 % bounds, error budget (section 3c) |
 | 4. Team-mate repeats the procedure | Jia, after Monday, with her own 150 g of unused seeds |
 | 5. Report / presentation | To start after the main data (send before 26 Oct) |
-| 6. Demo with CNH | App runs on Hadi's laptop; procedure for CNH in `PROCEDURE.md` |
+| 6. Demo with CNH | App with fixed scale and calibrated constant ready; Hadi's laptop to be updated (`3_UPDATE_double_click.bat`); procedure version 2 in `PROCEDURE.md` |
 
 All 72 tests pass, including the course self-check `tests/test_student_tasks.py` (6 of 6).
 
@@ -110,26 +110,83 @@ photo: `analysis/results/2026-10-19_standardisation_counts.csv`.
 | Photos as taken | 0.0542 | 5.9 % | +0.63 | 3.0 % |
 | Resized to 0.110 mm/px | 0.0530 | 4.2 % | +0.12 | 1.6 % |
 | Resized to 0.135 mm/px | 0.0566 | 4.8 % | +0.12 | 2.5 % |
+| Fixed scale 0.110 mm/px inside the program (final) | 0.0529 | 4.0 % | +0.04 | 1.2 % |
 
 Resizing to 0.110 mm/px removes the height effect and halves the A vs B difference. 0.135 mm/px also removes
 the correlation, but the seeds are smaller in pixels and the detector misses more of them. Chosen standard:
 **0.110 mm/px**; photos taken from higher up (or with a phone with fewer pixels) are enlarged to it.
 
-After standardising (pile level, mean of photos A and B, 8 piles), computed in Python:
-- Grams per seed: relative sd between piles 4.3 %, no trend with pile weight (r = -0.10).
-- Constant (grams per seed): relative standard error 1.5 % with 8 piles; with 15 piles and the same spread
-  it would be about 1.1 %.
-- 95 % prediction interval for one new pile: about +-10.7 % (t with 7 degrees of freedom).
-- The spread that is left comes from the detector (example: P06, 0.0574 g per seed, about 7 seeds lying close
+The fixed scale is now built into the program (`detkit predict --std-mm-per-px 0.110` and the app, section 6):
+the photo is resized in memory and the boxes are mapped back to the original pixels. Counted this way (the
+way the app counts, `analysis/results/main_std/`), the main photos give: grams per seed 0.0529 on average,
+relative sd 4.0 %, correlation with mm/px +0.04, mean difference photo A vs B 1.2 %. These counts differ by a
+few seeds from the test copies above (other resizing and no extra JPEG step); the numbers below use them.
+
+Pile level (mean of photos A and B, 8 piles), computed in Python:
+- Grams per seed per pile: 0.0506 to 0.0572; relative sd between piles 4.0 %; no trend with pile weight
+  (r = -0.08).
+- Constant (grams per seed): relative standard error 1.4 % with 8 piles; with 15 piles and the same spread
+  it would be about 1.0 %.
+- 95 % prediction interval for one new photo: +-10.0 % (the bounds the app shows; t with 7 degrees of
+  freedom).
+- The spread that is left comes from the detector (example: P06, 0.0572 g per seed, about 7 seeds lying close
   together not found, and 2 `sunflower` boxes on the handwritten note) and from the scale rounding (0.29 g,
   which is 2.9 % of 10 g and 1.2 % of 24 g).
-- Re-spread photos now agree with the main photos (P03: 273/276 vs 278/274; P08: 459/460 vs 462/467).
-- Touching seeds: P03 218/231 and P08 377/383 instead of about 276 and 465, so about 18 to 19 % fewer.
+- Re-spread photos agree with the main photos (P03: 275/276 vs 277/273; P08: 458/464 vs 464/468).
+- Touching seeds: P03 223/232 and P08 389/389 instead of 275 and 466 (mean of A and B), so 17 % fewer.
 
 **Decision (19 Oct): 8 piles are enough for tasks 2 and 3.** More piles taken the same way would mainly shrink
-the error of the constant from 1.5 % to about 1.1 %, while the error for one new sample (about +-10.7 %) is
-set by the pile-to-pile spread, which more piles do not reduce. The validity range of the result is 10 to
-24 g; if the CNH demo sample is larger, it is split over several photos (question 1 for CNH).
+the error of the constant from 1.4 % to about 1.0 %, while the error for one new sample (+-10.0 %) is set by
+the pile-to-pile spread, which more piles do not reduce. The validity range of the result is 10 to 24 g; if
+the CNH demo sample is larger, it is split over several photos (question 1 for CNH).
+
+## 3c. Tasks 2 and 3: results (19 October)
+
+Full output: [`analysis/results/main_std/results.md`](../../analysis/results/main_std/results.md) (tables)
+and the plots in the same folder. Made with `analysis/build_project.py`, `detkit predict --std-mm-per-px 0.110`
+and `analysis/sunflower_analysis.py --use predictions` (commands at the top of `build_project.py`). The pilot
+and batch photos of 17 Oct have no markers; their scale was **estimated** from the seed size
+(`analysis/estimate_scale_from_seeds.py`: typical seed length 11.25 mm, sd 0.17 mm over the 24 main photos).
+
+**Task 2, which feature** (pile level, 8 piles; r = correlation with the weight, 95 % cluster bootstrap):
+
+| Feature | r | r 95 % CI | Spread of weight / feature |
+|---|---|---|---|
+| count of all boxes | 0.990 | 0.950 .. 0.999 | 3.7 % |
+| count of sunflower boxes | 0.989 | 0.945 .. 0.999 | 4.0 % |
+| box area of sunflower boxes, mm^2 | 0.985 | 0.930 .. 0.999 | 5.4 % |
+| box area of sunflower boxes, px^2 | 0.900 | 0.635 .. 0.990 | 11.6 % |
+| mean box area, px^2 | -0.271 | -0.984 .. 0.753 | 35.7 % |
+
+Chosen: **count of sunflower boxes** (`crop_count_x_constant`, 0.05294 g per seed, +-10.0 %). Counting all
+boxes is as good here (the confidence intervals overlap almost fully), but at the fixed scale it still gave 1 to 6 extra boxes of other
+classes per batch photo (0.5 to 3 %); counting only sunflower boxes is safer when the
+demo photo has other objects in it. Area in px^2 is poor because it changes with the camera height; in mm^2
+(scale from the markers) it is good but still behind the count.
+
+**Task 2, how many samples**: the constant's relative sd over random subsets of n piles (learning curve) falls
+from 2.2 % (3 piles) to 1.3 % (8 piles), and r stays above 0.98 from 5 piles on. **Photos per pile**: two
+photos of the same pile differ by 1.0 % (count), while piles differ by 4.0 %, so one photo per sample is
+enough for the demo and a second photo adds little.
+
+**Honest error** (leave one pile out: fit on 7 piles, predict the 8th, for every pile): mean absolute error
+3.3 %; 14 of the 16 held-out photos (87.5 %) fall inside their 95 % bounds. With 16 photos from 8 piles this
+is close to the 95 % aimed at, but it is a small test.
+
+**Task 3, error budget** (count model, at the mean pile weight of 17 g; relative standard errors):
+
+| Stage | Relative error | Share of variance | How measured |
+|---|---|---|---|
+| Balance | 1.7 % | 18 % | 1 g steps: 0.29 g / 17 g; 5 repeated weighings gave no spread |
+| Seed weight (200 seeds) | below the scale resolution | 0 % | 3 batches of 200 seeds all 11 g: smaller than the 1 g step can show |
+| Detector | 1.0 % | 7 % | 6 hand-counted photos (200 seeds each), at the fixed scale: 196 to 202, mean -0.8 % |
+| Not explained by the stages above | 3.4 % | 75 % | sqrt(4.0^2 - 1.7^2 - 1.0^2): seeds close together missed, pile-to-pile differences in seed mix |
+| **Total (top-down)** | **4.0 %** | | spread of weight / count over the main photos |
+
+The biggest part is not explained by the measured stages. What we know about it: the detector misses seeds
+lying close together (P06), and piles may differ in the share of broken hull pieces (rule 7 of the procedure
+keeps them). A scale with 0.01 g steps would show whether single seed weights differ more than the 1 g scale
+can see.
 
 ## 4. Plan and who does what (updated 19 Oct)
 
@@ -140,9 +197,10 @@ code for tasks 2 and 3.
 | When | What |
 |---|---|
 | Mon 19 Oct (done) | 12 MP / 8 MP test: with the fixed scale, counts stay within about 2 % (section 6) |
-| Tue 20 to Wed 21 Oct | Full task 2 and 3 analysis on the standardised photos: best feature, learning curve, bootstrap confidence interval, bounds, error budget |
-| Tue 20 to Wed 21 Oct | Standardising built into the app, so the demo photo is resized automatically; new constant and bounds saved in the app |
-| Wed 21 Oct | `PROCEDURE.md` version 2: marker sheet instead of ruler, no handwritten note near the seeds, height check from the marker |
+| Mon 19 Oct (done) | Full task 2 and 3 analysis on the standardised photos (section 3c) |
+| Mon 19 Oct (done) | Fixed scale built into the app and `detkit predict`; constant and bounds calibrated (`analysis/results/main_std/weight_config.json`) |
+| Before Wed 21 Oct | Hadi: double-click `03_Assignment/setup/3_UPDATE_double_click.bat` on the laptop, then test the app with one photo |
+| Mon 19 Oct (done) | `PROCEDURE.md` version 2 and `data/DATASHEET.md` |
 | Optional | If a 0.01 g scale can be borrowed: weigh about 30 single seeds (seed weight spread for task 3) |
 
 **Jia**
@@ -193,8 +251,10 @@ printed marker that a program can find automatically), then resize every photo t
 pixel before detection. Then 12 MP, 24 MP and small changes of camera height all give the detector seeds of
 the same pixel size. Tested on the main collection (section 3b): standard 0.110 mm/px. Because the detector finds
 more seeds when they are bigger in pixels, photos are also enlarged to this standard when needed (enlarging
-adds no detail). Code: `tools/measure_scale.py --images DIR --standardise OUT --target 0.110`. Still to do:
-the same test on our photos shrunk to 12 MP and 8 MP.
+adds no detail). Code: `detkit/scale.py`, used by `detkit predict --std-mm-per-px 0.110` and by the app
+(Inference tab, "Fixed scale from the marker sheet", on by default; the row note shows the measured scale or
+"no marker found"). Photos without markers can get a scale measured another way (`--scale-csv`). The
+stand-alone tool `tools/measure_scale.py` writes the scale of a folder of photos to a CSV.
 
 **Phone resolution test (19 Oct).** The 24 main photos were shrunk to 12 MP and to 8 MP (as a phone with
 fewer pixels would take them) and counted, once as they are and once after resizing to 0.110 mm/px. Counts
