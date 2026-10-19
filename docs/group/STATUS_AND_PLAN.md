@@ -1,14 +1,14 @@
 # Status and plan: sunflower group (Hadi Nasooti, Jia)
 
-Last update: Saturday 17 October 2026. CNH Data Collection module, KU Leuven MAIBI.
+Last update: Monday 19 October 2026. CNH Data Collection module, KU Leuven MAIBI.
 
 ## 1. Where we are
 
 | Task | Status |
 |---|---|
-| 1. Plan the data collection | Jia's plan reviewed; pilot done; procedure written: [`PROCEDURE.md`](PROCEDURE.md) |
-| 2. Feature + number of samples (code) | Code done (`learning_curve`, `bootstrap_ci`); waiting for the main data |
-| 3. Bounds + error propagation (code) | Code done (`low_g`/`high_g`, `propagate`); waiting for the main data |
+| 1. Plan the data collection | Jia's plan reviewed; pilot done; procedure written: [`PROCEDURE.md`](PROCEDURE.md); main collection done (8 piles, 19 Oct) |
+| 2. Feature + number of samples (code) | Code done (`learning_curve`, `bootstrap_ci`); main data in; full analysis run still to do |
+| 3. Bounds + error propagation (code) | Code done (`low_g`/`high_g`, `propagate`); main data in; full analysis run still to do |
 | 4. Team-mate repeats the procedure | Jia, after Monday, with her own 150 g of unused seeds |
 | 5. Report / presentation | To start after the main data (send before 26 Oct) |
 | 6. Demo with CNH | App runs on Hadi's laptop; procedure for CNH in `PROCEDURE.md` |
@@ -88,11 +88,54 @@ Rule: no seed may touch another.
 - Note: the batches were whole seeds only, while the piles keep the broken hull pieces (procedure rule 7),
   so the two numbers measure slightly different material.
 
+## 3b. Main collection (19 October, Hadi)
+
+Piles P01 to P08 (10 to 24 g, 2 g steps), 2 photos each, plus re-spread (R) and touching (T) photos for P03
+and P08: 24 photos in `data/photos/2026-10-19_main/`. Daylight, marker sheet in every photo. Each pile weighed
+its target weight. P09 to P15 (26 to 38 g) were **not** collected; see the decision below.
+
+**Scale from the markers** (`tools/measure_scale.py`, result in `data/photos/2026-10-19_main/scale.csv`):
+0.106 to 0.136 mm per pixel, so the camera height was not constant (roughly 36 to 46 cm; estimate from the
+marker, not measured). The two markers in one photo differ by up to 3.6 %, so the phone was sometimes tilted.
+
+**Effect of the camera height**: on the photos as taken, grams per seed varies 5.9 % (relative sd, 16 main
+photos) and is correlated with mm per pixel (r = +0.63): photos taken from higher up miss seeds. Example: P01
+photo A 185 seeds at 0.108 mm/px, photo B 164 seeds at 0.134 mm/px.
+
+**Standardised scale** (every photo resized to the same mm per pixel before detection, section 6). Counts per
+photo: `analysis/results/2026-10-19_standardisation_counts.csv`.
+
+| Detector input | Grams per seed (mean) | Relative sd (16 photos) | Correlation with mm/px | Mean difference photo A vs B |
+|---|---|---|---|---|
+| Photos as taken | 0.0542 | 5.9 % | +0.63 | 3.0 % |
+| Resized to 0.110 mm/px | 0.0530 | 4.2 % | +0.12 | 1.6 % |
+| Resized to 0.135 mm/px | 0.0566 | 4.8 % | +0.12 | 2.5 % |
+
+Resizing to 0.110 mm/px removes the height effect and halves the A vs B difference. 0.135 mm/px also removes
+the correlation, but the seeds are smaller in pixels and the detector misses more of them. Chosen standard:
+**0.110 mm/px**; photos taken from higher up (or with a phone with fewer pixels) are enlarged to it.
+
+After standardising (pile level, mean of photos A and B, 8 piles), computed in Python:
+- Grams per seed: relative sd between piles 4.3 %, no trend with pile weight (r = -0.10).
+- Constant (grams per seed): relative standard error 1.5 % with 8 piles; with 15 piles and the same spread
+  it would be about 1.1 %.
+- 95 % prediction interval for one new pile: about +-10.7 % (t with 7 degrees of freedom).
+- The spread that is left comes from the detector (example: P06, 0.0574 g per seed, about 7 seeds lying close
+  together not found, and 2 `sunflower` boxes on the handwritten note) and from the scale rounding (0.29 g,
+  which is 2.9 % of 10 g and 1.2 % of 24 g).
+- Re-spread photos now agree with the main photos (P03: 273/276 vs 278/274; P08: 459/460 vs 462/467).
+- Touching seeds: P03 218/231 and P08 377/383 instead of about 276 and 465, so about 18 to 19 % fewer.
+
+**Decision (19 Oct): 8 piles are enough for tasks 2 and 3.** More piles taken the same way would mainly shrink
+the error of the constant from 1.5 % to about 1.1 %, while the error for one new sample (about +-10.7 %) is
+set by the pile-to-pile spread, which more piles do not reduce. The validity range of the result is 10 to
+24 g; if the CNH demo sample is larger, it is split over several photos (question 1 for CNH).
+
 ## 4. Plan and who does what
 
 | When | Who | What |
 |---|---|---|
-| Sun 18 Oct | Hadi | Main collection: 15 piles from 10 to 38 g (2 g steps), 2 photos each at 40 cm; extra re-spread (R) and touching (T) photos for P03, P08, P13. Then run the task 2 and 3 analysis. |
+| Mon 19 Oct (done) | Hadi | Main collection: 8 piles from 10 to 24 g (2 g steps), 2 photos each at 40 cm; extra re-spread (R) and touching (T) photos for P03 and P08 (section 3b). Next: run the task 2 and 3 analysis on the standardised photos. |
 | Sun 18 Oct | Jia | Read `PROCEDURE.md` and note every step that is unclear or that you would do differently (that is part of task 4). Clone this repository on your Mac (see below). |
 | Mon 19 Oct, 15:00-15:30 | Both | Online meeting: go through the first results and the questions for CNH. |
 | Mon 19 Oct, evening | Both | CNH session: questions (below). Hadi brings Jia's jar with 150 g of unused seeds. |
@@ -105,7 +148,7 @@ Rule: no seed may touch another.
 | # | Weak spot | Why it matters for the grade | What we do | Who, when |
 |---|---|---|---|---|
 | 1 | Task 4 mixes person, phone and seeds: if Jia's results differ we cannot say why | Lecture "Gauge R and R": repeatability (same person, again) vs reproducibility (other person, same thing) | Mini Gauge R&R on Monday: one small pile, the ruler and the scale; both of us photograph the SAME pile, each with our own phone and with the other's phone (4 photos), and both weigh it | Both, Mon 19 Oct, about 15 min |
-| 2 | The demo phone of CNH may have another resolution (12 MP instead of 24 MP), so seeds have fewer pixels and the count can change | Task 6 is done with their phone; the result must not depend on the phone | (a) Test: shrink our photos to 12 MP and 8 MP and count again; (b) standardise every photo to the same millimetres per pixel before detection (see section 6) | Hadi |
+| 2 | The demo phone of CNH may have another resolution (12 MP instead of 24 MP), so seeds have fewer pixels and the count can change | Task 6 is done with their phone; the result must not depend on the phone | (a) Test: shrink our photos to 12 MP and 8 MP and count again; (b) standardise every photo to the same millimetres per pixel before detection (see section 6). Done for the height effect (section 3b); 12 MP / 8 MP test running | Hadi |
 | 3 | Seed weight spread is only an upper limit: all 3 batches weighed 11 g on a scale with 1 g steps | "Measure the errors": the kernel weight stage in task 3 needs a number, not only a limit | If a 0.01 g scale can be borrowed: weigh about 30 single seeds. If not: say so, and use the pile-to-pile spread (top-down) instead | Hadi or Jia |
 | 4 | No business case on the first slide yet | Lecture starts with "identify the business case": why CNH needs kernel weight (harvest losses, seed planning) | One slide at the start of the presentation | Jia |
 | 5 | No datasheet for our dataset | Lecture "Datasheets for datasets" | One page in `data/`: who collected, how, when, conditions, limits | Hadi |
@@ -119,9 +162,10 @@ what matters is how many pixels one seed covers. That depends on the phone resol
 height. Plan: measure millimetres per pixel in every photo from a reference of known size (ruler, or a
 printed marker that a program can find automatically), then resize every photo to the same millimetres per
 pixel before detection. Then 12 MP, 24 MP and small changes of camera height all give the detector seeds of
-the same pixel size. Resizing can only throw away detail, never add it, so the standard is set at the level
-of an ordinary phone at 40 cm. To be tested on our own photos (original vs shrunk to 12 MP and 8 MP, with
-and without standardising).
+the same pixel size. Tested on the main collection (section 3b): standard 0.110 mm/px. Because the detector finds
+more seeds when they are bigger in pixels, photos are also enlarged to this standard when needed (enlarging
+adds no detail). Code: `tools/measure_scale.py --images DIR --standardise OUT --target 0.110`. Still to do:
+the same test on our photos shrunk to 12 MP and 8 MP.
 
 ## 7. Questions for CNH on Monday 19 October
 

@@ -32,3 +32,11 @@ Most photos were cropped on the phone before upload; 4165/4166 (P06) showed knee
 Printed ArUco marker (50 mm) found automatically in all 24 photos. Scale ranged from 0.106 to 0.136 mm per pixel, so the camera height varied (roughly 36 to 46 cm if 0.12 mm/px is 40 cm; estimate, not measured). The two markers in one photo differ by up to 3 %, a sign of a slightly tilted phone.
 Detector (tile 1500, score 0.38), sunflower boxes, main photos: grams per seed 0.0500 to 0.0610, mean 0.0542, relative sd 5.9 % (16 photos). The count falls about 4 % for every +0.01 mm/px (correlation -0.63): photos taken from higher up miss seeds. Example: P01 photo A 185 seeds at 0.108 mm/px, photo B 164 at 0.134 mm/px.
 Touching: P03 226/220 vs 278/274 apart; P08 363/364 vs 437/424 apart. Re-spread: P03 272/259, P08 466/446.
+
+Standardised scale test (same day): every photo resized to 0.110 mm per pixel (`tools/measure_scale.py`), then counted again.
+Grams per seed relative sd 5.9 % -> 4.2 %, correlation with mm/px +0.63 -> +0.12, mean photo A vs B difference 3.0 % -> 1.6 %.
+Resized to 0.135 mm/px instead: 4.8 %, +0.12, 2.5 % (seeds smaller in pixels, more missed). Standard chosen: 0.110 mm/px.
+P01 after standardising: 182 / 185 (was 185 / 164). P08: 462 / 467. Counts per photo in analysis/results/2026-10-19_standardisation_counts.csv.
+P06 is the largest outlier (0.0574 g per seed): about 7 seeds lying close together not found, and 2 sunflower boxes on the handwritten note.
+Decision: stop at 8 piles (constant rel. standard error 1.5 % with 8 piles, about 1.1 % with 15; prediction interval about +-10.7 %, set by pile-to-pile spread).
+Hadi confirmed the order for P08: normal photos, then touching, then re-spread.
