@@ -131,17 +131,44 @@ the error of the constant from 1.5 % to about 1.1 %, while the error for one new
 set by the pile-to-pile spread, which more piles do not reduce. The validity range of the result is 10 to
 24 g; if the CNH demo sample is larger, it is split over several photos (question 1 for CNH).
 
-## 4. Plan and who does what
+## 4. Plan and who does what (updated 19 Oct)
 
-| When | Who | What |
-|---|---|---|
-| Mon 19 Oct (done) | Hadi | Main collection: 8 piles from 10 to 24 g (2 g steps), 2 photos each at 40 cm; extra re-spread (R) and touching (T) photos for P03 and P08 (section 3b). Next: run the task 2 and 3 analysis on the standardised photos. |
-| Sun 18 Oct | Jia | Read `PROCEDURE.md` and note every step that is unclear or that you would do differently (that is part of task 4). Clone this repository on your Mac (see below). |
-| Mon 19 Oct, 15:00-15:30 | Both | Online meeting: go through the first results and the questions for CNH. |
-| Mon 19 Oct, evening | Both | CNH session: questions (below). Hadi brings Jia's jar with 150 g of unused seeds. |
-| After Monday | Jia | Task 4: collect a small new sample with your own seeds, following only `PROCEDURE.md` (for example 5 piles of 10, 15, 20, 25 and 30 g, 2 photos each). Write down the phone model. |
-| After Monday | Both | Task 4 analysis, report and presentation. Draft by Thu 22 Oct, final Sat 24 Oct, send before the 26 Oct session. |
-| Mon 26 Oct | Both | Presentation and live demo (app on Hadi's laptop over a phone hotspot). |
+**Done:** pilot, scale checks, hand-counted batches, main collection (8 piles), standardised scale (section 3b),
+code for tasks 2 and 3.
+
+**Hadi**
+| When | What |
+|---|---|
+| Mon 19 Oct | 12 MP / 8 MP test (does a phone with fewer pixels still work after standardising?) |
+| Tue 20 to Wed 21 Oct | Full task 2 and 3 analysis on the standardised photos: best feature, learning curve, bootstrap confidence interval, bounds, error budget |
+| Tue 20 to Wed 21 Oct | Standardising built into the app, so the demo photo is resized automatically; new constant and bounds saved in the app |
+| Wed 21 Oct | `PROCEDURE.md` version 2: marker sheet instead of ruler, no handwritten note near the seeds, height check from the marker |
+| Optional | If a 0.01 g scale can be borrowed: weigh about 30 single seeds (seed weight spread for task 3) |
+
+**Jia**
+| When | What |
+|---|---|
+| Before Mon 19 Oct evening | Read `PROCEDURE.md`; write down every step that is unclear (part of task 4) |
+| Tue 20 to Thu 22 Oct | Task 4: with the jar of unused seeds, a printed marker sheet (print at 100 %, check the 100 mm line) and a kitchen scale, collect 4 piles of 10, 14, 18 and 22 g, 2 photos each, following only `PROCEDURE.md`. Write down phone model, light, any problem. Upload to `data/photos/<date>_task4/` plus lines in `data/samples.csv` |
+| Thu 22 Oct | Business case slide (why CNH needs seed weight) and first draft of the presentation |
+
+**Together**
+| When | What |
+|---|---|
+| Mon 19 Oct, CNH session | Mini Gauge R&R (section 5, row 1) and the questions in section 7 |
+| Thu 22 Oct | Draft presentation complete; Hadi adds tasks 2, 3 and 6 results, Jia tasks 1, 4 and the business case |
+| Sat 24 Oct | Final version; send to CNH before the 26 Oct session |
+| Sun 25 Oct | Demo rehearsal: one of us acts as CNH and follows the procedure with a phone that was not used before |
+| Mon 26 Oct | Presentation and live demo |
+
+**Mini Gauge R&R** (lecture: repeatability = same person, same tool, again; reproducibility = other person or
+other tool). One pile of about 16 g on white paper, marker sheet next to it, no seed touching.
+1. Hadi weighs the pile (TARE first), Jia weighs it again. Write both readings.
+2. Hadi takes 2 photos with his phone, then 2 with Jia's phone (move away and come back between photos).
+3. Jia does the same: 2 with her phone, 2 with Hadi's phone. Do not touch the seeds in between.
+4. Result: 8 photos of the same seeds. Differences between photos of the same person and phone show
+   repeatability; between persons and between phones show reproducibility. Same seeds, so the true count is
+   the same in all 8.
 
 ## 5. Weak spots we found ourselves, and how we close them
 
@@ -169,14 +196,18 @@ the same test on our photos shrunk to 12 MP and 8 MP.
 
 ## 7. Questions for CNH on Monday 19 October
 
-1. How big is the sample you bring for the demo (task 6), roughly in grams? If it is more than fits in one
-   photo with all seeds apart, may it be split over several photos?
-2. Will you photograph with your own phone, at the height our procedure says, with our ruler in the photo?
-3. The deliverables slide says "Github repo with your code (6/10/2026)". Which date is meant, and should
-   the repository be shared with you (user names), or made public?
-4. For the demo: may we give you a printed marker (or our ruler) to put next to the seeds, so that the
-   program can measure millimetres per pixel in your photos?
-5. Is it fine that we added two weight models (count and area of the photo's own crop only) and changed two
+1. Demo (task 6): how big is the sample you bring, roughly in grams? Our method is tested for 10 to 24 g per
+   photo. May a bigger sample be split over several photos?
+2. Which phone will you use (model or megapixels)? Is it fine that you put our printed marker sheet next to
+   the seeds, on white paper, so the program can measure the scale in your photo?
+3. Is it allowed to resize the photo to a fixed scale before detection (we do not retrain the detector)?
+4. Number of samples (task 2): is it fine that we decide it from our own learning curve and stopped at 8
+   piles, or do you expect a minimum?
+5. Task 4: is a small repeat by the team mate plus a mini Gauge R&R on one pile what you expect?
+6. Presentation: how long, and is a slide deck enough or do you also want a report or notebook?
+7. GitHub: the slide says "Github repo with your code (6/10/2026)". Which date is meant, and should we add
+   you as collaborators (user names) or make the repository public?
+8. Is it fine that we added two weight models (count and area of the photo's own crop only) and changed two
    course tests that listed the models?
 
 ## 8. Using this repository
