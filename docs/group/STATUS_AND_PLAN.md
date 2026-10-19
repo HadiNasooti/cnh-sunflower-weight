@@ -139,7 +139,7 @@ code for tasks 2 and 3.
 **Hadi**
 | When | What |
 |---|---|
-| Mon 19 Oct | 12 MP / 8 MP test (does a phone with fewer pixels still work after standardising?) |
+| Mon 19 Oct (done) | 12 MP / 8 MP test: with the fixed scale, counts stay within about 2 % (section 6) |
 | Tue 20 to Wed 21 Oct | Full task 2 and 3 analysis on the standardised photos: best feature, learning curve, bootstrap confidence interval, bounds, error budget |
 | Tue 20 to Wed 21 Oct | Standardising built into the app, so the demo photo is resized automatically; new constant and bounds saved in the app |
 | Wed 21 Oct | `PROCEDURE.md` version 2: marker sheet instead of ruler, no handwritten note near the seeds, height check from the marker |
@@ -175,7 +175,7 @@ other tool). One pile of about 16 g on white paper, marker sheet next to it, no 
 | # | Weak spot | Why it matters for the grade | What we do | Who, when |
 |---|---|---|---|---|
 | 1 | Task 4 mixes person, phone and seeds: if Jia's results differ we cannot say why | Lecture "Gauge R and R": repeatability (same person, again) vs reproducibility (other person, same thing) | Mini Gauge R&R on Monday: one small pile, the ruler and the scale; both of us photograph the SAME pile, each with our own phone and with the other's phone (4 photos), and both weigh it | Both, Mon 19 Oct, about 15 min |
-| 2 | The demo phone of CNH may have another resolution (12 MP instead of 24 MP), so seeds have fewer pixels and the count can change | Task 6 is done with their phone; the result must not depend on the phone | (a) Test: shrink our photos to 12 MP and 8 MP and count again; (b) standardise every photo to the same millimetres per pixel before detection (see section 6). Done for the height effect (section 3b); 12 MP / 8 MP test running | Hadi |
+| 2 | The demo phone of CNH may have another resolution (12 MP instead of 24 MP), so seeds have fewer pixels and the count can change | Task 6 is done with their phone; the result must not depend on the phone | (a) Test: shrink our photos to 12 MP and 8 MP and count again; (b) standardise every photo to the same millimetres per pixel before detection (see section 6). Done: height effect (section 3b) and 12 MP / 8 MP test (section 6) | Hadi |
 | 3 | Seed weight spread is only an upper limit: all 3 batches weighed 11 g on a scale with 1 g steps | "Measure the errors": the kernel weight stage in task 3 needs a number, not only a limit | If a 0.01 g scale can be borrowed: weigh about 30 single seeds. If not: say so, and use the pile-to-pile spread (top-down) instead | Hadi or Jia |
 | 4 | No business case on the first slide yet | Lecture starts with "identify the business case": why CNH needs kernel weight (harvest losses, seed planning) | One slide at the start of the presentation | Jia |
 | 5 | No datasheet for our dataset | Lecture "Datasheets for datasets" | One page in `data/`: who collected, how, when, conditions, limits | Hadi |
@@ -193,6 +193,22 @@ the same pixel size. Tested on the main collection (section 3b): standard 0.110 
 more seeds when they are bigger in pixels, photos are also enlarged to this standard when needed (enlarging
 adds no detail). Code: `tools/measure_scale.py --images DIR --standardise OUT --target 0.110`. Still to do:
 the same test on our photos shrunk to 12 MP and 8 MP.
+
+**Phone resolution test (19 Oct).** The 24 main photos were shrunk to 12 MP and to 8 MP (as a phone with
+fewer pixels would take them) and counted, once as they are and once after resizing to 0.110 mm/px. Counts
+compared with the full-resolution photos resized to 0.110 mm/px (16 main photos;
+`analysis/results/2026-10-19_megapixel_test_counts.csv`):
+
+| Detector input | Mean count difference | Range | Grams per seed relative sd |
+|---|---|---|---|
+| 12 MP, as it is | -17.8 % | -33.0 to -7.5 % | 9.6 % |
+| 12 MP, resized to 0.110 mm/px | +0.1 % | -1.9 to +2.2 % | 3.6 % |
+| 8 MP, as it is | -42.6 % | -68.1 to -26.1 % | 25.4 % |
+| 8 MP, resized to 0.110 mm/px | +0.2 % | -1.7 to +1.7 % | 3.7 % |
+
+Without the fixed scale, a phone with fewer pixels misses many seeds. With it, the count stays within about
+2 % of the full-resolution count. The markers were still found at 8 MP (in 19 of 24 photos both markers, in
+5 one marker). This is the main reason the demo with CNH's phone must use the fixed scale.
 
 ## 7. Questions for CNH on Monday 19 October
 
