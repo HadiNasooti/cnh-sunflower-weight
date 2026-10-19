@@ -161,7 +161,9 @@ code for tasks 2 and 3.
 | Sun 25 Oct | Demo rehearsal: one of us acts as CNH and follows the procedure with a phone that was not used before |
 | Mon 26 Oct | Presentation and live demo |
 
-**Mini Gauge R&R** (lecture: repeatability = same person, same tool, again; reproducibility = other person or
+**Mini Gauge R&R** (Jia: iPhone 14, main camera 12 MP; Hadi: iPhone 15 Pro, 24 MP photos. The phone is one of
+the factors we want to measure, and every person uses both phones, so the phone effect and the person effect can
+be separated. The 12 MP test in section 6 shows the fixed scale keeps the count within about 2 %.) (lecture: repeatability = same person, same tool, again; reproducibility = other person or
 other tool). One pile of about 16 g on white paper, marker sheet next to it, no seed touching.
 1. Hadi weighs the pile (TARE first), Jia weighs it again. Write both readings.
 2. Hadi takes 2 photos with his phone, then 2 with Jia's phone (move away and come back between photos).
@@ -219,11 +221,17 @@ Without the fixed scale, a phone with fewer pixels misses many seeds. With it, t
 3. Is it allowed to resize the photo to a fixed scale before detection (we do not retrain the detector)?
 4. Number of samples (task 2): is it fine that we decide it from our own learning curve and stopped at 8
    piles, or do you expect a minimum?
-5. Task 4: is a small repeat by the team mate plus a mini Gauge R&R on one pile what you expect?
-6. Presentation: how long, and is a slide deck enough or do you also want a report or notebook?
-7. GitHub: the slide says "Github repo with your code (6/10/2026)". Which date is meant, and should we add
+5. Task 4 (Jia): should the team mate repeat the full data collection with new piles, or is a smaller
+   independent replication enough? And what does "independent" mean for you: another person only, or also
+   another phone and other seeds?
+6. Task 4 (Jia): we plan to compare measured weight, predicted weight and prediction error between our
+   collection and the replication, check how many of the replication's true weights fall inside our 95 %
+   bounds, compare the grams per seed of both, and add a mini Gauge R&R (2 persons x 2 phones x 2 photos of one
+   pile). Is that enough, or do you expect more statistical analysis?
+7. Presentation: how long, and is a slide deck enough or do you also want a report or notebook?
+8. GitHub: the slide says "Github repo with your code (6/10/2026)". Which date is meant, and should we add
    you as collaborators (user names) or make the repository public?
-8. Is it fine that we added two weight models (count and area of the photo's own crop only) and changed two
+9. Is it fine that we added two weight models (count and area of the photo's own crop only) and changed two
    course tests that listed the models?
 
 ## 8. Using this repository
