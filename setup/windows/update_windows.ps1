@@ -22,24 +22,48 @@ if (-not (Test-Path (Join-Path $Repo "pyproject.toml"))) {
     Write-Host "ERROR: the toolkit is not installed yet. Run 1_SETUP_double_click.bat first." -ForegroundColor Red
     $Ok = $false
 } else {
+    Write-Host "Close the app window (2_START_APP) before updating." -ForegroundColor Yellow
     Step "1. Copy our code from Google Drive"
     $Code = Join-Path $Assign "code"
-    Get-ChildItem -Path $Code -Recurse -File | Where-Object { $_.Name -ne "weight_config.json" } | ForEach-Object {
-        $rel = $_.FullName.Substring($Code.Length + 1)
-        $dst = Join-Path $Repo $rel
-        New-Item -ItemType Directory -Force -Path (Split-Path $dst) | Out-Null
-        Copy-Item $_.FullName $dst -Force
-        Write-Host "copied $rel"
+    $n = 0
+    if (-not (Test-Path $Code)) {
+        Write-Host "ERROR: folder $Code not found (is Google Drive synced?)" -ForegroundColor Red
+        $Ok = $false
+    } else {
+        Get-ChildItem -Path $Code -Recurse -File | Where-Object { $_.Name -ne "weight_config.json" } | ForEach-Object {
+            $rel = $_.FullName.Substring($Code.Length + 1)
+            $dst = Join-Path $Repo $rel
+            try {
+                New-Item -ItemType Directory -Force -Path (Split-Path $dst) -ErrorAction Stop | Out-Null
+                Copy-Item $_.FullName $dst -Force -ErrorAction Stop
+                Write-Host "copied $rel"
+                $n++
+            } catch {
+                Write-Host "ERROR copying $rel : $_" -ForegroundColor Red
+                $script:Ok = $false
+            }
+        }
+        Write-Host "$n files copied"
+        if ($n -eq 0) { Write-Host "ERROR: nothing was copied" -ForegroundColor Red; $Ok = $false }
     }
 
     Step "2. Calibrated weight constants"
     $W = Join-Path $Repo "runs\sunflower"
+    New-Item -ItemType Directory -Force -Path $W | Out-Null
     $Cfg = Join-Path $Code "weight_config.json"
     if (Test-Path $Cfg) {
         $Old = Join-Path $W "weight_config.json"
-        if (Test-Path $Old) { Copy-Item $Old (Join-Path $W "weight_config_before_update.json") -Force }
-        Copy-Item $Cfg $Old -Force
-        Get-Content $Old | Write-Host
+        try {
+            if (Test-Path $Old) { Copy-Item $Old (Join-Path $W "weight_config_before_update.json") -Force -ErrorAction Stop }
+            Copy-Item $Cfg $Old -Force -ErrorAction Stop
+            Get-Content $Old | Write-Host
+        } catch {
+            Write-Host "ERROR copying weight_config.json : $_" -ForegroundColor Red
+            $Ok = $false
+        }
+    } else {
+        Write-Host "ERROR: $Cfg not found" -ForegroundColor Red
+        $Ok = $false
     }
 
     Step "3. Tests"

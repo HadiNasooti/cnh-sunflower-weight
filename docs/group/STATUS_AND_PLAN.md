@@ -13,7 +13,7 @@ Last update: Monday 19 October 2026. CNH Data Collection module, KU Leuven MAIBI
 | 5. Report / presentation | To start after the main data (send before 26 Oct) |
 | 6. Demo with CNH | App with fixed scale and calibrated constant ready; Hadi's laptop to be updated (`3_UPDATE_double_click.bat`); procedure version 2 in `PROCEDURE.md` |
 
-All 72 tests pass, including the course self-check `tests/test_student_tasks.py` (6 of 6).
+All 81 tests pass, including the course self-check `tests/test_student_tasks.py` (6 of 6).
 
 ## 2. What changed compared to Jia's Task 1 plan
 
@@ -26,8 +26,9 @@ for every stage:
    scale step).
 2. **Detector error could not be isolated without a manual count of the true number of seeds.** The same 3 hand-counted batches give
    the detector error directly (true count = 200).
-3. **Scale calibration was not concrete.** Now: a steel ruler in every photo and the camera at 40 cm, checked
-   with the ruler standing upright.
+3. **Scale calibration was not concrete.** Pilot (17 Oct): a steel ruler in every photo and the camera at
+   40 cm, checked with the ruler standing upright. From the main collection on (19 Oct): a printed marker
+   sheet in every photo, from which the program measures the scale itself (section 6).
 4. **Task 6 (CNH takes the photos with their own phone) was not covered.** The procedure is now written so an
    outsider can follow it.
 
@@ -77,7 +78,8 @@ Rule: no seed may touch another.
   the sunflower-only count is always much better than counting all boxes. Between tile sizes and thresholds
   the differences are small (sd of the error 0.8 to 1.8 %), and the best combination changed between the
   original and the cropped photos. With only 3 independent batches we cannot really tell them apart, so we
-  keep the standard setting (tile 1500, score 0.38, the course default and the app default): bias +1.7 %,
+  keep the standard setting (tile 1500, score 0.38, the best-F1 score of the course model; since 19 Oct it is
+  saved with the calibrated constant and used as the app default): bias +1.7 %,
   sd 1.7 % over the 6 photos. The bias is absorbed when the grams-per-seed constant is calibrated.
 - Chosen camera height: **40 cm** (about as accurate as 25 cm: mean error +1.7 % at both heights, and the
   photo covers about 2.5 times the area: (40/25)^2 = 2.56, from geometry, not measured).
@@ -92,11 +94,13 @@ Rule: no seed may touch another.
 
 Piles P01 to P08 (10 to 24 g, 2 g steps), 2 photos each, plus re-spread (R) and touching (T) photos for P03
 and P08: 24 photos in `data/photos/2026-10-19_main/`. Daylight, marker sheet in every photo. Each pile weighed
-its target weight. P09 to P15 (26 to 38 g) were **not** collected; see the decision below.
+its target weight, as reported by Hadi (the filled-in checklist with the before and after readings is still
+to be photographed and added). P09 to P15 (26 to 38 g) were **not** collected; see the decision below.
 
 **Scale from the markers** (`tools/measure_scale.py`, result in `data/photos/2026-10-19_main/scale.csv`):
-0.106 to 0.136 mm per pixel, so the camera height was not constant (roughly 36 to 46 cm; estimate from the
-marker, not measured). The two markers in one photo differ by up to 3.6 %, so the phone was sometimes tilted.
+0.106 to 0.134 mm per pixel per photo. The scale grows in proportion to the camera height, so the height
+varied by about 26 % between the lowest and the highest photo (the height itself was not measured). The two
+markers in one photo differ by up to 3.6 %, so the phone was sometimes a little tilted.
 
 **Effect of the camera height**: on the photos as taken, grams per seed varies 5.9 % (relative sd, 16 main
 photos) and is correlated with mm per pixel (r = +0.63): photos taken from higher up miss seeds. Example: P01
@@ -127,28 +131,41 @@ Pile level (mean of photos A and B, 8 piles), computed in Python:
   (r = -0.08).
 - Constant (grams per seed): relative standard error 1.4 % with 8 piles; with 15 piles and the same spread
   it would be about 1.0 %.
-- 95 % prediction interval for one new photo: +-10.0 % (the bounds the app shows; t with 7 degrees of
-  freedom).
-- The spread that is left comes from the detector (example: P06, 0.0572 g per seed, about 7 seeds lying close
-  together not found, and 2 `sunflower` boxes on the handwritten note) and from the scale rounding (0.29 g,
-  which is 2.9 % of 10 g and 1.2 % of 24 g).
+- 95 % prediction interval for one new photo: +-10.0 % (the bounds the app shows). A prediction interval is
+  the range in which the true weight of a NEW sample should fall 19 times out of 20. It uses the t
+  distribution with 7 degrees of freedom (8 piles minus 1), which widens the range because the spread is
+  estimated from few piles.
+- P06 is the clearest outlier: 0.0572 g per seed. With the fitted constant, 20 g should be about 378 seeds;
+  the detector found 352 and 347, so about 7.5 % fewer. About 7 seeds lying close together are visibly not
+  found and 2 `sunflower` boxes sit on the handwritten note, which together explain only about 1 to 2 %. The rest is not
+  explained; a weighing error is possible (the readings are reported, not yet written down, see above).
 - Re-spread photos agree with the main photos (P03: 275/276 vs 277/273; P08: 458/464 vs 464/468).
 - Touching seeds: P03 223/232 and P08 389/389 instead of 275 and 466 (mean of A and B), so 17 % fewer.
 
-**Decision (19 Oct): 8 piles are enough for tasks 2 and 3.** More piles taken the same way would mainly shrink
-the error of the constant from 1.4 % to about 1.0 %, while the error for one new sample (+-10.0 %) is set by
-the pile-to-pile spread, which more piles do not reduce. The validity range of the result is 10 to 24 g; if
-the CNH demo sample is larger, it is split over several photos (question 1 for CNH).
+**Decision on the number of piles (19 Oct, reworded after review).** 8 piles give a usable first constant
+(0.05294 g per seed, standard error 1.4 %). But the +-10.0 % is itself uncertain: it rests on a spread
+estimated from only 8 piles, and with 8 piles the true spread could be about 0.66 to 2.0 times the estimate,
+so the true half-width could be roughly 7 to 20 % (95 % confidence, chi-square, computed in Python). More
+piles DO help: with 15 piles and the same spread the interval would be about +-8.8 % and its own
+uncertainty much smaller (0.73 to 1.58 times). Two limits stay: the range is 10 to 24 g, not the planned 10 to
+38 g, and the bound covers one seed lot, one person and one phone. Options: (a) keep 8 piles and state these
+limits clearly; (b) add P09 to P15 (26 to 38 g, about 1 to 1.5 hours) to firm up the bound and cover larger
+samples. To be decided by Hadi.
 
 ## 3c. Tasks 2 and 3: results (19 October)
 
 Full output: [`analysis/results/main_std/results.md`](../../analysis/results/main_std/results.md) (tables)
-and the plots in the same folder. Made with `analysis/build_project.py`, `detkit predict --std-mm-per-px 0.110`
-and `analysis/sunflower_analysis.py --use predictions` (commands at the top of `build_project.py`). The pilot
-and batch photos of 17 Oct have no markers; their scale was **estimated** from the seed size
-(`analysis/estimate_scale_from_seeds.py`: typical seed length 11.25 mm, sd 0.17 mm over the 24 main photos).
+and the plots in the same folder. The exact commands, in order, are at the top of `analysis/build_project.py`;
+running them again gives the same counts. The pilot and batch photos of 17 Oct have no markers; their scale
+was **estimated** from the size of the seed boxes (`analysis/estimate_scale_from_seeds.py`: median long side
+of the sunflower boxes, 11.25 mm on average, sd 0.17 mm, over the 24 main photos).
 
-**Task 2, which feature** (pile level, 8 piles; r = correlation with the weight, 95 % cluster bootstrap):
+Words used below: **r** = correlation (1 = a perfect straight line). **Cluster bootstrap** = we draw whole
+piles at random many times and recompute, so photos of one pile always stay together. **Top-down** = the
+total spread we see in the data; **bottom-up** = the separate stages added up. **Root sum of squares** = how
+independent errors add up: sqrt(a^2 + b^2 + ...).
+
+**Task 2, which feature** (pile level, 8 piles; 95 % cluster bootstrap):
 
 | Feature | r | r 95 % CI | Spread of weight / feature |
 |---|---|---|---|
@@ -159,34 +176,36 @@ and batch photos of 17 Oct have no markers; their scale was **estimated** from t
 | mean box area, px^2 | -0.271 | -0.984 .. 0.753 | 35.7 % |
 
 Chosen: **count of sunflower boxes** (`crop_count_x_constant`, 0.05294 g per seed, +-10.0 %). Counting all
-boxes is as good here (the confidence intervals overlap almost fully), but at the fixed scale it still gave 1 to 6 extra boxes of other
-classes per batch photo (0.5 to 3 %); counting only sunflower boxes is safer when the
-demo photo has other objects in it. Area in px^2 is poor because it changes with the camera height; in mm^2
-(scale from the markers) it is good but still behind the count.
+boxes is as good here (the confidence intervals overlap almost fully), but at the fixed scale it still gave 1
+to 6 extra boxes of other classes per batch photo (0.5 to 3 %); counting only sunflower boxes is safer when
+the demo photo has other objects in it. Area in px^2 is poor because it changes with the camera height; in
+mm^2 (scale from the markers) it is good but still behind the count. The high r values partly come from the
+wide weight range (10 to 24 g); the spread column is the better guide.
 
-**Task 2, how many samples**: the constant's relative sd over random subsets of n piles (learning curve) falls
-from 2.2 % (3 piles) to 1.3 % (8 piles), and r stays above 0.98 from 5 piles on. **Photos per pile**: two
-photos of the same pile differ by 1.0 % (count), while piles differ by 4.0 %, so one photo per sample is
-enough for the demo and a second photo adds little.
+**Task 2, how many samples**: in the learning curve (bootstrap draws of n piles) the relative sd of the
+constant falls from 2.2 % (3 piles) to 1.3 % (8 piles); this follows about 1/sqrt(n), as expected. See the
+decision in section 3b. **Photos per pile**: two photos of the same pile differ by 1.0 % (count), while piles
+differ by 4.0 %, so one photo per sample is enough for the demo and a second photo adds little.
 
 **Honest error** (leave one pile out: fit on 7 piles, predict the 8th, for every pile): mean absolute error
-3.3 %; 14 of the 16 held-out photos (87.5 %) fall inside their 95 % bounds. With 16 photos from 8 piles this
-is close to the 95 % aimed at, but it is a small test.
+3.3 %. 7 of the 8 piles fall inside their 95 % bounds (both photos of P06 fall outside). With only 8 piles
+this test is weak: even if the bounds were exactly right, 7 or fewer of 8 would happen about 1 time in 3.
 
 **Task 3, error budget** (count model, at the mean pile weight of 17 g; relative standard errors):
 
 | Stage | Relative error | Share of variance | How measured |
 |---|---|---|---|
-| Balance | 1.7 % | 18 % | 1 g steps: 0.29 g / 17 g; 5 repeated weighings gave no spread |
-| Seed weight (200 seeds) | below the scale resolution | 0 % | 3 batches of 200 seeds all 11 g: smaller than the 1 g step can show |
-| Detector | 1.0 % | 7 % | 6 hand-counted photos (200 seeds each), at the fixed scale: 196 to 202, mean -0.8 % |
-| Not explained by the stages above | 3.4 % | 75 % | sqrt(4.0^2 - 1.7^2 - 1.0^2): seeds close together missed, pile-to-pile differences in seed mix |
+| Balance | 1.7 % | 18 % | 1 g steps: 0.29 g / 17 g (2.9 % at 10 g, 1.2 % at 24 g); 5 repeated weighings gave no spread |
+| Seed weight (200 seeds) | not measurable | - | 3 batches of 200 seeds all 11 g: the 1 g scale cannot show their difference |
+| Detector | 1.0 % | 7 % | 3 hand-counted batches of 200 seeds, 2 photos each (scale estimated from seed size): 196 to 202, mean -0.8 % |
+| Not explained by the stages above | 3.4 % | 75 % | sqrt(4.0^2 - 1.7^2 - 1.0^2) |
 | **Total (top-down)** | **4.0 %** | | spread of weight / count over the main photos |
 
-The biggest part is not explained by the measured stages. What we know about it: the detector misses seeds
-lying close together (P06), and piles may differ in the share of broken hull pieces (rule 7 of the procedure
-keeps them). A scale with 0.01 g steps would show whether single seed weights differ more than the 1 g scale
-can see.
+The biggest part is not explained by the measured stages. Possible causes, not measured: seed-to-seed
+weight differences (the 1 g scale cannot show them), seeds lying close together missed by the detector (P06),
+and piles differing in the share of broken hull pieces (procedure rule 7 keeps them). A scale with 0.01 g
+steps would show the first one. Note that the balance error is not a fixed percentage (larger for small
+piles), while the prediction interval treats the spread as one percentage for all weights.
 
 ## 4. Plan and who does what (updated 19 Oct)
 
@@ -234,13 +253,13 @@ other tool). One pile of about 16 g on white paper, marker sheet next to it, no 
 
 | # | Weak spot | Why it matters for the grade | What we do | Who, when |
 |---|---|---|---|---|
-| 1 | Task 4 mixes person, phone and seeds: if Jia's results differ we cannot say why | Lecture "Gauge R and R": repeatability (same person, again) vs reproducibility (other person, same thing) | Mini Gauge R&R on Monday: one small pile, the ruler and the scale; both of us photograph the SAME pile, each with our own phone and with the other's phone (4 photos), and both weigh it | Both, Mon 19 Oct, about 15 min |
+| 1 | Task 4 mixes person, phone and seeds: if Jia's results differ we cannot say why | Lecture "Gauge R and R": repeatability (same person, again) vs reproducibility (other person, same thing) | Mini Gauge R&R on Monday (steps in section 4): one pile of about 16 g with the marker sheet; each of us takes 2 photos with each phone (8 photos of the SAME seeds), and both weigh it | Both, Mon 19 Oct, about 15 min |
 | 2 | The demo phone of CNH may have another resolution (12 MP instead of 24 MP), so seeds have fewer pixels and the count can change | Task 6 is done with their phone; the result must not depend on the phone | (a) Test: shrink our photos to 12 MP and 8 MP and count again; (b) standardise every photo to the same millimetres per pixel before detection (see section 6). Done: height effect (section 3b) and 12 MP / 8 MP test (section 6) | Hadi |
-| 3 | Seed weight spread is only an upper limit: all 3 batches weighed 11 g on a scale with 1 g steps | "Measure the errors": the kernel weight stage in task 3 needs a number, not only a limit | If a 0.01 g scale can be borrowed: weigh about 30 single seeds. If not: say so, and use the pile-to-pile spread (top-down) instead | Hadi or Jia |
+| 3 | Seed weight spread is not measured: all 3 batches weighed 11 g on a scale with 1 g steps | "Measure the errors": the kernel weight stage in task 3 needs a number; now it is listed as "not measurable" and may be part of the unexplained 3.4 % | If a 0.01 g scale can be borrowed: weigh about 30 single seeds. If not: say so, and use the pile-to-pile spread (top-down) instead | Hadi or Jia |
 | 4 | No business case on the first slide yet | Lecture starts with "identify the business case": why CNH needs kernel weight (harvest losses, seed planning) | One slide at the start of the presentation | Jia |
-| 5 | No datasheet for our dataset | Lecture "Datasheets for datasets" | One page in `data/`: who collected, how, when, conditions, limits | Hadi |
+| 5 | No datasheet for our dataset | Lecture "Datasheets for datasets" | Done: `data/DATASHEET.md` | Hadi |
 | 6 | Possible bias: one bucket of seeds, one table, one light, one person | Lecture "Bias while data collection" | Slide on where the method may not hold (other varieties, piles, other light, other background) | Both |
-| 7 | Scattered seeds only; real samples can be piles | Assignment asks for scattered kernels; still a limit of the method | State the validity range; touching photos (pilot, P03-T, P08-T, P13-T) show how fast it breaks down; piles would need another feature or a retrained detector | Both (report) |
+| 7 | Scattered seeds only; real samples can be piles | Assignment asks for scattered kernels; still a limit of the method | State the validity range; touching photos (pilot, P03-T, P08-T) show how fast it breaks down; piles would need another feature or a retrained detector | Both (report) |
 
 ## 6. Making the result independent of the phone (standardised scale)
 

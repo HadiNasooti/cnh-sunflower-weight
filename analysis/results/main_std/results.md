@@ -21,7 +21,7 @@ Pile level (photos of one pile averaged). r = Pearson correlation with the weigh
 
 ### How many piles do we need
 
-**count_sunflower**: spread of the fitted constant (weight / count_sunflower) over random subsets of n piles.
+**count_sunflower**: spread of the fitted constant (weight / count_sunflower) over bootstrap draws of n piles (with replacement).
 
 | n piles | constant mean | constant rel. sd | r mean | r 2.5 % |
 |---|---|---|---|---|
@@ -32,7 +32,7 @@ Pile level (photos of one pile averaged). r = Pearson correlation with the weigh
 | 7 | 0.05294 | 1.4 % | 0.986 | 0.950 |
 | 8 | 0.053 | 1.3 % | 0.987 | 0.948 |
 
-**area_mm2_sunflower**: spread of the fitted constant (weight / area_mm2_sunflower) over random subsets of n piles.
+**area_mm2_sunflower**: spread of the fitted constant (weight / area_mm2_sunflower) over bootstrap draws of n piles (with replacement).
 
 | n piles | constant mean | constant rel. sd | r mean | r 2.5 % |
 |---|---|---|---|---|
@@ -49,6 +49,8 @@ Pile level (photos of one pile averaged). r = Pearson correlation with the weigh
 |---|---|---|---|
 | count_sunflower | 8 | 1.0 % | 4.0 % |
 | area_mm2_sunflower | 8 | 2.1 % | 5.1 % |
+
+(These two columns use the main AND the re-spread photos, so the pile-to-pile spread can differ a little from the feature table above, which uses the main photos only.)
 
 ## Calibrated models
 
@@ -75,9 +77,9 @@ Pile level (photos of one pile averaged). r = Pearson correlation with the weigh
 | stage | relative error | share of variance | how measured |
 |---|---|---|---|
 | balance | 1.7 % | 18.2 % | max(rounding 0.289 g, repeat sd 0.000 g) / mean main weight 17.0 g |
-| kernel_weight | 0.0 % | 0.0 % | cv per seed 0.000 from 3 batches of ~200 seeds weighed at 1 g (rounding removed; few batches: rough) / sqrt(mean count 322); batch spread not above rounding |
 | detector | 1.0 % | 6.7 % | sd of (count - hand count) / hand count on 6 photos (mean bias -0.8 %, absorbed by the calibration) |
-| unexplained | 3.4 % | 75.1 % | sqrt(top-down^2 - sum of the stages above^2): not measured separately |
+| unexplained | 3.4 % | 75.1 % | sqrt(top-down^2 - sum of the stages above^2). Possible causes, NOT measured: seed-to-seed weight variation (kernel_weight: not measurable), seeds lying close together missed by the detector, differences in seed mix between piles |
+| kernel_weight | not measurable | - | 3 batches of ~200 seeds all read 11, 11, 11 g on a 1 g scale: their spread is below what the scale can show |
 
 Total (root sum of squares, incl. 'unexplained' if present): 4.0 % (+/- 0.68 g, 1 sd). Dominant stage: unexplained.
 Top-down (spread of weight/feature over the main photos): 4.0 %.
@@ -88,8 +90,8 @@ Top-down (spread of weight/feature over the main photos): 4.0 %.
 |---|---|---|---|
 | balance | 1.7 % | 9.7 % | max(rounding 0.289 g, repeat sd 0.000 g) / mean main weight 17.0 g |
 | photo | 2.1 % | 15.5 % | photo-to-photo spread of area_mm2_sunflower within a pile (8 piles) |
-| scale | 2.3 % | 17.6 % | 2 x relative error of reading the ruler |
-| unexplained | 4.1 % | 57.2 % | sqrt(top-down^2 - sum of the stages above^2): not measured separately |
+| scale | 2.3 % | 17.6 % | 2 x relative error of the scale from the markers (lab: scale_read_rel) |
+| unexplained | 4.1 % | 57.2 % | sqrt(top-down^2 - sum of the stages above^2). Possible causes, NOT measured: seed-to-seed weight variation (kernel_weight: not measurable), seeds lying close together missed by the detector, differences in seed mix between piles |
 
 Total (root sum of squares, incl. 'unexplained' if present): 5.4 % (+/- 0.92 g, 1 sd). Dominant stage: unexplained.
 Top-down (spread of weight/feature over the main photos): 5.4 %.

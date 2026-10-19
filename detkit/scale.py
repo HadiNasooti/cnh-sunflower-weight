@@ -15,6 +15,8 @@ import numpy as np
 from PIL import Image
 
 MARKER_MM = 50.0
+MARKER_IDS = (0, 1)                     # the two markers on our sheet; any other id is ignored
+TILT_WARN_PCT = 5.0                     # the two markers differ by more than this: phone probably tilted
 DEFAULT_TARGET_MM_PER_PX = 0.110        # chosen on the main collection (19 Oct 2026)
 
 
@@ -30,19 +32,26 @@ def marker_sides(image: Image.Image) -> dict[int, float]:
     if ids is None:
         return out
     for c, i in zip(corners, ids.ravel()):
+        if int(i) not in MARKER_IDS:
+            continue
         p = c.reshape(4, 2)
         out[int(i)] = float(np.mean([np.linalg.norm(p[k] - p[(k + 1) % 4]) for k in range(4)]))
     return out
 
 
 def measure_scale(image: Image.Image, marker_mm: float = MARKER_MM) -> dict:
-    """``{"scale_mm_per_px", "n_markers", "marker_diff_pct"}``; scale is None when no marker is found.
-    marker_diff_pct = difference between the two markers (a sign of a tilted phone)."""
+    """``{"scale_mm_per_px", "n_markers", "marker_diff_pct", "scale_source"}``; scale is None when no marker
+    is found. marker_diff_pct = difference between the two markers (a sign of a tilted phone); above
+    TILT_WARN_PCT a ``warning`` is added."""
     sides = marker_sides(image)
     vals = [marker_mm / s for s in sides.values() if s > 0]
-    return {"scale_mm_per_px": float(np.mean(vals)) if vals else None,
-            "n_markers": len(vals),
-            "marker_diff_pct": (100 * (max(vals) - min(vals)) / float(np.mean(vals))) if len(vals) > 1 else None}
+    info = {"scale_mm_per_px": float(np.mean(vals)) if vals else None, "n_markers": len(vals),
+            "marker_diff_pct": (100 * (max(vals) - min(vals)) / float(np.mean(vals))) if len(vals) > 1 else None,
+            "scale_source": "markers" if vals else None}
+    if info["marker_diff_pct"] is not None and info["marker_diff_pct"] > TILT_WARN_PCT:
+        info["warning"] = (f"the two markers differ by {info['marker_diff_pct']:.1f} %: phone probably tilted, "
+                           f"take the photo again with the phone level")
+    return info
 
 
 def standardise(image: Image.Image, target_mm_per_px: float = DEFAULT_TARGET_MM_PER_PX,
@@ -53,7 +62,7 @@ def standardise(image: Image.Image, target_mm_per_px: float = DEFAULT_TARGET_MM_
     found."""
     info = measure_scale(image)
     if not info["scale_mm_per_px"] and known_scale:
-        info.update(scale_mm_per_px=float(known_scale), source="given")
+        info.update(scale_mm_per_px=float(known_scale), scale_source="given (no marker in the photo)")
     s = info["scale_mm_per_px"]
     if not s:
         info["note"] = "no marker found: photo used as it is (scale not fixed)"

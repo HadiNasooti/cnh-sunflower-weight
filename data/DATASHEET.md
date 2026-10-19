@@ -24,17 +24,22 @@ Structure after "Datasheets for Datasets" (Gebru et al.), shortened to what appl
 - **Labels:** weight from a kitchen scale (1 g steps); hand count for the batches only (`manual_count`). No
   boxes were drawn by hand: seed boxes come from the detector.
 - **Extra fields:** `condition` (main, pilot, batch, re_spread, touching), collector, camera height, phone,
-  remarks; `scale_mm_per_px` measured from the printed markers (main collection only, in `scale.csv`).
+  remarks; `scale_mm_per_px` per photo in each folder's `scale.csv`: measured from the printed markers for
+  the main collection, ESTIMATED from the seed size for the pilot and batch photos (no markers; column
+  `scale_source` says so).
 - **Known gaps:** one seed lot (one bag), one white table, one person and one phone so far, daylight only;
   no piles above 25 g; the pilot and batch photos have a ruler, not the marker sheet, so their scale was not
   measured automatically.
 - **Sensitive data:** none. People, floor and other objects were cropped out; location data was removed.
 
 ## Collection process
-- Written procedure: `docs/group/PROCEDURE.md` (version 1 used on 17 Oct, version 2 written after 19 Oct).
+- Written procedure: `docs/group/PROCEDURE.md`. 17 Oct: version 1 (ruler and pile note in the photo).
+  19 Oct: version 1 with the printed marker sheet added and the pile note still in the photo; this is why
+  version 2 (written after 19 Oct) takes the note out of the seed photos.
 - Phone: iPhone 15 Pro, main camera 1x, JPEG, about 40 cm above the table, no flash, daylight.
 - Weighing: TARE before every weighing; the pile is weighed in a bowl. Main collection: weights reported
-  equal to the target weight.
+  by the collector as equal to the target weight; the written before and after readings are still to be
+  added.
 - Full record with times and checks: `docs/group/lab_log.md`; measurements without photos (scale checks,
   repeated weighings, batches): `lab_measurements.json`.
 
