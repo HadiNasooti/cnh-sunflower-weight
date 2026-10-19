@@ -53,3 +53,6 @@ Main photos at the fixed scale: grams per seed 0.0529, rel sd 4.0 %, photo A vs 
 Leave one pile out: mean absolute error 3.3 %, 14 of 16 photos inside their bounds = 7 of 8 piles (both P06 photos outside); with 8 piles this test is weak.
 Review of the same day: the +-10.0 % rests on 8 piles; with 15 piles it would be about +-8.8 % and firmer. Whether to add P09 to P15 is open (STATUS_AND_PLAN section 3b).
 The analysis was re-run with the exact commands at the top of analysis/build_project.py: identical counts.
+
+# Decision (Mon 19 Oct, evening)
+Option (b) chosen: 7 more piles P09 to P15 (26 to 38 g). Jia collects them with Hadi's scale and ruler and her own iPhone 14, after her task 4. Plan and analysis rules in STATUS_AND_PLAN section 4b.

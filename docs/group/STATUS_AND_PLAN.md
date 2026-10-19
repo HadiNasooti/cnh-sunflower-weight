@@ -1,6 +1,6 @@
 # Status and plan: sunflower group (Hadi Nasooti, Jia)
 
-Last update: Monday 19 October 2026. CNH Data Collection module, KU Leuven MAIBI.
+Last update: Monday 19 October 2026 (evening). CNH Data Collection module, KU Leuven MAIBI.
 
 ## 1. Where we are
 
@@ -150,7 +150,8 @@ piles DO help: with 15 piles and the same spread the interval would be about +-8
 uncertainty much smaller (0.73 to 1.58 times). Two limits stay: the range is 10 to 24 g, not the planned 10 to
 38 g, and the bound covers one seed lot, one person and one phone. Options: (a) keep 8 piles and state these
 limits clearly; (b) add P09 to P15 (26 to 38 g, about 1 to 1.5 hours, estimate from the 19 Oct session) to firm up the bound and cover larger
-samples. To be decided by Hadi.
+samples. **Chosen (19 Oct evening): option (b).** Jia collects P09 to P15 with Hadi's scale and ruler, after her
+own task 4 (plan in section 4b).
 
 ## 3c. Tasks 2 and 3: results (19 October)
 
@@ -227,6 +228,7 @@ code for tasks 2 and 3.
 |---|---|
 | Before Mon 19 Oct evening | Read `PROCEDURE.md`; write down every step that is unclear (part of task 4) |
 | Tue 20 to Thu 22 Oct | Task 4: with the jar of unused seeds, a printed marker sheet (print at 100 %, check the 100 mm line) and a kitchen scale, collect 4 piles of 10, 14, 18 and 22 g, 2 photos each, following only `PROCEDURE.md`. Write down phone model, light, any problem. Upload to `data/photos/<date>_task4/` plus lines in `data/samples.csv` |
+| After task 4, by Thu 22 Oct | Extra piles P09 to P15 (26 to 38 g) for the main collection: see section 4b |
 | Thu 22 Oct | Business case slide (why CNH needs seed weight) and first draft of the presentation |
 
 **Together**
@@ -248,6 +250,50 @@ other tool). One pile of about 16 g on white paper, marker sheet next to it, no 
 4. Result: 8 photos of the same seeds. Differences between photos of the same person and phone show
    repeatability; between persons and between phones show reproducibility. Same seeds, so the true count is
    the same in all 8.
+
+## 4b. Jia: extra piles P09 to P15 (26 to 38 g)
+
+Why: with only 8 piles the +-10 % bound is itself uncertain and covers only 10 to 24 g (section 3b). 7 more
+piles make the bound firmer (about +-8.8 % with 15 piles, same spread) and cover bigger samples.
+
+**What you get from Hadi:** the kitchen scale (1 g steps), the ruler, the jar with 150 g of unused seeds, the
+marker sheet, white paper.
+
+**Seeds:** 150 g is enough. Each pile is weighed, photographed and poured back into the jar before the next
+one, so you never need more than the biggest pile (38 g). Keep every seed and the broken pieces in the jar.
+
+**Order (important):**
+1. First do task 4 (10, 14, 18 and 22 g), following only `PROCEDURE.md`, before reading the rest of this
+   section. Task 4 must show that someone else can follow the written procedure.
+2. Then do P09 to P15: 26, 28, 30, 32, 34, 36 and 38 g, in that order, with the same steps as in
+   `PROCEDURE.md` (TARE, label photo of the note, photo A, photo B, weigh after). No R or T photos needed.
+
+**Space in the photo (estimate, check it yourself):** 38 g is about 718 seeds. Spread like the 19 Oct piles they
+need about 2,200 to 2,800 cm2. Your iPhone 14 main camera (26 mm) sees about 15 % less than Hadi's iPhone 15
+Pro (24 mm), so at 40 cm, after the marker sheet and margins, there is about 1,900 cm2 free (estimate). That is
+probably enough up to about 26 to 33 g. To make room:
+- Check once that the 100 mm line on the marker sheet measures 100 mm. Then cut the sheet down to the two
+  markers, keeping at least 1 cm of white around each marker. Both markers stay in every photo.
+- You may hold the phone a bit higher, up to about 45 cm (the program fixes the scale; still level).
+- **Never push seeds closer together to make them fit.** If a pile does not fit with no seed touching, stop
+  there and write down the biggest weight that fitted. That is a result we need (largest sample per photo).
+
+**Phone:** Settings > Camera > Formats > Most Compatible (JPEG), main camera 1x, no flash, Level on.
+
+**Write down per pile:** pile name, target, before and after weight, photo file names, light, remarks.
+**Upload:** photos to `data/photos/<date>_extra_piles/`, one line per photo in `data/samples.csv` with
+`folder` = that folder name, `crop` = sunflower, `pile_id` P09 to P15, `total_weight_g` = the after weight, `collector` = Jia,
+`condition` = main, `phone` = iPhone 14 1x, `height_cm` = your height. Hadi then runs the analysis.
+
+**How we use the data (so person, phone and pile size are not mixed up):**
+- The grams-per-seed constant first stays fitted on Hadi's P01 to P08.
+- Jia's task 4 piles (10 to 22 g, inside Hadi's range) show whether another person and phone give the same
+  result (reproducibility), together with the mini Gauge R&R.
+- Jia's P09 to P15 first test whether the constant still holds at 26 to 38 g. Only if task 4 and the Gauge
+  R&R show no clear person or phone difference are all 15 piles fitted together.
+
+**Time (estimate from 19 Oct, about 12 minutes per pile):** task 4 about 50 minutes; P09 to P15 at least 1.5
+hours (bigger piles take longer to spread).
 
 ## 5. Weak spots we found ourselves, and how we close them
 
