@@ -25,6 +25,19 @@ if (-not (Test-Path (Join-Path $Repo "pyproject.toml"))) {
     Write-Host "Close the app window (2_START_APP) before updating." -ForegroundColor Yellow
     Step "1. Copy our code from Google Drive"
     $Code = Join-Path $Assign "code"
+    $Zip = Join-Path $PSScriptRoot "code_update.zip"         # newest code as one file, if present
+    if (Test-Path $Zip) {
+        $Tmp = Join-Path $env:TEMP "cnh_code_update"
+        if (Test-Path $Tmp) { Remove-Item -Recurse -Force $Tmp }
+        try {
+            Expand-Archive -Path $Zip -DestinationPath $Tmp -Force -ErrorAction Stop
+            $Code = $Tmp
+            Write-Host "using $Zip"
+        } catch {
+            Write-Host "ERROR unpacking $Zip : $_" -ForegroundColor Red
+            $Ok = $false
+        }
+    }
     $n = 0
     if (-not (Test-Path $Code)) {
         Write-Host "ERROR: folder $Code not found (is Google Drive synced?)" -ForegroundColor Red

@@ -168,10 +168,8 @@ def leave_one_pile_out(t: SampleTable, model_cls) -> dict:
 
 
 # ---- task 3 ---------------------------------------------------------------------------------------
-NOT_MEASURED: dict[str, str] = {}      # stages that could not be measured (shown as such, never as 0 %)
-
-
-def stage_errors(t: SampleTable, lab: dict, model_feature: str, top_rel_sd: float | None = None) -> dict:
+def stage_errors(t: SampleTable, lab: dict, model_feature: str, top_rel_sd: float | None = None,
+                 not_measured: dict | None = None) -> dict:
     """Relative standard error of each stage, measured in task 1. Returns {stage: (value, how)}.
     Each physical error source is counted ONCE:
 
@@ -217,7 +215,7 @@ def stage_errors(t: SampleTable, lab: dict, model_feature: str, top_rel_sd: floa
                                     f"weighed at {res} g (rounding removed; few batches: rough) "
                                     f"/ sqrt(mean count {n_main:.0f})")
         elif n_main:            # no measurement, NOT zero: it may be part of 'unexplained'
-            NOT_MEASURED["kernel_weight"] = (f"{len(batches)} batches of ~{n_b:.0f} seeds all read "
+            (not_measured if not_measured is not None else {})["kernel_weight"] = (f"{len(batches)} batches of ~{n_b:.0f} seeds all read "
                                              f"{', '.join(str(b['weight_g']) for b in batches)} g on a {res} g scale: "
                                              f"their spread is below what the scale can show")
     counted = [s for s in t if s.meta.get("manual_count") not in (None, "")]
@@ -330,22 +328,20 @@ def run(workdir: str, lab_path: str | None, out_dir: str, use: str = "reviewed")
     lines += ["## Task 3: error budget", ""]
     for cls, feat in MODEL_SET[:2]:
         top = res[cls.name]["bounds"].get("rel_sd")
-        st = stage_errors(t_all, lab, feat, top_rel_sd=top)
+        nm: dict = {}                    # stages that could not be measured (shown as such, never as 0 %)
+        st = stage_errors(t_all, lab, feat, top_rel_sd=top, not_measured=nm)
         if not st:
             continue
         w_mean = statistics.fmean([s.weight_g for s in t]) if len(t) else 0.0
         pr = propagate({k: v[0] for k, v in st.items()}, weight_g=w_mean)
         res[f"budget_{cls.name}"] = {"stages": {k: v[0] for k, v in st.items()}, "how": {k: v[1] for k, v in st.items()},
                                      "propagate": pr, "top_down_rel_sd": top}
-        NOT_MEASURED.clear()
-        st = stage_errors(t_all, lab, feat, top_rel_sd=top)
-        pr = propagate({k: v[0] for k, v in st.items()}, weight_g=w_mean)
-        res[f"budget_{cls.name}"]["not_measured"] = dict(NOT_MEASURED)
+        res[f"budget_{cls.name}"]["not_measured"] = dict(nm)
         lines += [f"**{cls.name}** (at the mean pile weight {w_mean:.1f} g)", "",
                   "| stage | relative error | share of variance | how measured |", "|---|---|---|---|"]
         for k, (v, how) in st.items():
             lines.append(f"| {k} | {_f(v, pct=True)} | {_f(pr['budget'][k], pct=True)} | {how} |")
-        for k, how in NOT_MEASURED.items():
+        for k, how in nm.items():
             lines.append(f"| {k} | not measurable | - | {how} |")
         lines += ["", f"Total (root sum of squares, incl. 'unexplained' if present): {_f(pr['rel_total'], pct=True)} "
                       f"(+/- {pr['weight_u_g']:.2f} g, 1 sd). Dominant stage: {pr['dominant']}.",

@@ -146,3 +146,62 @@ def test_upright_copy_follows_exif_orientation(tmp_path):
     out = upright_copy(tmp_path / "r.jpg", tmp_path / "up")
     assert out != tmp_path / "r.jpg" and Image.open(out).size == (200, 300)
     assert upright_copy(tmp_path / "plain.jpg", tmp_path / "up") == tmp_path / "plain.jpg"
+
+
+def test_predict_paths_fixed_scale(tmp_path, monkeypatch):
+    """predict_paths with std_mm_per_px: the detector sees the resized photo, boxes come back in original
+    pixels; a photo without marker uses the given scale; scale and source are written to the result."""
+    from detkit import predict as PR
+
+    class Cfg:
+        id2label = {0: "sunflower"}
+
+    class Model:
+        config = Cfg()
+
+    seen = []
+    monkeypatch.setattr(PR, "load_model", lambda ckpt, device=None: (Model(), None, {}, "cpu"))
+
+    def fake_predict(im, model, proc, device, **kw):
+        seen.append(im.size)
+        return [{"bbox": [10.0, 10.0, 110.0, 60.0], "score": 0.9, "label": "sunflower", "label_id": 0}]
+
+    monkeypatch.setattr(PR, "predict_image", fake_predict)
+    src = tmp_path / "in"
+    src.mkdir()
+    marker_photo(400).save(src / "m.png")
+    Image.new("RGB", (1000, 800), (255, 255, 255)).save(src / "plain.png")
+    res = PR.predict_paths("ck", [src], tmp_path / "out", tile=800, overlap=0.2, overlay=False,
+                           std_mm_per_px=0.110, known_scales={"plain.png": 0.055})
+    f = res["m.png"]["std_factor"]
+    assert res["m.png"]["scale_source"] == "markers" and seen[0] == (round(3000 * f), round(2000 * f))
+    assert res["m.png"]["detections"][0]["bbox"] == pytest.approx([10 / f, 10 / f, 110 / f, 60 / f], abs=0.2)
+    assert res["plain.png"]["scale_source"].startswith("given") and seen[1] == (500, 400)
+
+
+def test_calibrate_main_only(tmp_path):
+    """--main-only fits only main photos: a touching photo (far fewer boxes) must not change the constant."""
+    import argparse
+    import json as _json
+
+    from detkit.cmd_weight import cmd_calibrate
+
+    p = Project(workdir=tmp_path / "w", classes=["sunflower"], extra_image_fields=[{"key": "condition", "kind": "str"}])
+    p.save()
+    p.photos_dir.mkdir()
+    st = p.store()
+    box = lambda i: {"bbox": [i * 20, 0, i * 20 + 10, 10], "class": "sunflower"}           # noqa: E731
+    for name, n, w, pile, cond in (("a.png", 200, 10.0, "P1", "main"), ("b.png", 400, 20.0, "P2", "main"),
+                                   ("c.png", 300, 15.0, "P3", "main"), ("t.png", 100, 10.0, "P1", "touching")):
+        st.upsert_image(name, 9000, 100, [box(i) for i in range(n)],
+                        {"crop": "sunflower", "total_weight_g": w, "pile_id": pile, "condition": cond}, reviewed=True)
+    args = dict(workdir=str(p.workdir), use="reviewed", predictions=None, reviewed_only=False,
+                model="crop_count_x_constant", detector_score=0.38, detector_tile=1500, detector_overlap=0.2,
+                detector_std_mm_per_px=0.11)
+    cmd_calibrate(argparse.Namespace(**args, main_only=True))
+    cfg = _json.loads((p.workdir / "weight_config.json").read_text())
+    assert cfg["crop_count_constants"]["sunflower"] == pytest.approx(0.05)
+    assert cfg["detector"] == {"score": 0.38, "tile": 1500, "overlap": 0.2, "std_mm_per_px": 0.11}
+    cmd_calibrate(argparse.Namespace(**args, main_only=False))
+    cfg = _json.loads((p.workdir / "weight_config.json").read_text())
+    assert cfg["crop_count_constants"]["sunflower"] != pytest.approx(0.05)

@@ -92,7 +92,7 @@ def predict_paths(ckpt: str | Path, inputs: list[str | Path], out_dir: str | Pat
             if std_mm_per_px:
                 from .scale import standardise
                 work, _f, info = standardise(im, std_mm_per_px, (known_scales or {}).get(f.name))
-            if work is im and max_side and max(im.size) > max_side:     # also the fallback without marker
+            if not info.get("scale_mm_per_px") and max_side and max(im.size) > max_side:   # no fixed scale
                 k = max_side / max(im.size)
                 work = im.resize((round(im.width * k), round(im.height * k)), Image.LANCZOS)
             dets = predict_image(work, model, proc, device, tile=tile, overlap=overlap,

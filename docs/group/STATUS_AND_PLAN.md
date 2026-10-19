@@ -13,7 +13,7 @@ Last update: Monday 19 October 2026. CNH Data Collection module, KU Leuven MAIBI
 | 5. Report / presentation | To start after the main data (send before 26 Oct) |
 | 6. Demo with CNH | App with fixed scale and calibrated constant ready; Hadi's laptop to be updated (`3_UPDATE_double_click.bat`); procedure version 2 in `PROCEDURE.md` |
 
-All 81 tests pass, including the course self-check `tests/test_student_tasks.py` (6 of 6).
+All 83 tests pass, including the course self-check `tests/test_student_tasks.py` (6 of 6).
 
 ## 2. What changed compared to Jia's Task 1 plan
 
@@ -137,7 +137,7 @@ Pile level (mean of photos A and B, 8 piles), computed in Python:
   estimated from few piles.
 - P06 is the clearest outlier: 0.0572 g per seed. With the fitted constant, 20 g should be about 378 seeds;
   the detector found 352 and 347, so about 7.5 % fewer. About 7 seeds lying close together are visibly not
-  found and 2 `sunflower` boxes sit on the handwritten note, which together explain only about 1 to 2 %. The rest is not
+  found (about 2 %), while 2 `sunflower` boxes on the handwritten note work the other way (net about 1.3 %). The rest is not
   explained; a weighing error is possible (the readings are reported, not yet written down, see above).
 - Re-spread photos agree with the main photos (P03: 275/276 vs 277/273; P08: 458/464 vs 464/468).
 - Touching seeds: P03 223/232 and P08 389/389 instead of 275 and 466 (mean of A and B), so 17 % fewer.
@@ -149,7 +149,7 @@ so the true half-width could be roughly 7 to 20 % (95 % confidence, chi-square, 
 piles DO help: with 15 piles and the same spread the interval would be about +-8.8 % and its own
 uncertainty much smaller (0.73 to 1.58 times). Two limits stay: the range is 10 to 24 g, not the planned 10 to
 38 g, and the bound covers one seed lot, one person and one phone. Options: (a) keep 8 piles and state these
-limits clearly; (b) add P09 to P15 (26 to 38 g, about 1 to 1.5 hours) to firm up the bound and cover larger
+limits clearly; (b) add P09 to P15 (26 to 38 g, about 1 to 1.5 hours, estimate from the 19 Oct session) to firm up the bound and cover larger
 samples. To be decided by Hadi.
 
 ## 3c. Tasks 2 and 3: results (19 October)
@@ -217,7 +217,7 @@ code for tasks 2 and 3.
 |---|---|
 | Mon 19 Oct (done) | 12 MP / 8 MP test: with the fixed scale, counts stay within about 2 % (section 6) |
 | Mon 19 Oct (done) | Full task 2 and 3 analysis on the standardised photos (section 3c) |
-| Mon 19 Oct (done) | Fixed scale built into the app and `detkit predict`; constant and bounds calibrated (`analysis/results/main_std/weight_config.json`) |
+| Mon 19 Oct (done) | Fixed scale built into the app and `detkit predict`; constant and bounds calibrated (`analysis/results/main_std/weight_config.json`; both count models are calibrated, the area models are not) |
 | Before Wed 21 Oct | Hadi: double-click `03_Assignment/setup/3_UPDATE_double_click.bat` on the laptop, then test the app with one photo |
 | Mon 19 Oct (done) | `PROCEDURE.md` version 2 and `data/DATASHEET.md` |
 | Optional | If a 0.01 g scale can be borrowed: weigh about 30 single seeds (seed weight spread for task 3) |
