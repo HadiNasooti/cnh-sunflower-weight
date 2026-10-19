@@ -468,15 +468,13 @@
   "budget_crop_count_x_constant": {
     "stages": {
       "balance": 0.016980890270283114,
-      "kernel_weight": 0.0,
       "detector": 0.010327955589886445,
       "unexplained": 0.03449028926786405
     },
     "how": {
       "balance": "max(rounding 0.289 g, repeat sd 0.000 g) / mean main weight 17.0 g",
-      "kernel_weight": "cv per seed 0.000 from 3 batches of ~200 seeds weighed at 1 g (rounding removed; few batches: rough) / sqrt(mean count 322); batch spread not above rounding",
       "detector": "sd of (count - hand count) / hand count on 6 photos (mean bias -0.8 %, absorbed by the calibration)",
-      "unexplained": "sqrt(top-down^2 - sum of the stages above^2): not measured separately"
+      "unexplained": "sqrt(top-down^2 - sum of the stages above^2). Possible causes, NOT measured: seed-to-seed weight variation (kernel_weight: not measurable), seeds lying close together missed by the detector, differences in seed mix between piles"
     },
     "propagate": {
       "rel_total": 0.03980700132915063,
@@ -484,13 +482,15 @@
       "dominant": "unexplained",
       "budget": {
         "balance": 0.1819709174033882,
-        "kernel_weight": 0.0,
         "detector": 0.06731468176586133,
         "unexplained": 0.7507144008307505
       },
       "method": "rss"
     },
-    "top_down_rel_sd": 0.03980700132915064
+    "top_down_rel_sd": 0.03980700132915064,
+    "not_measured": {
+      "kernel_weight": "3 batches of ~200 seeds all read 11, 11, 11 g on a 1 g scale: their spread is below what the scale can show"
+    }
   },
   "budget_crop_area_mm2_x_constant": {
     "stages": {
@@ -502,8 +502,8 @@
     "how": {
       "balance": "max(rounding 0.289 g, repeat sd 0.000 g) / mean main weight 17.0 g",
       "photo": "photo-to-photo spread of area_mm2_sunflower within a pile (8 piles)",
-      "scale": "2 x relative error of reading the ruler",
-      "unexplained": "sqrt(top-down^2 - sum of the stages above^2): not measured separately"
+      "scale": "2 x relative error of the scale from the markers (lab: scale_read_rel)",
+      "unexplained": "sqrt(top-down^2 - sum of the stages above^2). Possible causes, NOT measured: seed-to-seed weight variation (kernel_weight: not measurable), seeds lying close together missed by the detector, differences in seed mix between piles"
     },
     "propagate": {
       "rel_total": 0.05440404467768664,
@@ -517,6 +517,7 @@
       },
       "method": "rss"
     },
-    "top_down_rel_sd": 0.05440404467768664
+    "top_down_rel_sd": 0.05440404467768664,
+    "not_measured": {}
   }
 }

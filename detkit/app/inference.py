@@ -75,6 +75,21 @@ def todo_message(name: str) -> str:
 
 
 # ---- one photo -------------------------------------------------------------------------------------
+def upright_copy(path: Path, folder: Path) -> Path:
+    """Phone photos often store "rotate me" in EXIF instead of rotating the pixels. With the fixed scale the
+    photo is used upright (as the calibration photos were): return an upright copy in *folder* when the
+    photo has an EXIF orientation, else the photo itself."""
+    from PIL import ImageOps
+    with Image.open(path) as im:
+        if im.getexif().get(0x0112, 1) in (None, 1):
+            return Path(path)
+        folder = Path(folder)
+        folder.mkdir(parents=True, exist_ok=True)
+        out = folder / Path(path).name
+        ImageOps.exif_transpose(im).convert("RGB").save(out, quality=95)
+    return out
+
+
 def dets_from_boxes(boxes: list[dict]) -> list[dict]:
     return [{"bbox": b["bbox"], "score": b.get("score"), "label": b["class"]} for b in boxes]
 
@@ -97,7 +112,8 @@ def detect_photo(path: Path, bundle, project, *, crop: str | None, score: float,
                 scale_info.update(info)
             if roi and factor != 1.0:
                 roi = tuple(round(v * factor) for v in roi)
-            max_side = 0
+            if info.get("scale_mm_per_px"):         # scale fixed: max_side only for photos without marker
+                max_side = 0
         boxes, _info = P.propose_rfdetr(im, bundle, project.classes, crop or None, score=score, tile=tile,
                                         overlap=overlap, max_side=max_side, roi=roi)
     if factor != 1.0:
@@ -177,6 +193,8 @@ def run_inference(paths: list[Path], per_photo: dict[str, dict], project, *, ckp
     for i, p in enumerate(paths):
         if on_photo:
             on_photo(i, len(paths), p.name)
+        if std_mm_per_px:
+            p = upright_copy(p, Path(cache) / "upright")
         meta = {k: v for k, v in (per_photo.get(p.name) or {}).items() if v not in (None, "")}
         crop = meta.get("crop")
         sc: dict = {}
@@ -193,8 +211,14 @@ def run_inference(paths: list[Path], per_photo: dict[str, dict], project, *, ckp
             meta.setdefault("scale_mm_per_px", round(sc["scale_mm_per_px"], 5))
         row = estimate_row(p.name, dets, meta, model, cfg)
         if std_mm_per_px:
-            sn = (f"scale {sc['scale_mm_per_px']:.3f} mm/px, resized x{sc.get('std_factor', 1):.2f}"
-                  if sc.get("scale_mm_per_px") else sc.get("note", ""))
+            if sc.get("scale_mm_per_px"):
+                sn = f"scale {sc['scale_mm_per_px']:.3f} mm/px, resized x{sc.get('std_factor', 1):.2f}"
+                if sc.get("warning"):
+                    sn += f"; WARNING {sc['warning']}"
+            else:                                            # the calibration needs the fixed scale
+                row["low_g"] = row["high_g"] = None
+                sn = ("NO MARKER FOUND: scale not fixed, weight not reliable (can be far too low); "
+                      "take the photo again with the marker sheet")
             row["note"] = "; ".join(v for v in (row.get("note"), sn) if v)
         rows.append(row)
         items.append({"path": str(p), "dets": dets, "meta": meta})

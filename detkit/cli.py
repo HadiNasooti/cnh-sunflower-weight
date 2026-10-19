@@ -93,17 +93,23 @@ def cmd_train(a) -> int:
     return 0
 
 
-def _scale_csv(path) -> dict[str, float] | None:
-    """CSV with columns file, scale_mm_per_px -> {file: mm per pixel} (empty values skipped)."""
-    if not path:
+def _scale_csv(paths) -> dict[str, float] | None:
+    """CSV file(s) with columns file, scale_mm_per_px -> {file: mm per pixel} (empty values skipped)."""
+    if not paths:
         return None
     import csv
-    with open(path, encoding="utf-8-sig") as fh:
-        return {r["file"]: float(r["scale_mm_per_px"]) for r in csv.DictReader(fh) if r.get("scale_mm_per_px")}
+    out: dict[str, float] = {}
+    for path in ([paths] if isinstance(paths, str) else paths):
+        with open(path, encoding="utf-8-sig") as fh:
+            out.update({r["file"]: float(r["scale_mm_per_px"]) for r in csv.DictReader(fh) if r.get("scale_mm_per_px")})
+    return out
 
 
 def cmd_predict(a) -> int:
     from .predict import predict_paths
+
+    if a.scale_csv and not a.std_mm_per_px:
+        print("note: --scale-csv is only used together with --std-mm-per-px; ignored")
 
     crop = tuple(int(v) for v in a.crop.split(",")) if a.crop else None
     predict_paths(a.model, a.images, a.out, tile=a.tile, overlap=a.overlap, crop=crop,
@@ -183,7 +189,8 @@ def build_parser() -> argparse.ArgumentParser:
     s.add_argument("--score", type=float, default=0.5)
     s.add_argument("--tile", type=int)
     s.add_argument("--overlap", type=float)
-    s.add_argument("--crop", help="x0,y0,x1,y1 region to scan (default: whole photo)")
+    s.add_argument("--crop", help="x0,y0,x1,y1 region to scan (default: whole photo; with --std-mm-per-px in "
+                                  "pixels of the resized photo)")
     s.add_argument("--batch", type=int, default=4, help="tiles per forward pass")
     s.add_argument("--threads", type=int, help="torch CPU threads")
     s.add_argument("--max-side", type=int,
@@ -193,8 +200,9 @@ def build_parser() -> argparse.ArgumentParser:
     s.add_argument("--std-mm-per-px", type=float,
                    help="fixed scale: resize each photo to this many mm per pixel, measured from the printed "
                         "marker sheet, before tiling (e.g. 0.110; replaces --max-side)")
-    s.add_argument("--scale-csv", help="with --std-mm-per-px: CSV file,scale_mm_per_px for photos WITHOUT markers "
-                                       "(scale measured another way)")
+    s.add_argument("--scale-csv", nargs="+", help="with --std-mm-per-px: one or more CSV files (columns file, "
+                                                   "scale_mm_per_px) for photos WITHOUT markers (scale measured "
+                                                   "another way)")
 
     s = add("doctor", cmd_doctor, "check GPU/torch and HF token", workdir=False)
     s.add_argument("--online", action="store_true", help="also ping HF (no secrets printed)")

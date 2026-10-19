@@ -1,9 +1,9 @@
 {
   "model": "crop_count_x_constant",
   "constants": {
-    "default": 0.05225847925798603,
+    "default": 0.04,
     "wheat": 0.04,
-    "sunflower": 0.05225847925798603
+    "sunflower": 0.05
   },
   "area_constants": {},
   "crop_count_constants": {
@@ -11,23 +11,11 @@
     "default": 0.052939411479942425
   },
   "crop_area_constants": {},
-  "constants_bounds": {
-    "sunflower": {
-      "rel_halfwidth": 0.09438350587439749,
-      "rel_sd": 0.03763203504939783,
-      "n_piles": 8,
-      "n_photos": 16,
-      "t": 2.364624251592784,
-      "level": 0.95
-    },
-    "default": {
-      "rel_halfwidth": 0.09438350587439749,
-      "rel_sd": 0.03763203504939783,
-      "n_piles": 8,
-      "n_photos": 16,
-      "t": 2.364624251592784,
-      "level": 0.95
-    }
+  "detector": {
+    "score": 0.38,
+    "tile": 1500,
+    "overlap": 0.2,
+    "std_mm_per_px": 0.11
   },
   "crop_count_constants_bounds": {
     "sunflower": {

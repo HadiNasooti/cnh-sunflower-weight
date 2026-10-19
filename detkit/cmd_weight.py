@@ -99,6 +99,10 @@ def cmd_calibrate(a) -> int:
         print(f"note: {no_crop} weighed photos have no crop and are skipped by {a.model}")
     model = configured_model(cfg, a.model).fit(samples)
     cfg.update({"model": a.model, model.config_key: model.constants})
+    det = {k: v for k, v in (("score", a.detector_score), ("tile", a.detector_tile),
+                             ("overlap", a.detector_overlap), ("std_mm_per_px", a.detector_std_mm_per_px)) if v}
+    if det:                                          # how the boxes were made: the app uses these as defaults
+        cfg["detector"] = det
     if hasattr(model, "bounds_key"):
         cfg[model.bounds_key()] = model.bounds
     p = save_config(a.workdir, cfg)
@@ -138,6 +142,11 @@ def register(sub) -> None:
     common(p)
     p.add_argument("--model", default="count_x_constant",
                    choices=["count_x_constant", "area_x_constant", "crop_count_x_constant", "crop_area_x_constant"])
+    p.add_argument("--detector-score", type=float, help="record: score threshold of the boxes used (app default)")
+    p.add_argument("--detector-tile", type=int, help="record: tile size of the boxes used (app default)")
+    p.add_argument("--detector-overlap", type=float, help="record: tile overlap of the boxes used (app default)")
+    p.add_argument("--detector-std-mm-per-px", type=float,
+                   help="record: fixed scale the boxes were made with (app default)")
     p.add_argument("--main-only", action="store_true",
                    help="fit only photos with condition main (or no condition): leaves out experiments such as "
                         "touching or re-spread photos")

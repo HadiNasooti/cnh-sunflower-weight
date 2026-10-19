@@ -1,16 +1,33 @@
 """Build a detkit project from the photos in data/ (all folders) with their metadata, ready for the analysis.
 
-Steps it does:
+What it does:
 1. create the project (the 6 detector classes) with the extra photo properties condition, collector,
    scale_mm_per_px;
 2. import every photo listed in data/samples.csv, with crop, pile_id, total_weight_g, manual_count,
    collector, condition, and scale_mm_per_px from the folder's scale.csv when there is one.
+It refuses to run on a work folder that already has photos (importing twice would duplicate them).
 
-Then, from the repository folder:
+The full analysis of 19 Oct 2026 (analysis/results/main_std), in this order, from the repository folder:
+    python analysis/build_project.py --workdir runs/analysis
+    # pass 1: count with the fixed scale; the 17 Oct photos have no markers and are counted as they are
     python -m detkit predict --model weights/grain_rfdetr_small_v1/final --images runs/analysis/photos \
-        --tile 1500 --overlap 0.2 --score 0.38 --std-mm-per-px 0.110 --out runs/analysis/predictions
+        --tile 1500 --overlap 0.2 --score 0.38 --std-mm-per-px 0.110 --out runs/analysis/predictions_pass1
+    # ESTIMATE the scale of the 17 Oct photos from the seed size (writes their scale.csv files)
+    python analysis/estimate_scale_from_seeds.py --predictions runs/analysis/predictions_pass1/predictions.json \
+        --data data --folders 2026-10-17_pilot,2026-10-17_batches
+    # pass 2: all photos at the fixed scale (17 Oct photos with the estimated scale)
+    python -m detkit predict --model weights/grain_rfdetr_small_v1/final --images runs/analysis/photos \
+        --tile 1500 --overlap 0.2 --score 0.38 --std-mm-per-px 0.110 --out runs/analysis/predictions \
+        --scale-csv data/photos/2026-10-17_pilot/scale.csv data/photos/2026-10-17_batches/scale.csv
     python analysis/sunflower_analysis.py --workdir runs/analysis --lab data/lab_measurements.json \
         --use predictions --out analysis/results/main_std
+    # constants for the app (main photos only), with the detector settings they belong to
+    python -m detkit weight calibrate --workdir runs/analysis --use predictions --main-only \
+        --model crop_count_x_constant --detector-score 0.38 --detector-tile 1500 --detector-overlap 0.2 \
+        --detector-std-mm-per-px 0.110
+Pass 1 and the estimate step only recreate the scale.csv files of the 17 Oct folders. These files are in the
+repository, so a re-run can go straight from build_project to pass 2 (build_project then also stores the
+estimated scales as photo metadata).
 
 Usage:
     python analysis/build_project.py [--workdir runs/analysis] [--folders 2026-10-17_batches,2026-10-19_main]
@@ -48,7 +65,10 @@ def main():
     ap.add_argument("--folders", help="comma-separated photo folders (default: all in samples.csv)")
     a = ap.parse_args()
     data = Path(a.data)
-    p = Project(workdir=Path(a.workdir), classes=CLASSES, tile=1500, overlap=0.2, extra_image_fields=EXTRA)
+    wd = Path(a.workdir)
+    if (wd / "photos").exists() and any((wd / "photos").iterdir()):
+        sys.exit(f"{wd} already has photos: use a new --workdir (importing twice duplicates the photos)")
+    p = Project(workdir=wd, classes=CLASSES, tile=1500, overlap=0.2, extra_image_fields=EXTRA)
     p.save()
     p.photos_dir.mkdir(parents=True, exist_ok=True)
     store = p.store()

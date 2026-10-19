@@ -36,13 +36,14 @@ Phone settings, once:
 ## Rules (each one comes from a measured problem)
 
 1. **Press TARE right before every weighing.** Without it, the scale read 1 g too high (zero drift, coin test).
-2. **No seed may touch another seed.** With seeds touching, the detector found 17 to 32 % fewer seeds (main
-   collection and pilot).
+2. **No seed may touch another seed.** With seeds touching, the detector found 17 to 36 % fewer seeds (main
+   collection and pilot, at the fixed scale).
 3. **At most 24 g of seeds per photo.** That is the range we tested (10 to 24 g). A bigger sample is split
    into portions of 10 to 24 g; each portion is weighed and photographed on its own, and the weights are added.
 4. **Marker sheet in every photo, flat, fully visible, at least 3 cm from the seeds.** The program needs the
    markers to fix the scale. Without them the count depends on the phone and the height: on 12 MP photos
-   the detector missed 18 % of the seeds on average without the fixed scale, and about 0 % with it.
+   the detector found 18 % fewer seeds on average than on the full-resolution photo without the fixed
+   scale, and stayed within about 2 % of it with the fixed scale.
 5. **Camera straight down at about 40 cm**, crosshair yellow. The program corrects small height differences,
    but a tilted phone makes one side of the photo smaller than the other.
 6. **Only the white background, the seeds and the marker sheet in the photo**: no note, no hands, feet,
@@ -94,8 +95,10 @@ Photo conditions: photos A and B = `main`, R = `re_spread`, T = `touching`.
 3. Keep **Fixed scale from the marker sheet** ticked (0.110 mm per pixel) and the weight model
    `crop_count_x_constant`. Tile 1500, score 0.38.
 4. Press **Run inference**. Each row shows the estimated weight with `low_g` and `high_g` (95 % prediction
-   interval) and, in `note`, the measured scale. If the note says "no marker found", the scale was not fixed:
-   take the photo again with the marker sheet.
+   interval: for our seeds, our phone and 10 to 24 g, about 19 of 20 true weights should fall inside) and, in
+   `note`, the measured scale. If the note says "NO MARKER FOUND", the scale was not fixed and no bounds are
+   shown: take the photo again with the marker sheet. If it says "WARNING ... tilted", take it again with the
+   phone level.
 5. For several photos of one sample (portions, rule 3): add the weights of the portions.
 
 To add photos to the data set for analysis: put them in `data/photos/<date>_<what>/`, add one line per photo
@@ -111,3 +114,5 @@ to `data/samples.csv`, and run `analysis/build_project.py` (see the top of that 
   1/sqrt(12) = 0.29 g, or 2.9 % of 10 g.
 - The detector misses some seeds that lie close together even when they do not touch. This is part of the
   pile-to-pile spread that the 95 % interval covers.
+- The 95 % interval was measured with one seed lot, one person and one phone. Another person or phone (task 4,
+  Gauge R&R) or another seed lot can add error that the interval does not include yet.

@@ -46,6 +46,11 @@ def build_inference_tab(project, wd: Path, ckpt: str | None, device: str) -> Non
     score0, score_note = I.default_score(wd)
     cks = P.find_checkpoints(wd, ckpt, project.proposer_ckpt)
     d0 = I.ckpt_defaults(cks[0] if cks else None, project)
+    det = I.W.load_config(wd).get("detector") or {}          # settings the constants were calibrated with
+    if det.get("score"):
+        score0, score_note = float(det["score"]), "score used when the weight constants were calibrated"
+    d0.update({k: det[k] for k in ("tile", "overlap") if det.get(k)})
+    std0 = float(det.get("std_mm_per_px") or DEFAULT_TARGET_MM_PER_PX)
     classes = project.classes
 
     gr.Markdown("### Inference: photos -> boxes -> kernel count / area -> weight")
@@ -71,7 +76,7 @@ def build_inference_tab(project, wd: Path, ckpt: str | None, device: str) -> Non
                 std_on = gr.Checkbox(value=True, label="Fixed scale from the marker sheet",
                                      info="measure mm per pixel from the printed markers and resize the photo "
                                           "to the same scale before detection (any phone, any height)")
-                std_mm = gr.Number(value=DEFAULT_TARGET_MM_PER_PX, label="fixed scale (mm per pixel)",
+                std_mm = gr.Number(value=std0, label="fixed scale (mm per pixel)",
                                    precision=3)
             with gr.Row():
                 max_side = gr.Slider(0, 6000, 0, step=100, label="downscale longest side to (0 = off; faster on "

@@ -168,6 +168,9 @@ def leave_one_pile_out(t: SampleTable, model_cls) -> dict:
 
 
 # ---- task 3 ---------------------------------------------------------------------------------------
+NOT_MEASURED: dict[str, str] = {}      # stages that could not be measured (shown as such, never as 0 %)
+
+
 def stage_errors(t: SampleTable, lab: dict, model_feature: str, top_rel_sd: float | None = None) -> dict:
     """Relative standard error of each stage, measured in task 1. Returns {stage: (value, how)}.
     Each physical error source is counted ONCE:
@@ -208,12 +211,15 @@ def stage_errors(t: SampleTable, lab: dict, model_feature: str, top_rel_sd: floa
         var_round = ((res or 0) / math.sqrt(12) / w_b) ** 2
         cv_seed = math.sqrt(max(var_batch - var_round, 0.0) * n_b)
         n_main = statistics.fmean([s.features.get(model_feature, 0) for s in main]) if len(main) else None
-        if n_main:
-            note = "" if var_batch > var_round else "; batch spread not above rounding"
+        if n_main and var_batch > var_round:
             out["kernel_weight"] = (cv_seed / math.sqrt(n_main),
                                     f"cv per seed {cv_seed:.3f} from {len(batches)} batches of ~{n_b:.0f} seeds "
                                     f"weighed at {res} g (rounding removed; few batches: rough) "
-                                    f"/ sqrt(mean count {n_main:.0f}){note}")
+                                    f"/ sqrt(mean count {n_main:.0f})")
+        elif n_main:            # no measurement, NOT zero: it may be part of 'unexplained'
+            NOT_MEASURED["kernel_weight"] = (f"{len(batches)} batches of ~{n_b:.0f} seeds all read "
+                                             f"{', '.join(str(b['weight_g']) for b in batches)} g on a {res} g scale: "
+                                             f"their spread is below what the scale can show")
     counted = [s for s in t if s.meta.get("manual_count") not in (None, "")]
     if is_count and len(counted) > 1:
         rel = [(s.features.get(model_feature, 0) - float(s.meta["manual_count"])) / float(s.meta["manual_count"])
@@ -237,7 +243,9 @@ def stage_errors(t: SampleTable, lab: dict, model_feature: str, top_rel_sd: floa
         bottom = math.sqrt(sum(v[0] ** 2 for v in out.values()))
         if top_rel_sd > bottom:
             out["unexplained"] = (math.sqrt(top_rel_sd ** 2 - bottom ** 2),
-                                  "sqrt(top-down^2 - sum of the stages above^2): not measured separately")
+                                  "sqrt(top-down^2 - sum of the stages above^2). Possible causes, NOT measured: "
+                                  "seed-to-seed weight variation (kernel_weight: not measurable), seeds lying "
+                                  "close together missed by the detector, differences in seed mix between piles")
     return out
 
 
@@ -281,7 +289,7 @@ def run(workdir: str, lab_path: str | None, out_dir: str, use: str = "reviewed")
         sizes = list(range(3, len(x) + 1))
         lc = learning_curve(t, f, sizes=sizes, crop=CROP, repeats=500) or []
         res[f"learning_curve_{f}"] = lc
-        lines += [f"**{f}**: spread of the fitted constant (weight / {f}) over random subsets of n piles.", "",
+        lines += [f"**{f}**: spread of the fitted constant (weight / {f}) over bootstrap draws of n piles (with replacement).", "",
                   "| n piles | constant mean | constant rel. sd | r mean | r 2.5 % |", "|---|---|---|---|---|"]
         for e in lc:
             if e["ratio_mean"] is not None:
@@ -299,6 +307,8 @@ def run(workdir: str, lab_path: str | None, out_dir: str, use: str = "reviewed")
     for w in wb:
         lines.append(f"| {w['feature']} | {w['piles_with_repeats']} | {_f(w['within_pile_rel_sd'], pct=True)} | "
                      f"{_f(w['between_pile_ratio_rel_sd'], pct=True)} |")
+    lines += ["", "(These two columns use the main AND the re-spread photos, so the pile-to-pile spread can differ a "
+              "little from the feature table above, which uses the main photos only.)"]
 
     # calibrate both models + honest errors
     lines += ["", "## Calibrated models", ""]
@@ -327,10 +337,16 @@ def run(workdir: str, lab_path: str | None, out_dir: str, use: str = "reviewed")
         pr = propagate({k: v[0] for k, v in st.items()}, weight_g=w_mean)
         res[f"budget_{cls.name}"] = {"stages": {k: v[0] for k, v in st.items()}, "how": {k: v[1] for k, v in st.items()},
                                      "propagate": pr, "top_down_rel_sd": top}
+        NOT_MEASURED.clear()
+        st = stage_errors(t_all, lab, feat, top_rel_sd=top)
+        pr = propagate({k: v[0] for k, v in st.items()}, weight_g=w_mean)
+        res[f"budget_{cls.name}"]["not_measured"] = dict(NOT_MEASURED)
         lines += [f"**{cls.name}** (at the mean pile weight {w_mean:.1f} g)", "",
                   "| stage | relative error | share of variance | how measured |", "|---|---|---|---|"]
         for k, (v, how) in st.items():
             lines.append(f"| {k} | {_f(v, pct=True)} | {_f(pr['budget'][k], pct=True)} | {how} |")
+        for k, how in NOT_MEASURED.items():
+            lines.append(f"| {k} | not measurable | - | {how} |")
         lines += ["", f"Total (root sum of squares, incl. 'unexplained' if present): {_f(pr['rel_total'], pct=True)} "
                       f"(+/- {pr['weight_u_g']:.2f} g, 1 sd). Dominant stage: {pr['dominant']}.",
                   f"Top-down (spread of weight/feature over the main photos): {_f(top, pct=True)}.", ""]

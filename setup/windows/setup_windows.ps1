@@ -103,6 +103,6 @@ $ModelOk = Test-Path (Join-Path $Final "model.safetensors")
 if ($SyncOk -and $ModelOk) {
     Write-Host "SETUP OK. You can close this window." -ForegroundColor Green
 } else {
-    Write-Host "SETUP FAILED (packages ok: $SyncOk, model ok: $ModelOk). Tell Claude; the log is in 03_Assignment\logs." -ForegroundColor Red
+    Write-Host "SETUP FAILED (packages ok: $SyncOk, model ok: $ModelOk). Send the log in 03_Assignment\logs to Hadi." -ForegroundColor Red
 }
 Read-Host "Press Enter to close"

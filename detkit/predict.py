@@ -61,8 +61,10 @@ def predict_paths(ckpt: str | Path, inputs: list[str | Path], out_dir: str | Pat
     """``max_side`` downscales the photo before tiling (boxes are scaled back; ``tile``/``crop`` are
     then in downscaled pixels - use it for speed on CPU). ``threads`` sets torch CPU threads.
     ``std_mm_per_px`` resizes every photo to this many mm per pixel, measured from the printed marker sheet
-    (``detkit/scale.py``), before tiling; it replaces ``max_side``. ``known_scales`` = {file name: mm per pixel}
-    for photos without markers (e.g. measured from a ruler). Boxes are always in original pixels."""
+    (``detkit/scale.py``), before tiling; ``max_side`` is then only used for photos without a scale.
+    ``known_scales`` = {file name: mm per pixel} for photos without markers (e.g. measured from a ruler).
+    With ``std_mm_per_px`` the photo is first turned upright (EXIF orientation) and the boxes are in upright
+    photo pixels; ``crop`` is then in resized pixels. Without it, boxes are in the stored photo's pixels."""
     import torch
 
     if threads:
@@ -80,6 +82,9 @@ def predict_paths(ckpt: str | Path, inputs: list[str | Path], out_dir: str | Pat
     result: dict = {}
     for f in files:
         with Image.open(f) as im:
+            if std_mm_per_px:                       # fixed scale: work on the photo as it is seen (upright)
+                from PIL import ImageOps
+                im = ImageOps.exif_transpose(im)
             im = im.convert("RGB")
             orig_size = im.size
             work = im
@@ -87,7 +92,7 @@ def predict_paths(ckpt: str | Path, inputs: list[str | Path], out_dir: str | Pat
             if std_mm_per_px:
                 from .scale import standardise
                 work, _f, info = standardise(im, std_mm_per_px, (known_scales or {}).get(f.name))
-            elif max_side and max(im.size) > max_side:
+            if work is im and max_side and max(im.size) > max_side:     # also the fallback without marker
                 k = max_side / max(im.size)
                 work = im.resize((round(im.width * k), round(im.height * k)), Image.LANCZOS)
             dets = predict_image(work, model, proc, device, tile=tile, overlap=overlap,
@@ -105,10 +110,14 @@ def predict_paths(ckpt: str | Path, inputs: list[str | Path], out_dir: str | Pat
                           "detections": dets}
         if std_mm_per_px:
             result[f.name].update({"scale_mm_per_px": info.get("scale_mm_per_px"),
-                                   "std_factor": info.get("std_factor"), "scale_note": info.get("note", "")})
+                                   "scale_source": info.get("scale_source"),
+                                   "std_factor": info.get("std_factor"),
+                                   "scale_note": "; ".join(v for v in (info.get("note"), info.get("warning")) if v),
+                                   "boxes_in": "upright photo pixels"})
         print(f"{f.name}: {len(dets)} {dict(Counter(d['label'] for d in dets))}"
-              + ((f"  scale {info['scale_mm_per_px']:.4f} mm/px" if info.get("scale_mm_per_px")
-                  else f"  {info.get('note', '')}") if std_mm_per_px else ""),
+              + ((f"  scale {info['scale_mm_per_px']:.4f} mm/px ({info.get('scale_source')})"
+                  + (f"  WARNING {info['warning']}" if info.get("warning") else "")
+                  if info.get("scale_mm_per_px") else f"  {info.get('note', '')}") if std_mm_per_px else ""),
               flush=True)
     (out_dir / "predictions.json").write_text(json.dumps(result, indent=1), encoding="utf-8")
     return result
