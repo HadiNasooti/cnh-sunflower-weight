@@ -24,3 +24,11 @@ Detector on cropped photos (tile 1500, score 0.38): pilot apart 460 (sunflower 4
 Batches, sunflower boxes: B1-40 205, B2-40 199, B3-40 206, B1-25 206, B2-25 199, B3-25 205 (bias +1.7 %, sd 1.7 %). All boxes: 210, 212, 217, 229, 234, 257.
 Before cropping, B2-40 had 6 sunflower boxes on the trousers at the photo edge, and B3-40 had 1 on the phone at the top. Rule: only the table in the photo.
 Counts also change by a few seeds when the same photo is stored differently (other tile layout), e.g. B1-40: 202 before, 205 after.
+
+# Main collection (collector: Hadi, Mon 19 Oct 2026, 13:23 to 15:00, daylight, at home)
+Piles P01 to P08 done (10 to 24 g in 2 g steps); P09 to P15 not done. Hadi reported that every pile weighed its target weight.
+Photos (labels read from the notes): P01 4147/4148, P02 4149/4150, P03 4152/4153, P03-R 4155/4156, P03-T 4157/4158, P04 4159/4160, P05 4163/4164, P06 4165/4166, P07 4167/4168, P08 4169/4170, P08-T 4171/4172, P08-R 4173/4174 (two photos each for R and T).
+Most photos were cropped on the phone before upload; 4165/4166 (P06) showed knees at the bottom and were cropped to 86 % of the height. All photos turned upright, location data removed.
+Printed ArUco marker (50 mm) found automatically in all 24 photos. Scale ranged from 0.106 to 0.136 mm per pixel, so the camera height varied (roughly 36 to 46 cm if 0.12 mm/px is 40 cm; estimate, not measured). The two markers in one photo differ by up to 3 %, a sign of a slightly tilted phone.
+Detector (tile 1500, score 0.38), sunflower boxes, main photos: grams per seed 0.0500 to 0.0610, mean 0.0542, relative sd 5.9 % (16 photos). The count falls about 4 % for every +0.01 mm/px (correlation -0.63): photos taken from higher up miss seeds. Example: P01 photo A 185 seeds at 0.108 mm/px, photo B 164 at 0.134 mm/px.
+Touching: P03 226/220 vs 278/274 apart; P08 363/364 vs 437/424 apart. Re-spread: P03 272/259, P08 466/446.
