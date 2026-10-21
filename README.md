@@ -84,6 +84,49 @@ python -m detkit app --workdir runs\mine --ckpt weights\grain_rfdetr_small_v1\fi
 ```
 A Hugging Face token (`HF_TOKEN=...` in `.env`) is only needed for pushing a model to the Hub (optional). Never commit it.
 
+
+## Authentication and security
+
+### What is authenticated?
+
+The annotation app is a local research tool, not a multi-user web service. It does **not** implement application login, user accounts, or per-user sessions. By default, `detkit app` binds to `127.0.0.1:7860`, so only programs on the same computer can reach it.
+
+The app can read, change, and save project photos, annotation boxes, metadata, and weight-calibration settings in the selected work directory. Anyone who can reach an unauthenticated app instance may be able to perform those actions. Treat network exposure as access to the project files, not merely as read-only viewing.
+
+### Hugging Face credentials
+
+Most project workflows use public Hugging Face datasets and model checkpoints and do not need a token. A Hugging Face token is only needed for authenticated actions such as pushing a trained model to the Hub.
+
+- Set `HF_TOKEN` in an untracked local `.env` file or in the process environment.
+- `.env` is excluded by `.gitignore`; `.env.example` is a placeholder only.
+- Existing process environment variables take precedence over values loaded from `.env`.
+- `python -m detkit doctor --online` sends the token as a Bearer credential to Hugging Face's `/api/whoami-v2` endpoint and reports the HTTP status. Do not paste token values into issues, logs, commits, or screenshots.
+- Use a token with the minimum permissions needed. Do not create a write token just to download public assets.
+
+Example local setup:
+
+```bash
+cp .env.example .env
+# Edit .env and set HF_TOKEN only if an authenticated Hub action needs it.
+```
+
+### Network access
+
+Keep the default localhost binding for normal use. To use the app from a phone on a trusted private hotspot, bind to the laptop's LAN interfaces only while needed:
+
+```bash
+python -m detkit app --workdir runs/mine --host 0.0.0.0
+```
+
+This does **not** enable authentication or encryption. Anyone able to reach the port on that network may be able to use the app and modify project data. Stop it with Ctrl+C when finished; do not expose it to the public internet or an untrusted network. If remote access beyond a trusted local network is necessary, put it behind an authenticated HTTPS reverse proxy or use a private VPN; do not treat a secret URL as a security control.
+
+### Security checklist
+
+- Keep `.env`, photos, annotations, and work directories out of Git; verify before committing.
+- If a token is exposed, revoke it in Hugging Face settings and create a replacement with minimal permissions.
+- Keep the app on `127.0.0.1` unless you intentionally need LAN access.
+- Do not put credentials in command-line arguments that may be captured in shell history or process listings.
+
 ## Data and baseline model (Hugging Face Hub, public: no token needed)
 Dataset: 6 classes, COCO format; read its README. Then try the baseline (downloaded in Quick start, step 2) on a
 test photo (score 0.38 = best-F1 threshold chosen on validation).
