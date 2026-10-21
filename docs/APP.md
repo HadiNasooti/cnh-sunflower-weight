@@ -62,6 +62,19 @@ photo with the phone's camera.
 * Windows asks whether to allow Python through the firewall: allow it on private networks.
 * Anyone on the network can open the app while it runs this way; stop it (Ctrl+C) when you are done.
 
+
+## Access control and safe network use
+
+The app has **no built-in login or user authentication**. Its default host is `127.0.0.1`, which is suitable for work on the same computer. Because the app can save annotations, metadata, and calibration settings, anyone who can reach a running instance should be treated as having project write access.
+
+For phone access on a trusted private hotspot only, you can temporarily use:
+
+```bash
+python -m detkit app --workdir runs/mine --ckpt weights/grain_rfdetr_small_v1/final --host 0.0.0.0
+```
+
+Binding to `0.0.0.0` only makes the service listen on network interfaces; it does not add a login or HTTPS encryption. Stop the app with Ctrl+C as soon as you finish. Do not use this mode on public/untrusted Wi-Fi or expose the port to the internet. For sustained remote access, use an authenticated HTTPS reverse proxy or private VPN.
+
 ## After reviewing
 Go to weight estimation ([WEIGHT.md](WEIGHT.md)). Retraining the detector (`detkit split --from-reviewed` ->
 `detkit train`, [TRAINING.md](TRAINING.md)) is possible but optional and not part of the course.
