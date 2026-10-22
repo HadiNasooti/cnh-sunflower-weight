@@ -281,6 +281,25 @@ if fs:
     results["no_fixed_scale_vs_fixed_pct"] = {"mean": round(float(d.mean()), 1), "min": round(float(d.min()), 1),
                                               "max": round(float(d.max()), 1), "n_photos": len(d)}
 
+# task 4 question: does the count still correlate best with the weight for the other person? (per photo,
+# main/Task4 photos with a marker, note boxes dropped; area = sum of sunflower box areas in mm2)
+feat = {}
+for folder in ("2026-10-19_main", "2026-10-20_task4", "2026-10-21_extra_piles"):
+    std, zn = load_pred(folder, "std"), zones(folder)
+    for p in photos:
+        if p["folder"] != folder or p["condition"] not in ("main", "Task4") or not p["predicted_g"]:
+            continue
+        mm, poly = std[p["file"]]["scale_mm_per_px"], zn.get(p["file"])
+        areas = [(d["bbox"][2] - d["bbox"][0]) * (d["bbox"][3] - d["bbox"][1]) * mm * mm
+                 for d in std[p["file"]]["detections"] if d["label"] == CROP and not
+                 (poly is not None and inside(poly, (d["bbox"][0] + d["bbox"][2]) / 2, (d["bbox"][1] + d["bbox"][3]) / 2))]
+        feat.setdefault(p["collector"], []).append((p["weight_after_g"], p["count_sunflower"], sum(areas),
+                                                    sum(areas) / len(areas)))
+results["feature_correlation_r"] = {
+    who: {"n_photos": len(v), **{name: round(float(np.corrcoef([x[0] for x in v], [x[i] for x in v])[0, 1]), 4)
+                                 for i, name in ((1, "count"), (2, "total_box_area_mm2"), (3, "mean_box_area_mm2"))}}
+    for who, v in feat.items()}
+
 (OUT / "results.json").write_text(json.dumps(results, indent=1))
 print(json.dumps(results, indent=1))
 

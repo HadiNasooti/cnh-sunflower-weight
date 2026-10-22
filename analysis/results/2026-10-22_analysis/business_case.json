@@ -7,7 +7,7 @@
   "minutes_per_pile": {
    "Hadi P01-P08, 10-24 g": 12.7,
    "Jia task 4, 11-23 g": 10.8,
-   "Jia P09-P13, 26-34 g": 21.6
+   "Jia P09-P13, 27-34 g": 21.6
   },
   "same_setup_photo_gaps_s": [
    22,
@@ -19,10 +19,21 @@
    3
   ]
  },
+ "photo_time_all_sessions": {
+  "minutes_per_session": {
+   "2026-10-17_pilot": 2.7,
+   "2026-10-17_batches": 20.8,
+   "2026-10-19_main": 97.1,
+   "2026-10-20_task4": 33.1,
+   "2026-10-21_extra_piles": 86.5,
+   "2026-10-19_gauge_rr": 18.8
+  },
+  "total_hours": 4.32
+ },
  "cost_per_pile_eur": {
   "Hadi P01-P08, 10-24 g": 10.2,
   "Jia task 4, 11-23 g": 8.68,
-  "Jia P09-P13, 26-34 g": 17.35
+  "Jia P09-P13, 27-34 g": 17.35
  },
  "extra_photo": {
   "median_s": 19,

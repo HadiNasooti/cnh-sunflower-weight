@@ -25,7 +25,7 @@ N_NOW = 17
 MIN_PER_PILE = {                                         # measured from photo timestamps (results.json)
     "Hadi P01-P08, 10-24 g": R["minutes_per_pile"]["2026-10-19_main"]["min_between_piles_mean"],
     "Jia task 4, 11-23 g": R["minutes_per_pile"]["2026-10-20_task4"]["min_between_piles_mean"],
-    "Jia P09-P13, 26-34 g": R["minutes_per_pile"]["2026-10-21_extra_piles"]["min_between_piles_mean"],
+    "Jia P09-P13, 27-34 g": R["minutes_per_pile"]["2026-10-21_extra_piles"]["min_between_piles_mean"],
 }
 
 
@@ -64,6 +64,26 @@ out = {"inputs": {"rate_eur_per_h": RATE_EUR_PER_H, "rate_source": "Eurostat 202
                   "s_rel_pct": round(100 * S_REL, 2), "n_piles_now": N_NOW,
                   "minutes_per_pile": MIN_PER_PILE, "same_setup_photo_gaps_s": SAME_SETUP_GAPS_S}}
 
+
+
+def session_photo_hours() -> dict:
+    """Photo time per data-collection session: first to last photo (EXIF), so the last pile's own time,
+    travel and preparation are not included."""
+    import csv
+    import datetime as dt
+
+    from PIL import Image
+    spans = {}
+    for r in csv.DictReader(open(ROOT / "data/samples.csv", encoding="utf-8-sig")):
+        ex = Image.open(ROOT / "data/photos" / r["folder"] / r["file"]).getexif()
+        v = ex.get_ifd(0x8769).get(36867) or ex.get(306)
+        if v:
+            spans.setdefault(r["folder"], []).append(dt.datetime.strptime(v, "%Y:%m:%d %H:%M:%S"))
+    mins = {k: round((max(v) - min(v)).total_seconds() / 60, 1) for k, v in spans.items()}
+    return {"minutes_per_session": mins, "total_hours": round(sum(mins.values()) / 60, 2)}
+
+
+out["photo_time_all_sessions"] = session_photo_hours()
 out["cost_per_pile_eur"] = {k: round(v / 60 * RATE_EUR_PER_H, 2) for k, v in MIN_PER_PILE.items()}
 med_gap = sorted(SAME_SETUP_GAPS_S)[len(SAME_SETUP_GAPS_S) // 2]
 out["extra_photo"] = {"median_s": med_gap, "cost_eur": round(med_gap / 3600 * RATE_EUR_PER_H, 2),

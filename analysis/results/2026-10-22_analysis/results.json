@@ -225,6 +225,20 @@
   "max": 1.7,
   "n_photos": 42
  },
+ "feature_correlation_r": {
+  "Hadi": {
+   "n_photos": 16,
+   "count": 0.989,
+   "total_box_area_mm2": 0.9836,
+   "mean_box_area_mm2": 0.5104
+  },
+  "Jia": {
+   "n_photos": 18,
+   "count": 0.9939,
+   "total_box_area_mm2": 0.9884,
+   "mean_box_area_mm2": 0.0742
+  }
+ },
  "bound_levels": {
   "app_bound_19oct_pct": 9.98,
   "app_bound_level": "one photo (photo-level spread of 16 photos, t with 8 piles)",
