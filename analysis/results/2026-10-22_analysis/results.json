@@ -1,7 +1,7 @@
 {
  "constant_used_g_per_seed": 0.052939411479942425,
  "bound_rel_halfwidth": 0.09983845781553496,
- "weight_rule": "after weight (PROCEDURE.md step 10, written 17 Oct before these data: photographed, then weighed)",
+ "weight_rule": "after weight (PROCEDURE.md step 10, written 19 Oct, before these data of 20-21 Oct: photographed, then weighed)",
  "groups": [
   {
    "group": "Hadi P01-P08 (10-24 g): FIT, in-sample",
@@ -59,7 +59,7 @@
  "jia_coverage": {
   "inside": "9 of 9",
   "prob_all_inside_if_true_coverage_95": 0.63,
-  "coverage_lower_bound_95": 0.72
+  "coverage_lower_bound_one_sided_95": 0.72
  },
  "jia_inside_with_before_weight": "8 of 9",
  "welch_hadi_vs_task4": {
@@ -511,7 +511,7 @@
   }
  ],
  "minutes_per_pile": {
-  "definition": "elapsed time from the first photo of one pile to the first photo of the next: spreading, label photo, 2 photos, weighing, extras (R and T photos on P03 and P08) and breaks",
+  "definition": "elapsed time from the first photo of one pile to the first photo of the next: spreading, label photo, 2 photos, weighing, extras (R and T photos on P03 and P08) and breaks. Jia's photos: DateTimeOriginal; Hadi's main photos have none left (removed when cropped), so their times are the file time (EXIF DateTime)",
   "2026-10-19_main": {
    "n_piles": 8,
    "n_gaps": 7,

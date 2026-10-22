@@ -85,7 +85,7 @@ def before_weight(notes: str, after: float | None) -> float | None:
 
 # seeds cut in half by Jia's own crop at the photo edge (found with tools/check_note_zones.py-style dark-spot
 # check and looked at one by one, 22 Oct); still counted when the visible part is detected
-SEEDS_CUT = {"IMG_2302.jpg": 1, "IMG_2305.jpg": 4, "IMG_2319.jpg": 2}
+SEEDS_CUT = {"IMG_2302.jpg": 1, "IMG_2305.jpg": 4, "IMG_2319.jpg": 2, "IMG_2332.jpg": 1}
 FIT = {"2026-10-19_main"}          # piles the 19 Oct constant and bound were fitted on (in-sample)
 
 rows = list(csv.DictReader(open(ROOT / "data/samples.csv", encoding="utf-8-sig")))
@@ -181,7 +181,7 @@ main = group(lambda p: p["folder"] == "2026-10-19_main")
 t4 = group(lambda p: p["folder"] == "2026-10-20_task4")
 extra = group(lambda p: p["folder"] == "2026-10-21_extra_piles")
 results = {"constant_used_g_per_seed": G_PER_SEED, "bound_rel_halfwidth": HALF,
-           "weight_rule": "after weight (PROCEDURE.md step 10, written 17 Oct before these data: photographed, then weighed)",
+           "weight_rule": "after weight (PROCEDURE.md step 10, written 19 Oct, before these data of 20-21 Oct: photographed, then weighed)",
            "groups": [summary(main, "Hadi P01-P08 (10-24 g): FIT, in-sample"),
                       summary(t4, "Jia task 4 (11-23 g): test"),
                       summary(extra, "Jia P09-P13 (26-34 g): test"),
@@ -191,7 +191,7 @@ jia = t4 + extra
 k_in = sum(p["inside_bounds"] for p in jia)
 results["jia_coverage"] = {"inside": f"{k_in} of {len(jia)}",
                            "prob_all_inside_if_true_coverage_95": round(0.95 ** len(jia), 2),
-                           "coverage_lower_bound_95": round(float(stats.beta.ppf(0.05, k_in, len(jia) - k_in + 1)), 2)
+                           "coverage_lower_bound_one_sided_95": round(float(stats.beta.ppf(0.05, k_in, len(jia) - k_in + 1)), 2)
                            if k_in == len(jia) else None}
 # same check with the BEFORE weight where one was written
 ins_b = []
@@ -387,7 +387,9 @@ for folder in ("2026-10-19_main", "2026-10-20_task4", "2026-10-21_extra_piles"):
     times[folder] = {"n_piles": len(ts), "n_gaps": len(gaps), "min_between_piles_mean": round(float(np.mean(gaps)), 1),
                      "min_between_piles_range": [round(min(gaps), 1), round(max(gaps), 1)]}
 results["minutes_per_pile"] = {"definition": "elapsed time from the first photo of one pile to the first photo of the next: "
-                               "spreading, label photo, 2 photos, weighing, extras (R and T photos on P03 and P08) and breaks",
+                               "spreading, label photo, 2 photos, weighing, extras (R and T photos on P03 and P08) and breaks. "
+                               "Jia's photos: DateTimeOriginal; Hadi's main photos have none left (removed when cropped), "
+                               "so their times are the file time (EXIF DateTime)",
                                **times}
 
 (OUT / "results.json").write_text(json.dumps(results, indent=1))
