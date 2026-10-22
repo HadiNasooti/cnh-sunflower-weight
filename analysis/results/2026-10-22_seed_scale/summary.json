@@ -1,0 +1,178 @@
+{
+ "typical_seed_length_mm": {
+  "typical_seed_length_mm_hadi_main": 11.249,
+  "typical_seed_length_mm_all_marker_photos": 11.4858,
+  "used": "hadi_main"
+ },
+ "1_count_diff_pct_vs_marker": {
+  "all": {
+   "n": 58,
+   "mean": -0.95,
+   "sd": 1.64,
+   "mean_abs": 1.41,
+   "min": -5.6,
+   "max": 2.47
+  },
+  "2026-10-19_gauge_rr": {
+   "n": 16,
+   "mean": -0.7,
+   "sd": 1.55,
+   "mean_abs": 1.32,
+   "min": -4.42,
+   "max": 2.47
+  },
+  "2026-10-19_main": {
+   "n": 24,
+   "mean": -0.6,
+   "sd": 1.72,
+   "mean_abs": 1.22,
+   "min": -5.6,
+   "max": 1.78
+  },
+  "2026-10-20_task4": {
+   "n": 8,
+   "mean": -1.44,
+   "sd": 1.24,
+   "mean_abs": 1.57,
+   "min": -3.33,
+   "max": 0.5
+  },
+  "2026-10-21_extra_piles": {
+   "n": 10,
+   "mean": -1.76,
+   "sd": 1.7,
+   "mean_abs": 1.91,
+   "min": -4.36,
+   "max": 0.39
+  }
+ },
+ "1_pass1_only_count_diff_pct": {
+  "n": 58,
+  "mean": -1.7,
+  "sd": 3.35,
+  "mean_abs": 2.03,
+  "min": -22.15,
+  "max": 2.47
+ },
+ "1_scale_diff_pct_vs_marker": {
+  "n": 58,
+  "mean": -2.3,
+  "sd": 2.61,
+  "mean_abs": 2.74,
+  "min": -6.87,
+  "max": 4.43
+ },
+ "1_worst_photos": [
+  {
+   "file": "IMG_4158.JPG",
+   "count_diff_pct": -5.6,
+   "scale_diff_pct": -2.6
+  },
+  {
+   "file": "IMG_4179.JPG",
+   "count_diff_pct": -4.42,
+   "scale_diff_pct": -2.58
+  },
+  {
+   "file": "IMG_2328.jpg",
+   "count_diff_pct": -4.36,
+   "scale_diff_pct": -4.8
+  },
+  {
+   "file": "IMG_2327.jpg",
+   "count_diff_pct": -4.04,
+   "scale_diff_pct": -4.26
+  },
+  {
+   "file": "IMG_4171.JPG",
+   "count_diff_pct": -3.86,
+   "scale_diff_pct": -3.82
+  }
+ ],
+ "2_bound_seed": {
+  "n_piles": 17,
+  "g_per_seed": 0.05385,
+  "rel_sd_pct": 4.32,
+  "bound_pct": 9.42
+ },
+ "2_bound_marker": {
+  "n_piles": 17,
+  "g_per_seed": 0.05336,
+  "rel_sd_pct": 3.97,
+  "bound_pct": 8.66
+ },
+ "2_jia_test_seed": {
+  "hadi_bound_pct": 10.69,
+  "bias_pct": -2.86,
+  "mean_abs_err_pct": 3.59,
+  "inside": "9 of 9"
+ },
+ "2_jia_test_marker": {
+  "hadi_bound_pct": 10.16,
+  "bias_pct": -1.33,
+  "mean_abs_err_pct": 3.42,
+  "inside": "9 of 9"
+ },
+ "3_gauge_rr_seed_scale": {
+  "n": 17,
+  "min": 281,
+  "max": 295,
+  "mean": 287.7,
+  "rel_sd_pct": 1.24,
+  "marker_same_photos_rel_sd_pct": 1.16,
+  "Jia_minus_Hadi_pct_95ci": [
+   -0.4,
+   0.8,
+   2.1
+  ],
+  "iPhone 14 1x_minus_iPhone 15 Pro 1x_pct_95ci": [
+   -0.2,
+   1.0,
+   2.3
+  ],
+  "high_minus_normal_pct_95ci": [
+   -1.5,
+   -0.1,
+   1.2
+  ],
+  "IMG_2261_no_marker": 292.0
+ },
+ "4_seed_length_mm_by_folder": {
+  "2026-10-19_main": {
+   "n": 24,
+   "mean": 11.25,
+   "sd": 0.17,
+   "mean_abs": 11.25,
+   "min": 10.76,
+   "max": 11.49
+  },
+  "2026-10-20_task4": {
+   "n": 8,
+   "mean": 11.88,
+   "sd": 0.1,
+   "mean_abs": 11.88,
+   "min": 11.72,
+   "max": 12.04
+  },
+  "2026-10-21_extra_piles": {
+   "n": 10,
+   "mean": 11.75,
+   "sd": 0.22,
+   "mean_abs": 11.75,
+   "min": 11.37,
+   "max": 11.96
+  },
+  "2026-10-19_gauge_rr": {
+   "n": 16,
+   "mean": 11.48,
+   "sd": 0.15,
+   "mean_abs": 11.48,
+   "min": 11.27,
+   "max": 11.77
+  }
+ },
+ "4_count_change_per_1pct_scale_error": {
+  "slope": 0.247,
+  "r": 0.39
+ }
+}
