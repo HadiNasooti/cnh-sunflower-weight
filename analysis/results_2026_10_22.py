@@ -30,14 +30,22 @@ cfg = json.loads((RES / "main_std/weight_config.json").read_text())
 G_PER_SEED = cfg["crop_count_constants"][CROP]                 # 0.05294 g per seed (Hadi P01-P08, 19 Oct)
 HALF = cfg["crop_count_constants_bounds"][CROP]["rel_halfwidth"]  # 0.0998 -> +-10.0 %
 
-RUNS = {"2026-10-19_main": "2026-10-22_detect_main"}
-for f in ("2026-10-20_task4", "2026-10-21_extra_piles", "2026-10-19_gauge_rr"):
-    RUNS[f] = "2026-10-22_detect"
+# detector runs per photo folder; later runs are added to earlier ones. 2026-10-22_detect_rr5 = IMG_4179-4183
+# (run on 22 Oct evening with the same model and settings) plus IMG_4187 as a control: it gives exactly the
+# same boxes as the first run.
+RUNS = {"2026-10-19_main": ["2026-10-22_detect_main"],
+        "2026-10-20_task4": ["2026-10-22_detect"],
+        "2026-10-21_extra_piles": ["2026-10-22_detect"],
+        "2026-10-19_gauge_rr": ["2026-10-22_detect", "2026-10-22_detect_rr5"]}
 
 
 def load_pred(folder: str, mode: str) -> dict:
-    p = RES / RUNS[folder] / mode / folder / "predictions.json"
-    return json.loads(p.read_text()) if p.exists() else {}
+    out = {}
+    for run in RUNS[folder]:
+        p = RES / run / mode / folder / "predictions.json"
+        if p.exists():
+            out.update(json.loads(p.read_text()))
+    return out
 
 
 def zones(folder: str) -> dict:
@@ -72,6 +80,12 @@ def count(pred: dict, poly: np.ndarray | None) -> tuple[int, int, int]:
             else:
                 keep += 1
     return keep, drop, allc
+
+
+def marker_diff(pred: dict) -> float | None:
+    """Difference between the two markers (a sign of a tilted phone), from the detector's scale note."""
+    m = re.search(r"markers differ by ([\d.]+) %", pred.get("warning", "") + " " + pred.get("scale_note", ""))
+    return float(m.group(1)) if m else None
 
 
 def before_weight(notes: str, after: float | None) -> float | None:
@@ -109,6 +123,7 @@ for folder in RUNS:
             "collector": r["collector"], "phone": r["phone"], "height_cm": r["height_cm"],
             "height_class": hm.group(1) if hm else "",
             "scale_mm_per_px": std[f].get("scale_mm_per_px"), "scale_note": std[f].get("scale_note", ""),
+            "marker_diff_pct": marker_diff(std[f]),
             "count_sunflower": n, "boxes_in_note_dropped": dropped, "count_all_classes": n_all,
             "count_sunflower_no_fixed_scale": n_raw,
             "weight_before_g": before_weight(r["notes"], w), "weight_after_g": w,
@@ -304,8 +319,8 @@ bal_rel = np.mean([0.2887 / x for x in wt])          # 1 g scale step: sd 1/sqrt
 results["floor_note"] = {"floor_is_for": "this setup (1 g kitchen scale, one seed lot), not for the method",
                          "balance_rms_rel_pct": round(100 * float(np.sqrt(np.mean([(0.2887 / x) ** 2 for x in wt]))), 2),
                          "floor_without_balance_pct_estimate": round(100 * 1.959964 * math.sqrt(max(s_rel ** 2 - float(np.mean([(0.2887 / x) ** 2 for x in wt])), 0)), 2)}
-results["pooling_note"] = ("pooling all 17 piles is conditional (STATUS 4b): task 4 shows no difference, but the "
-                           "Gauge R&R is incomplete (5 photos missing); the 19 Oct constant stays in the app until then")
+results["pooling_note"] = ("pooling all 17 piles is conditional (STATUS 4b): pool only if task 4 and the Gauge R&R show "
+                           "no person or phone difference; see gauge_rr_marker_ok for the complete R&R")
 
 # Gauge R&R without the photo where no marker was found (the app would refuse it)
 ok = [p for p in rr if p["scale_mm_per_px"]]
@@ -347,7 +362,8 @@ if ok:
     gr2["repeatability_sd_95ci_seeds"] = [round(ci[0], 1), round(ci[1], 1)]
     gr2["repeatability_rel_pct"] = round(100 * rep_sd / grand, 2)
     # 95 % CIs of the person and phone differences (Welch), so the size an effect could still have is visible
-    for fac, (l1, l2) in (("collector", ("Jia", "Hadi")), ("phone", ("iPhone 14 1x", "iPhone 15 Pro 1x"))):
+    for fac, (l1, l2) in (("collector", ("Jia", "Hadi")), ("phone", ("iPhone 14 1x", "iPhone 15 Pro 1x")),
+                          ("height_class", ("high", "normal"))):
         a = np.array([p["count_sunflower"] for p in ok if p[fac] == l1], float)
         b = np.array([p["count_sunflower"] for p in ok if p[fac] == l2], float)
         va, vb = a.var(ddof=1) / len(a), b.var(ddof=1) / len(b)
@@ -356,7 +372,8 @@ if ok:
         d = a.mean() - b.mean()
         gr2[f"diff_{l1}_minus_{l2}_pct_95ci"] = [round(100 * (d - h) / grand, 1), round(100 * d / grand, 1),
                                                  round(100 * (d + h) / grand, 1)]
-    gr2["missing"] = "IMG_4179-4183 (iPhone 15 Pro, probably normal height) not yet in the repo; heights are labelled normal/high, not measured"
+    gr2["note"] = ("complete design: 2 persons x 2 phones x 2 heights; heights are labelled normal/high (from the "
+                   "sticky notes), not measured; IMG_4183 has a tilt warning (markers differ 9.5 %) and is kept")
 
 # before or after weight: which one does the photo agree with? (piles with two different readings)
 ba = [p for p in pile_rows if p["weight_before_g"] and p["weight_before_g"] != p["weight_after_g"]]

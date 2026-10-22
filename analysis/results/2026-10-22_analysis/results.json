@@ -93,8 +93,8 @@
  },
  "gauge_rr_all_12_photos_incl_no_marker (do not use: IMG_2261 has no fixed scale)": {
   "all": {
-   "n": 12,
-   "mean": 286.4,
+   "n": 17,
+   "mean": 287.4,
    "counts": [
     253,
     289,
@@ -107,7 +107,12 @@
     289,
     290,
     287,
-    288
+    288,
+    294,
+    290,
+    290,
+    291,
+    283
    ]
   },
   "iPhone 14 1x | Hadi | normal": {
@@ -143,9 +148,13 @@
    ]
   },
   "iPhone 15 Pro 1x | Hadi | normal": {
-   "n": 0,
-   "mean": null,
-   "counts": []
+   "n": 3,
+   "mean": 291.3,
+   "counts": [
+    294,
+    290,
+    290
+   ]
   },
   "iPhone 15 Pro 1x | Hadi | high": {
    "n": 2,
@@ -156,9 +165,12 @@
    ]
   },
   "iPhone 15 Pro 1x | Jia | normal": {
-   "n": 0,
-   "mean": null,
-   "counts": []
+   "n": 2,
+   "mean": 287.0,
+   "counts": [
+    291,
+    283
+   ]
   },
   "iPhone 15 Pro 1x | Jia | high": {
    "n": 2,
@@ -168,24 +180,24 @@
     290
    ]
   },
-  "rel_sd_all_pct": 3.83,
-  "range_pct": 15.71,
+  "rel_sd_all_pct": 3.28,
+  "range_pct": 15.66,
   "by_phone": {
    "iPhone 14 1x": 285.4,
-   "iPhone 15 Pro 1x": 288.5
+   "iPhone 15 Pro 1x": 289.1
   },
   "by_collector": {
-   "Jia": 284.3,
-   "Hadi": 288.5
+   "Jia": 285.0,
+   "Hadi": 289.4
   },
   "by_height_class": {
-   "normal": 280.2,
+   "normal": 285.4,
    "high": 289.5
   },
-  "no_fixed_scale_rel_sd_pct": 18.73,
-  "no_fixed_scale_range_pct": 68.67,
+  "no_fixed_scale_rel_sd_pct": 17.97,
+  "no_fixed_scale_range_pct": 72.12,
   "scale_mm_per_px_range": [
-   0.1444,
+   0.1021,
    0.2496
   ]
  },
@@ -201,7 +213,9 @@
   "IMG_2269.jpg": 2,
   "IMG_2267.jpg": 2,
   "IMG_2268.jpg": 1,
-  "IMG_4185.JPG": 1
+  "IMG_4185.JPG": 1,
+  "IMG_4182.JPG": 4,
+  "IMG_4183.JPG": 2
  },
  "no_fixed_scale_vs_fixed_pct": {
   "mean": -6.6,
@@ -376,12 +390,12 @@
   "balance_rms_rel_pct": 1.73,
   "floor_without_balance_pct_estimate": 7.0
  },
- "pooling_note": "pooling all 17 piles is conditional (STATUS 4b): task 4 shows no difference, but the Gauge R&R is incomplete (5 photos missing); the 19 Oct constant stays in the app until then",
+ "pooling_note": "pooling all 17 piles is conditional (STATUS 4b): pool only if task 4 and the Gauge R&R show no person or phone difference; see gauge_rr_marker_ok for the complete R&R",
  "gauge_rr_marker_ok": {
-  "n": 11,
+  "n": 16,
   "mean": 289.5,
-  "rel_sd_pct": 1.11,
-  "range_pct": 3.8,
+  "rel_sd_pct": 1.16,
+  "range_pct": 5.18,
   "excluded": [
    "IMG_2261.jpg"
   ],
@@ -391,24 +405,24 @@
     7
    ],
    "iPhone 15 Pro 1x": [
-    288.5,
-    4
+    289.1,
+    9
    ]
   },
   "by_collector": {
    "Jia": [
-    290.6,
-    5
+    289.6,
+    7
    ],
    "Hadi": [
-    288.5,
-    6
+    289.4,
+    9
    ]
   },
   "by_height_class": {
    "normal": [
-    289.3,
-    3
+    289.5,
+    8
    ],
    "high": [
     289.5,
@@ -416,9 +430,9 @@
    ]
   },
   "no_fixed_scale": {
-   "rel_sd_pct": 19.59,
+   "rel_sd_pct": 18.57,
    "min": 112,
-   "max": 272
+   "max": 292
   },
   "cells": {
    "iPhone 14 1x | Jia | normal": [
@@ -443,35 +457,49 @@
    "iPhone 15 Pro 1x | Hadi | high": [
     287,
     288
+   ],
+   "iPhone 15 Pro 1x | Hadi | normal": [
+    294,
+    290,
+    290
+   ],
+   "iPhone 15 Pro 1x | Jia | normal": [
+    291,
+    283
    ]
   },
   "anova": {
-   "ms_between": 5.65,
-   "ms_within": 14.9,
+   "ms_between": 7.26,
+   "ms_within": 14.65,
    "df": [
-    5,
-    5
+    7,
+    8
    ],
-   "p_value": 0.84,
+   "p_value": 0.81,
    "verdict": "no person, phone or height effect detectable (between-cell variance not larger than within)"
   },
-  "repeatability_sd_seeds": 3.86,
+  "repeatability_sd_seeds": 3.83,
   "repeatability_sd_95ci_seeds": [
-   2.4,
-   9.5
+   2.6,
+   7.3
   ],
-  "repeatability_rel_pct": 1.33,
+  "repeatability_rel_pct": 1.32,
   "diff_Jia_minus_Hadi_pct_95ci": [
-   -1.1,
-   0.7,
-   2.5
+   -1.4,
+   0.0,
+   1.5
   ],
   "diff_iPhone 14 1x_minus_iPhone 15 Pro 1x_pct_95ci": [
-   -0.8,
-   0.5,
-   1.8
+   -1.1,
+   0.3,
+   1.7
   ],
-  "missing": "IMG_4179-4183 (iPhone 15 Pro, probably normal height) not yet in the repo; heights are labelled normal/high, not measured"
+  "diff_high_minus_normal_pct_95ci": [
+   -1.3,
+   0.0,
+   1.3
+  ],
+  "note": "complete design: 2 persons x 2 phones x 2 heights; heights are labelled normal/high (from the sticky notes), not measured; IMG_4183 has a tilt warning (markers differ 9.5 %) and is kept"
  },
  "before_vs_after": [
   {
