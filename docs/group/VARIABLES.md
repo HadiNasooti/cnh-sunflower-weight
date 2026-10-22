@@ -1,8 +1,9 @@
 # Everything that can make the weight wrong, and how we handle it (22 October 2026)
 
 Group: Hadi Nasooti, Jia. Crop: sunflower seeds with hulls. Method: weight = number of seeds the detector
-finds x grams per seed. The app now uses 0.05294 g per seed with a 95 % bound of +-10.0 % (Hadi's 8 piles of
-19 Oct). With all 17 piles it would be 0.05331 g and +-8.7 % (Hadi decides which one goes in the demo app).
+finds x grams per seed. Since 22 Oct the app uses all 17 piles: 0.05336 g per seed and a 95 % bound of +-8.7 %
+with the marker sheet; without a marker the seeds are the ruler: 0.05385 g per seed and +-9.4 % (before: Hadi's
+8 piles, 0.05294 g and +-10.0 %).
 
 All numbers come from our own photos and weighings, computed by `analysis/results_2026_10_22.py` and
 `analysis/business_case.py` (tables in `analysis/results/2026-10-22_analysis/`). Older numbers (17 and 19 Oct)

@@ -1,4 +1,4 @@
-# Sunflower seeds: data collection procedure (version 2, 19 October 2026)
+# Sunflower seeds: data collection procedure (version 3, 22 October 2026)
 
 This is the written procedure of our group (Hadi Nasooti, Jia). It must be complete enough that someone who
 was not there can follow it from this text alone: Jia for task 4, and CNH for the demo in task 6.
@@ -8,6 +8,11 @@ Based on Jia's Task 1 plan (`Task_1_Sunflower_Data_Collection_Plan`), with the c
 **Changes from version 1 (17 Oct):** the printed marker sheet replaces the ruler as the scale reference, and
 the program measures the scale itself; the pile name note is photographed separately and is not in the seed
 photos; the tested range is 10 to 24 g per photo; a bigger sample is split into portions.
+
+**Changes in version 3 (22 Oct):** never crop a photo (Jia's crops cut seeds at the edge); both markers must be
+fully in the photo (IMG_2261 had both cut by the edge); tested range now 10 to 34 g per photo (up to 651 seeds);
+the app gives every photo a light with a sentence, uses the seeds as the ruler when no marker is found, and
+uses the constants of all 17 piles.
 
 A **sample** (= one pile, `pile_id`) is one portion of seeds that is weighed and photographed.
 
@@ -93,20 +98,24 @@ Photo conditions: photos A and B = `main`, R = `re_spread`, T = `touching`.
 1. Start the app (on Hadi's laptop: `2_START_APP_double_click.bat`) and open the **Inference** tab.
 2. Upload the photos. Optionally fill in the crop (`sunflower`) and the measured weight per photo.
 3. Keep **Fixed scale from the marker sheet** ticked (0.110 mm per pixel) and the weight model
-   `crop_count_x_constant`. Tile 1500, score 0.38.
-4. Press **Run inference**. Each row shows the estimated weight with `low_g` and `high_g` (95 % prediction
-   interval: for our seeds, our phone and 10 to 24 g, about 19 of 20 true weights should fall inside) and, in
-   `note`, the measured scale. If the note says "NO MARKER FOUND", the scale was not fixed and no bounds are
-   shown: take the photo again with the marker sheet. If it says "WARNING ... tilted", take it again with the
-   phone level.
+   `crop_count_x_constant`. Tile 1500, score 0.38. The instructions for the photo are shown at the top.
+4. Press **Run inference**. Each row shows a **light** and a **message**, then the weight with `low_g` and
+   `high_g` (95 % range) and `range_pct`:
+   - green: good photo; range +-8.7 % with the markers;
+   - orange: the weight is shown, the message says what to change (seeds too close together, phone tilted,
+     more seeds than tested, too few seeds, or no marker). Without a marker the seeds are used as the ruler
+     (`scale_from` = seeds) and the range is +-9.4 %;
+   - red: no weight (no seeds found, or no marker and the seed size of the crop is not known).
+   Limits come from our 59 photos (`analysis/validate_light.py`: all 53 normal photos green, the 6 known
+   problem photos orange).
 5. For several photos of one sample (portions, rule 3): add the weights of the portions.
 
 To add photos to the data set for analysis: put them in `data/photos/<date>_<what>/`, add one line per photo
 to `data/samples.csv`, and run `analysis/build_project.py` (see the top of that file).
 
-## Limits of this procedure (version 2)
+## Limits of this procedure (version 3)
 
-- Tested for 10 to 24 g per photo, one seed lot (one bag), one white table, daylight, one phone (iPhone 15 Pro; 12 MP and 8 MP
+- Tested for 10 to 34 g per photo (17 piles, Hadi and Jia, iPhone 15 Pro and iPhone 14), one seed lot (one bag), one white table, daylight, one phone (iPhone 15 Pro; 12 MP and 8 MP
   copies of its photos were also tested). Jia's task 4 photos (iPhone 14) are the first test with another
   phone and person. Other
   varieties, other backgrounds or seeds lying on top of each other are not covered.
