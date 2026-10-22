@@ -1,0 +1,28 @@
+name: detect
+# Runs the grain detector on the cloud runner (CPU) and commits the counts back to the repository.
+on:
+  workflow_dispatch:
+    inputs:
+      folders: {description: "comma-separated photo folders", required: true}
+      out: {description: "results folder name under analysis/results", required: true}
+      modes: {description: "std,raw or std", default: "std,raw"}
+permissions:
+  contents: write
+jobs:
+  detect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+      - run: uv sync --extra cpu --extra app
+      - run: uv run hf download niru-5/manama_course_rfdetr_grain_detection --local-dir weights/grain_rfdetr_small_v1/final
+      - run: uv run python -m detkit doctor || true
+      - run: uv run python analysis/detect_new.py --folders "${{ inputs.folders }}" --out "${{ inputs.out }}" --modes "${{ inputs.modes }}"
+      - name: commit results
+        run: |
+          git config user.name "detect workflow"
+          git config user.email "actions@users.noreply.github.com"
+          git add analysis/results/${{ inputs.out }}
+          git commit -m "Detector counts: ${{ inputs.folders }} (${{ inputs.modes }})"
+          for i in 1 2 3; do git pull --rebase -q origin main && git push origin HEAD:main && break; sleep 5; done
