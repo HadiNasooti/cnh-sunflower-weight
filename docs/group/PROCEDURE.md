@@ -43,8 +43,9 @@ Phone settings, once:
 1. **Press TARE right before every weighing.** Without it, the scale read 1 g too high (zero drift, coin test).
 2. **No seed may touch another seed.** With seeds touching, the detector found 17 to 36 % fewer seeds (main
    collection and pilot, at the fixed scale).
-3. **At most 24 g of seeds per photo.** That is the range we tested (10 to 24 g). A bigger sample is split
-   into portions of 10 to 24 g; each portion is weighed and photographed on its own, and the weights are added.
+3. **At most 34 g (about 650 seeds) per photo.** That is the range we tested (10 to 34 g, version 3; it was
+   10 to 24 g in version 2). A bigger sample is split into portions; each portion is photographed on its own,
+   and the weights are added. The app warns (orange) above 651 seeds.
 4. **Marker sheet in every photo, flat, fully visible, at least 3 cm from the seeds.** The program needs the
    markers to fix the scale. Without them the count depends on the phone and the height: on 12 MP photos
    the detector found 18 % fewer seeds on average than on the full-resolution photo without the fixed
