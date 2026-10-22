@@ -19,6 +19,8 @@ Words used:
   A CI that includes 0 means "no difference found", but a difference up to the edge of the CI is still possible.
 - **p** (p-value): a high p (above 0.05) means the difference could easily be chance.
 - **Root mean square**: a kind of average size of an error.
+- **Bound**: the 95 % range around the predicted weight; about 19 of 20 true weights should fall inside it.
+- **TARE**: the scale button that sets the display to 0.
 - **P** = handled in the procedure (what the user does), **PRE** = by the program before counting,
   **POST** = by the program after counting.
 - Percentages are relative: 1 % of a 20 g pile is 0.2 g.
@@ -33,7 +35,7 @@ Words used:
 | 4 | Person who spreads, photographs and weighs | Different habits | (a) Gauge R&R, same pile; (b) task 4: Jia repeated the procedure on 4 new piles, plus 5 bigger piles | (a) Jia minus Hadi 0.0 % (95 % CI -1.4 to +1.5 %); (b) Jia's grams per seed +1.5 % (95 % CI -2.7 to +5.7 %); all 9 of Jia's piles inside Hadi's +-10 % bounds | P: written procedure (PROCEDURE.md) | The 5 steps on the screen |
 | 5 | Phone tilted (not straight down) | One side of the photo looks smaller | The two markers should be the same size; we compare them in every photo where both are found (48 of 59) | 47 of those 48 photos: markers differ 3.7 % or less. IMG_4183 (Gauge R&R): 9.5 %, count 283 against 289.5 average (-2.2 %) | P: phone level; POST: warning above 5 % | Orange: "Phone tilted: hold it flat" |
 | 6 | Marker cut by the photo edge | No scale: back to row 1 and 2 | IMG_2261 (Gauge R&R): both markers touch the edge | No marker found: -12.6 % | POST: no weight without a marker | Red: "No marker found: put both markers fully in the photo" |
-| 6b | Only one of the two markers found | Scale from one marker only; tilt cannot be checked | Counted in all 59 photos | One marker found in 10 good photos (for example IMG_4147, IMG_2304); all 10 inside the bounds: no effect shown | PRE: one marker is enough for the scale | Nothing |
+| 6b | Only one of the two markers found | Scale from one marker only; tilt cannot be checked | Counted in all 59 photos | One marker found in 10 good photos (for example IMG_4147, IMG_2304): the 9 with a weight are all inside the bounds, the 10th (IMG_2263, Gauge R&R) is +0.9 % from the average: no effect shown | PRE: one marker is enough for the scale | Nothing |
 | 7 | Seeds touching | Two touching seeds look like one; seeds hidden | 19 Oct: same piles pushed together (T photos); 17 Oct pilot | 16 to 19 % fewer seeds (19 Oct), 32 % (pilot). Boxes that overlap another box: 42 to 51 % in touching photos, 17 % or less in all normal photos | P: no seed touches another; POST: overlap check (proposed) | Orange: "Seeds too close: spread them out" |
 | 8 | Seeds close but not touching | Some missed | P06 (19 Oct), the pile with the densest spread | About 2 % missed; P06 error -7.5 % (inside the bound in the fit, but outside it when P06 is left out of the fit, 19 Oct) | Part of the spread in the bound | Nothing (covered by the bound) |
 | 9 | Size of the sample | Pile does not fit in one photo, or seeds start to touch | Piles from 10 to 34 g (17 piles), up to 651 seeds in one photo | No trend: grams per seed changes +0.2 % per 10 g (p = 0.87). Jia reported that P14 (36 g) did not fit at the height she used (not recorded in the data) | P: if the app says "too many seeds", split the sample in two photos and add the weights; POST: count check (proposed) | Orange above 651 seeds: "More seeds than we tested: split the sample" |
