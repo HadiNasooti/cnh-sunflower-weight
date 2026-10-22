@@ -232,3 +232,97 @@ if fs:
 
 (OUT / "results.json").write_text(json.dumps(results, indent=1))
 print(json.dumps(results, indent=1))
+
+# ---------------------------------------------------------------- pooled model over all 17 piles, honest error, stop rule
+ALL = main + t4 + extra
+g = np.array([p["g_per_seed"] for p in ALL])
+c = np.array([p["mean_count"] for p in ALL])
+wt = np.array([p["weight_after_g"] for p in ALL])
+k_all = float(wt.sum() / c.sum())        # pooled grams per seed: total weight / total count (ratio estimator)
+s_rel = float(g.std(ddof=1) / g.mean())  # pile-to-pile relative spread
+n = len(g)
+lopo = []
+for i in range(n):
+    m = np.ones(n, bool); m[i] = False
+    k = wt[m].sum() / c[m].sum()
+    s = (g[m]).std(ddof=1) / g[m].mean()
+    h = stats.t.ppf(0.975, n - 2) * s * math.sqrt(1 + 1 / (n - 1))
+    pred = c[i] * k
+    lopo.append({"pile": ALL[i]["pile_id"], "err_pct": 100 * (pred - wt[i]) / wt[i],
+                 "inside": pred * (1 - h) <= wt[i] <= pred * (1 + h)})
+results["pooled_17"] = {
+    "g_per_seed": round(k_all, 5), "rel_sd_pct": round(100 * s_rel, 2),
+    "bound_halfwidth_pct": round(100 * stats.t.ppf(0.975, n - 1) * s_rel * math.sqrt(1 + 1 / n), 2),
+    "lopo_mape_pct": round(float(np.mean([abs(x["err_pct"]) for x in lopo])), 2),
+    "lopo_inside": f"{sum(x['inside'] for x in lopo)} of {n}",
+    "lopo": [{"pile": x["pile"], "err_pct": round(x["err_pct"], 1), "inside": bool(x["inside"])} for x in lopo]}
+
+# bound versus number of piles, with the pooled spread; and how much one more pile buys
+curve = []
+for k in (3, 4, 5, 6, 8, 10, 12, 15, 17, 20, 25, 30, 50):
+    curve.append({"n_piles": k, "bound_pct": round(100 * stats.t.ppf(0.975, k - 1) * s_rel * math.sqrt(1 + 1 / k), 2)})
+for a_, b_ in zip(curve, curve[1:]):
+    b_["gain_per_extra_pile_pct_points"] = round((a_["bound_pct"] - b_["bound_pct"]) / (b_["n_piles"] - a_["n_piles"]), 3)
+results["bound_vs_piles"] = curve
+results["bound_floor_pct"] = round(100 * 1.959964 * s_rel, 2)
+
+# Gauge R&R without the photo where no marker was found (the app would refuse it)
+ok = [p for p in rr if p["scale_mm_per_px"]]
+if ok:
+    v = np.array([p["count_sunflower"] for p in ok], float)
+    results["gauge_rr_marker_ok"] = {"n": len(v), "mean": round(float(v.mean()), 1),
+                                     "rel_sd_pct": round(float(100 * v.std(ddof=1) / v.mean()), 2),
+                                     "range_pct": round(float(100 * (v.max() - v.min()) / v.mean()), 2),
+                                     "excluded": [p["file"] for p in rr if not p["scale_mm_per_px"]]}
+    for fac in ("phone", "collector", "height_class"):
+        lv = {}
+        for p in ok:
+            lv.setdefault(p[fac], []).append(p["count_sunflower"])
+        results["gauge_rr_marker_ok"][f"by_{fac}"] = {k: [round(float(np.mean(x)), 1), len(x)] for k, x in lv.items()}
+    raw_ok = np.array([p["count_sunflower_no_fixed_scale"] for p in ok], float)
+    results["gauge_rr_marker_ok"]["no_fixed_scale"] = {
+        "rel_sd_pct": round(float(100 * raw_ok.std(ddof=1) / raw_ok.mean()), 2),
+        "min": int(raw_ok.min()), "max": int(raw_ok.max())}
+    # repeatability: two photos of the same person, phone and height; reproducibility: the rest
+    cells = {}
+    for p in ok:
+        cells.setdefault((p["phone"], p["collector"], p["height_class"]), []).append(p["count_sunflower"])
+    within = [np.var(x, ddof=1) for x in cells.values() if len(x) > 1]
+    rep_sd = math.sqrt(np.mean(within)) if within else None
+    tot_sd = float(v.std(ddof=1))
+    results["gauge_rr_marker_ok"]["repeatability_sd_seeds"] = round(rep_sd, 2) if rep_sd else None
+    results["gauge_rr_marker_ok"]["total_sd_seeds"] = round(tot_sd, 2)
+    results["gauge_rr_marker_ok"]["reproducibility_sd_seeds"] = (
+        round(math.sqrt(max(tot_sd ** 2 - rep_sd ** 2, 0.0)), 2) if rep_sd else None)
+
+# before or after weight: which one does the photo agree with? (piles with two different readings)
+ba = [p for p in pile_rows if p["weight_before_g"] and p["weight_before_g"] != p["weight_after_g"]]
+results["before_vs_after"] = [{"pile": p["pile_id"], "before": p["weight_before_g"], "after": p["weight_after_g"],
+                               "predicted": p["predicted_g"],
+                               "closer_to": "after" if abs(p["error_pct_vs_after"]) < abs(p["error_pct_vs_before"]) else "before"}
+                              for p in ba]
+
+# time per pile, from the photo timestamps (first photo of one pile to the first photo of the next)
+from PIL import Image
+import datetime as dt
+
+
+def stamp(folder, f):
+    return dt.datetime.strptime(Image.open(ROOT / "data/photos" / folder / f).getexif().get(306), "%Y:%m:%d %H:%M:%S")
+
+
+times = {}
+for folder in ("2026-10-19_main", "2026-10-20_task4", "2026-10-21_extra_piles"):
+    first = {}
+    for r in (r for r in rows if r["folder"] == folder and r["condition"] in ("main", "Task4")):
+        t = stamp(folder, r["file"])
+        first[r["pile_id"]] = min(first.get(r["pile_id"], t), t)
+    ts = sorted(first.values())
+    gaps = [(b - a).total_seconds() / 60 for a, b in zip(ts, ts[1:])]
+    times[folder] = {"n_piles": len(ts), "min_per_pile_mean": round(float(np.mean(gaps)), 1),
+                     "min_per_pile_range": [round(min(gaps), 1), round(max(gaps), 1)]}
+results["minutes_per_pile"] = times
+
+(OUT / "results.json").write_text(json.dumps(results, indent=1))
+for k in ("pooled_17", "bound_vs_piles", "bound_floor_pct", "gauge_rr_marker_ok", "before_vs_after", "minutes_per_pile"):
+    print(k, json.dumps(results[k]))

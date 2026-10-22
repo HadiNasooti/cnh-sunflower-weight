@@ -1,0 +1,464 @@
+{
+ "constant_used_g_per_seed": 0.052939411479942425,
+ "bound_rel_halfwidth": 0.09983845781553496,
+ "groups": [
+  {
+   "group": "Hadi P01-P08 (10-24 g)",
+   "n_piles": 8,
+   "g_per_seed_mean": 0.05294,
+   "g_per_seed_rel_sd_pct": 4.05,
+   "bias_pct": 0.15,
+   "mape_pct": 2.9,
+   "inside_bounds": "8 of 8",
+   "g_per_seed_95ci": [
+    0.05115,
+    0.05473
+   ]
+  },
+  {
+   "group": "Jia task 4 (11-23 g)",
+   "n_piles": 4,
+   "g_per_seed_mean": 0.054,
+   "g_per_seed_rel_sd_pct": 4.28,
+   "bias_pct": -1.83,
+   "mape_pct": 3.97,
+   "inside_bounds": "4 of 4",
+   "g_per_seed_95ci": [
+    0.05032,
+    0.05769
+   ]
+  },
+  {
+   "group": "Jia P09-P13 (26-34 g)",
+   "n_piles": 5,
+   "g_per_seed_mean": 0.0535,
+   "g_per_seed_rel_sd_pct": 4.22,
+   "bias_pct": -0.92,
+   "mape_pct": 2.96,
+   "inside_bounds": "5 of 5",
+   "g_per_seed_95ci": [
+    0.0507,
+    0.05631
+   ]
+  },
+  {
+   "group": "all 17 piles",
+   "n_piles": 17,
+   "g_per_seed_mean": 0.05336,
+   "g_per_seed_rel_sd_pct": 3.97,
+   "bias_pct": -0.63,
+   "mape_pct": 3.17,
+   "inside_bounds": "17 of 17",
+   "g_per_seed_95ci": [
+    0.05227,
+    0.05444
+   ]
+  }
+ ],
+ "welch_hadi_vs_task4": {
+  "diff_pct": 2.01,
+  "p_value": 0.472
+ },
+ "welch_hadi_vs_extra": {
+  "diff_pct": 1.07,
+  "p_value": 0.666
+ },
+ "welch_hadi_vs_jia_all": {
+  "diff_pct": 1.49,
+  "p_value": 0.462
+ },
+ "trend_g_per_seed_vs_weight": {
+  "slope_pct_per_10g": 0.22,
+  "r": 0.043,
+  "p_value": 0.87
+ },
+ "gauge_rr": {
+  "all": {
+   "n": 12,
+   "mean": 286.4,
+   "counts": [
+    253,
+    289,
+    292,
+    287,
+    287,
+    298,
+    288,
+    289,
+    289,
+    290,
+    287,
+    288
+   ]
+  },
+  "iPhone 14 1x | Hadi | normal": {
+   "n": 2,
+   "mean": 289.5,
+   "counts": [
+    292,
+    287
+   ]
+  },
+  "iPhone 14 1x | Hadi | high": {
+   "n": 2,
+   "mean": 288.5,
+   "counts": [
+    288,
+    289
+   ]
+  },
+  "iPhone 14 1x | Jia | normal": {
+   "n": 2,
+   "mean": 271.0,
+   "counts": [
+    253,
+    289
+   ]
+  },
+  "iPhone 14 1x | Jia | high": {
+   "n": 2,
+   "mean": 292.5,
+   "counts": [
+    287,
+    298
+   ]
+  },
+  "iPhone 15 Pro 1x | Hadi | normal": {
+   "n": 0,
+   "mean": null,
+   "counts": []
+  },
+  "iPhone 15 Pro 1x | Hadi | high": {
+   "n": 2,
+   "mean": 287.5,
+   "counts": [
+    287,
+    288
+   ]
+  },
+  "iPhone 15 Pro 1x | Jia | normal": {
+   "n": 0,
+   "mean": null,
+   "counts": []
+  },
+  "iPhone 15 Pro 1x | Jia | high": {
+   "n": 2,
+   "mean": 289.5,
+   "counts": [
+    289,
+    290
+   ]
+  },
+  "rel_sd_all_pct": 3.83,
+  "range_pct": 15.71,
+  "by_phone": {
+   "iPhone 14 1x": 285.4,
+   "iPhone 15 Pro 1x": 288.5
+  },
+  "by_collector": {
+   "Jia": 284.3,
+   "Hadi": 288.5
+  },
+  "by_height_class": {
+   "normal": 280.2,
+   "high": 289.5
+  },
+  "no_fixed_scale_rel_sd_pct": 18.73,
+  "no_fixed_scale_range_pct": 68.67,
+  "scale_mm_per_px_range": [
+   0.1444,
+   0.2496
+  ]
+ },
+ "note_boxes_dropped": {
+  "IMG_2293.jpg": 2,
+  "IMG_2295.jpg": 3,
+  "IMG_2286.jpg": 1,
+  "IMG_2303.jpg": 1,
+  "IMG_2262.jpg": 4,
+  "IMG_2263.jpg": 6,
+  "IMG_2264.jpg": 2,
+  "IMG_2266.jpg": 1,
+  "IMG_2269.jpg": 2,
+  "IMG_2267.jpg": 2,
+  "IMG_2268.jpg": 1,
+  "IMG_4185.JPG": 1
+ },
+ "no_fixed_scale_vs_fixed_pct": {
+  "mean": -6.6,
+  "min": -39.1,
+  "max": 1.7,
+  "n_photos": 42
+ },
+ "pooled_17": {
+  "g_per_seed": 0.05331,
+  "rel_sd_pct": 3.97,
+  "bound_halfwidth_pct": 8.66,
+  "lopo_mape_pct": 3.38,
+  "lopo_inside": "17 of 17",
+  "lopo": [
+   {
+    "pile": "P01",
+    "err_pct": -1.7,
+    "inside": true
+   },
+   {
+    "pile": "P02",
+    "err_pct": 0.2,
+    "inside": true
+   },
+   {
+    "pile": "P03",
+    "err_pct": 4.9,
+    "inside": true
+   },
+   {
+    "pile": "P04",
+    "err_pct": -0.0,
+    "inside": true
+   },
+   {
+    "pile": "P05",
+    "err_pct": 5.7,
+    "inside": true
+   },
+   {
+    "pile": "P06",
+    "err_pct": -7.2,
+    "inside": true
+   },
+   {
+    "pile": "P07",
+    "err_pct": 1.5,
+    "inside": true
+   },
+   {
+    "pile": "P08",
+    "err_pct": 3.8,
+    "inside": true
+   },
+   {
+    "pile": "T4-01",
+    "err_pct": -1.9,
+    "inside": true
+   },
+   {
+    "pile": "T4-02",
+    "err_pct": 5.3,
+    "inside": true
+   },
+   {
+    "pile": "T4-03",
+    "err_pct": -2.9,
+    "inside": true
+   },
+   {
+    "pile": "T4-04",
+    "err_pct": -5.4,
+    "inside": true
+   },
+   {
+    "pile": "P09",
+    "err_pct": -7.2,
+    "inside": true
+   },
+   {
+    "pile": "P10",
+    "err_pct": -1.8,
+    "inside": true
+   },
+   {
+    "pile": "P11",
+    "err_pct": 2.9,
+    "inside": true
+   },
+   {
+    "pile": "P12",
+    "err_pct": 3.4,
+    "inside": true
+   },
+   {
+    "pile": "P13",
+    "err_pct": 1.6,
+    "inside": true
+   }
+  ]
+ },
+ "bound_vs_piles": [
+  {
+   "n_piles": 3,
+   "bound_pct": 19.72
+  },
+  {
+   "n_piles": 4,
+   "bound_pct": 14.12,
+   "gain_per_extra_pile_pct_points": 5.6
+  },
+  {
+   "n_piles": 5,
+   "bound_pct": 12.07,
+   "gain_per_extra_pile_pct_points": 2.05
+  },
+  {
+   "n_piles": 6,
+   "bound_pct": 11.02,
+   "gain_per_extra_pile_pct_points": 1.05
+  },
+  {
+   "n_piles": 8,
+   "bound_pct": 9.96,
+   "gain_per_extra_pile_pct_points": 0.53
+  },
+  {
+   "n_piles": 10,
+   "bound_pct": 9.42,
+   "gain_per_extra_pile_pct_points": 0.27
+  },
+  {
+   "n_piles": 12,
+   "bound_pct": 9.09,
+   "gain_per_extra_pile_pct_points": 0.165
+  },
+  {
+   "n_piles": 15,
+   "bound_pct": 8.79,
+   "gain_per_extra_pile_pct_points": 0.1
+  },
+  {
+   "n_piles": 17,
+   "bound_pct": 8.66,
+   "gain_per_extra_pile_pct_points": 0.065
+  },
+  {
+   "n_piles": 20,
+   "bound_pct": 8.51,
+   "gain_per_extra_pile_pct_points": 0.05
+  },
+  {
+   "n_piles": 25,
+   "bound_pct": 8.36,
+   "gain_per_extra_pile_pct_points": 0.03
+  },
+  {
+   "n_piles": 30,
+   "bound_pct": 8.25,
+   "gain_per_extra_pile_pct_points": 0.022
+  },
+  {
+   "n_piles": 50,
+   "bound_pct": 8.06,
+   "gain_per_extra_pile_pct_points": 0.009
+  }
+ ],
+ "bound_floor_pct": 7.78,
+ "gauge_rr_marker_ok": {
+  "n": 11,
+  "mean": 289.5,
+  "rel_sd_pct": 1.11,
+  "range_pct": 3.8,
+  "excluded": [
+   "IMG_2261.jpg"
+  ],
+  "by_phone": {
+   "iPhone 14 1x": [
+    290.0,
+    7
+   ],
+   "iPhone 15 Pro 1x": [
+    288.5,
+    4
+   ]
+  },
+  "by_collector": {
+   "Jia": [
+    290.6,
+    5
+   ],
+   "Hadi": [
+    288.5,
+    6
+   ]
+  },
+  "by_height_class": {
+   "normal": [
+    289.3,
+    3
+   ],
+   "high": [
+    289.5,
+    8
+   ]
+  },
+  "no_fixed_scale": {
+   "rel_sd_pct": 19.59,
+   "min": 112,
+   "max": 272
+  },
+  "repeatability_sd_seeds": 3.86,
+  "total_sd_seeds": 3.21,
+  "reproducibility_sd_seeds": 0.0
+ },
+ "before_vs_after": [
+  {
+   "pile": "T4-01",
+   "before": 10.0,
+   "after": 11.0,
+   "predicted": 10.72,
+   "closer_to": "after"
+  },
+  {
+   "pile": "T4-02",
+   "before": 14.0,
+   "after": 12.0,
+   "predicted": 12.52,
+   "closer_to": "after"
+  },
+  {
+   "pile": "T4-04",
+   "before": 22.0,
+   "after": 23.0,
+   "predicted": 21.68,
+   "closer_to": "before"
+  },
+  {
+   "pile": "P09",
+   "before": 26.0,
+   "after": 27.0,
+   "predicted": 25.01,
+   "closer_to": "before"
+  },
+  {
+   "pile": "P11",
+   "before": 30.0,
+   "after": 29.0,
+   "predicted": 29.57,
+   "closer_to": "before"
+  }
+ ],
+ "minutes_per_pile": {
+  "2026-10-19_main": {
+   "n_piles": 8,
+   "min_per_pile_mean": 12.7,
+   "min_per_pile_range": [
+    6.5,
+    21.9
+   ]
+  },
+  "2026-10-20_task4": {
+   "n_piles": 4,
+   "min_per_pile_mean": 10.8,
+   "min_per_pile_range": [
+    9.3,
+    13.2
+   ]
+  },
+  "2026-10-21_extra_piles": {
+   "n_piles": 5,
+   "min_per_pile_mean": 21.6,
+   "min_per_pile_range": [
+    18.2,
+    28.0
+   ]
+  }
+ }
+}
