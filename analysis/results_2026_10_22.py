@@ -145,7 +145,7 @@ with open(OUT / "per_photo.csv", "w", newline="", encoding="utf-8") as fh:
 # ---------------------------------------------------------------- pile level (mean of the photos of a pile)
 piles: dict = {}
 for p in photos:
-    if p["condition"] not in ("main", "Task4") or not p["weight_after_g"]:
+    if p["condition"] not in ("main", "Task4") or not p["weight_after_g"] or p["predicted_g"] is None:
         continue
     k = (p["folder"], p["pile_id"])
     piles.setdefault(k, {"folder": p["folder"], "pile_id": p["pile_id"], "collector": p["collector"],
@@ -199,15 +199,17 @@ results = {"constant_used_g_per_seed": G_PER_SEED, "bound_rel_halfwidth": HALF,
            "weight_rule": "after weight (PROCEDURE.md step 10, written 19 Oct, before these data of 20-21 Oct: photographed, then weighed)",
            "groups": [summary(main, "Hadi P01-P08 (10-24 g): FIT, in-sample"),
                       summary(t4, "Jia task 4 (11-23 g): test"),
-                      summary(extra, "Jia P09-P13 (26-34 g): test"),
-                      summary(t4 + extra, "Jia all 9 piles: test")]}
+                      summary(extra, "Jia P09-P13 (27-34 g after weight): test outside the fitted 10-24 g range"),
+                      summary(t4 + extra, "Jia all 9 piles (11-34 g): test")]}
 # coverage: what does "k of n inside" tell? (exact binomial / Clopper-Pearson lower bound, one-sided 95 %)
 jia = t4 + extra
 k_in = sum(p["inside_bounds"] for p in jia)
 results["jia_coverage"] = {"inside": f"{k_in} of {len(jia)}",
                            "prob_all_inside_if_true_coverage_95": round(0.95 ** len(jia), 2),
                            "coverage_lower_bound_one_sided_95": round(float(stats.beta.ppf(0.05, k_in, len(jia) - k_in + 1)), 2)
-                           if k_in == len(jia) else None}
+                           if k_in == len(jia) else None,
+                           "caveat": ("treats the 9 piles as independent trials; they share one constant and one bound, "
+                                      "so the outcomes are correlated and this lower bound is optimistic")}
 # same check with the BEFORE weight where one was written
 ins_b = []
 for p in jia:
@@ -236,7 +238,9 @@ w = np.array([p["weight_after_g"] for p in allp])
 g = np.array([p["_gps"] for p in allp])
 lr = stats.linregress(w, g)
 results["trend_g_per_seed_vs_weight"] = {"slope_pct_per_10g": round(float(100 * lr.slope * 10 / g.mean()), 2),
-                                         "r": round(float(lr.rvalue), 3), "p_value": round(float(lr.pvalue), 3)}
+                                         "r": round(float(lr.rvalue), 3), "p_value": round(float(lr.pvalue), 3),
+                                         "caveat": "weight is on both axes (w/count against w), so a weighing error "
+                                                   "pushes the slope up; the slope is about 0, so the conclusion stands"}
 
 # ---------------------------------------------------------------- Gauge R&R (one untouched pile)
 rr = [p for p in photos if p["condition"] == "gauge_rr"]
@@ -266,7 +270,7 @@ if rr:
         gr["no_fixed_scale_range_pct"] = round(float(100 * (rawc.max() - rawc.min()) / rawc.mean()), 2)
     sc = [p["scale_mm_per_px"] for p in rr if p["scale_mm_per_px"]]
     gr["scale_mm_per_px_range"] = [round(min(sc), 4), round(max(sc), 4)] if sc else None
-    results["gauge_rr_all_12_photos_incl_no_marker (do not use: IMG_2261 has no fixed scale)"] = gr
+    results["gauge_rr_all_17_photos_incl_no_marker (do not use: IMG_2261 has no fixed scale)"] = gr
 
 # ---------------------------------------------------------------- effect of the note filter and of the fixed scale
 results["note_boxes_dropped"] = {p["file"]: p["boxes_in_note_dropped"] for p in photos if p["boxes_in_note_dropped"]}
@@ -297,7 +301,20 @@ for i in range(n):
     pred = c[i] * k
     lopo.append({"pile": ALL[i]["pile_id"], "err_pct": 100 * (pred - wt[i]) / wt[i],
                  "inside": pred * (1 - h) <= wt[i] <= pred * (1 + h)})
+# which level the bound is for: the app's +-9.98 % (detkit/weight/models.py) comes from the PHOTO-level spread
+# (16 photos of Hadi's 8 piles) with t for 8 piles, so it is a bound for one photo. The pooled 17-pile bound
+# below uses the PILE-level spread (mean of 2 photos per pile). Like for like on Hadi's 8 piles:
+g8 = np.array([p["_gps"] for p in main])
+s8 = float(g8.std(ddof=1) / g8.mean())
+results["bound_levels"] = {
+    "app_bound_19oct_pct": round(100 * HALF, 2),
+    "app_bound_level": "one photo (photo-level spread of 16 photos, t with 8 piles)",
+    "hadi_8_piles_pile_level_pct": round(100 * stats.t.ppf(0.975, len(g8) - 1) * s8 * math.sqrt(1 + 1 / len(g8)), 2),
+    "note": "like-for-like change from 8 to 17 piles at pile level: this value -> pooled_17.bound_halfwidth_pct; "
+            "the photo-level spread over 17 piles is also about 3.97 %, so the 17-pile bound holds for one photo too"}
 results["pooled_17"] = {
+    "constant_method": "total weight / total count (ratio of sums); s is the spread of the per-pile ratios around "
+                       "their mean; the difference is negligible (s around the pooled constant 3.975 % vs 3.971 %)",
     "g_per_seed": round(k_all, 5), "rel_sd_pct": round(100 * s_rel, 2),
     "bound_halfwidth_pct": round(100 * stats.t.ppf(0.975, n - 1) * s_rel * math.sqrt(1 + 1 / n), 2),
     "lopo_mape_pct": round(float(np.mean([abs(x["err_pct"]) for x in lopo])), 2),
@@ -311,7 +328,7 @@ for k in (3, 4, 5, 6, 8, 10, 12, 15, 17, 20, 25, 30, 50):
 for a_, b_ in zip(curve, curve[1:]):
     b_["gain_per_extra_pile_pct_points"] = round((a_["bound_pct"] - b_["bound_pct"]) / (b_["n_piles"] - a_["n_piles"]), 3)
 results["bound_vs_piles"] = curve
-results["bound_vs_piles_note"] = ("treats s as known; gain = average gain per extra pile between the listed n. "
+results["bound_vs_piles_note"] = ("uses today's s estimate for every n; gain = average gain per extra pile between the listed n. "
                                   f"With {n} piles the true s is about {math.sqrt((n-1)/stats.chi2.ppf(0.975, n-1)):.2f} to "
                                   f"{math.sqrt((n-1)/stats.chi2.ppf(0.025, n-1)):.2f} times the estimate (95 %, chi-square)")
 results["bound_floor_pct"] = round(100 * 1.959964 * s_rel, 2)
@@ -372,8 +389,14 @@ if ok:
         d = a.mean() - b.mean()
         gr2[f"diff_{l1}_minus_{l2}_pct_95ci"] = [round(100 * (d - h) / grand, 1), round(100 * d / grand, 1),
                                                  round(100 * (d + h) / grand, 1)]
-    gr2["note"] = ("complete design: 2 persons x 2 phones x 2 heights; heights are labelled normal/high (from the "
-                   "sticky notes), not measured; IMG_4183 has a tilt warning (markers differ 9.5 %) and is kept")
+    n0 = (N - sum(len(x) ** 2 for x in groups_) / N) / df_b      # mean cell size for unequal cells
+    gr2["reproducibility_sd_seeds"] = round(math.sqrt(max(ms_b - ms_w, 0) / n0), 2)
+    gr2["reproducibility_note"] = ("variance between cells minus within, (MS_b - MS_w) / n0; negative is set to 0: "
+                                   "no person, phone or height part is left over")
+    gr2["note"] = ("all 8 cells of 2 persons x 2 phones x 2 heights have photos, but the cell iPhone 14 | Jia | "
+                   "normal has only 1 (IMG_2261 has no marker); heights are labelled normal/high (from the sticky "
+                   "notes), not measured; IMG_4183 has a tilt warning (markers differ 9.5 %; the app tells the user "
+                   "to retake it) and is kept")
 
 # before or after weight: which one does the photo agree with? (piles with two different readings)
 ba = [p for p in pile_rows if p["weight_before_g"] and p["weight_before_g"] != p["weight_after_g"]]
@@ -403,7 +426,8 @@ for folder in ("2026-10-19_main", "2026-10-20_task4", "2026-10-21_extra_piles"):
     gaps = [(b - a).total_seconds() / 60 for a, b in zip(ts, ts[1:])]
     times[folder] = {"n_piles": len(ts), "n_gaps": len(gaps), "min_between_piles_mean": round(float(np.mean(gaps)), 1),
                      "min_between_piles_range": [round(min(gaps), 1), round(max(gaps), 1)]}
-results["minutes_per_pile"] = {"definition": "elapsed time from the first photo of one pile to the first photo of the next: "
+results["minutes_per_pile"] = {"definition": "elapsed time from the first photo of one pile to the first photo of the next "
+                               "(n piles give n-1 gaps; the last pile's own time is not measured): "
                                "spreading, label photo, 2 photos, weighing, extras (R and T photos on P03 and P08) and breaks. "
                                "Jia's photos: DateTimeOriginal; Hadi's main photos have none left (removed when cropped), "
                                "so their times are the file time (EXIF DateTime)",

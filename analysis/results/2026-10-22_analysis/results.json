@@ -30,7 +30,7 @@
    ]
   },
   {
-   "group": "Jia P09-P13 (26-34 g): test",
+   "group": "Jia P09-P13 (27-34 g after weight): test outside the fitted 10-24 g range",
    "n_piles": 5,
    "g_per_seed_mean": 0.05351,
    "g_per_seed_rel_sd_pct": 4.22,
@@ -43,7 +43,7 @@
    ]
   },
   {
-   "group": "Jia all 9 piles: test",
+   "group": "Jia all 9 piles (11-34 g): test",
    "n_piles": 9,
    "g_per_seed_mean": 0.05373,
    "g_per_seed_rel_sd_pct": 4.0,
@@ -59,7 +59,8 @@
  "jia_coverage": {
   "inside": "9 of 9",
   "prob_all_inside_if_true_coverage_95": 0.63,
-  "coverage_lower_bound_one_sided_95": 0.72
+  "coverage_lower_bound_one_sided_95": 0.72,
+  "caveat": "treats the 9 piles as independent trials; they share one constant and one bound, so the outcomes are correlated and this lower bound is optimistic"
  },
  "jia_inside_with_before_weight": "8 of 9",
  "welch_hadi_vs_task4": {
@@ -89,9 +90,10 @@
  "trend_g_per_seed_vs_weight": {
   "slope_pct_per_10g": 0.22,
   "r": 0.043,
-  "p_value": 0.87
+  "p_value": 0.87,
+  "caveat": "weight is on both axes (w/count against w), so a weighing error pushes the slope up; the slope is about 0, so the conclusion stands"
  },
- "gauge_rr_all_12_photos_incl_no_marker (do not use: IMG_2261 has no fixed scale)": {
+ "gauge_rr_all_17_photos_incl_no_marker (do not use: IMG_2261 has no fixed scale)": {
   "all": {
    "n": 17,
    "mean": 287.4,
@@ -223,7 +225,14 @@
   "max": 1.7,
   "n_photos": 42
  },
+ "bound_levels": {
+  "app_bound_19oct_pct": 9.98,
+  "app_bound_level": "one photo (photo-level spread of 16 photos, t with 8 piles)",
+  "hadi_8_piles_pile_level_pct": 10.16,
+  "note": "like-for-like change from 8 to 17 piles at pile level: this value -> pooled_17.bound_halfwidth_pct; the photo-level spread over 17 piles is also about 3.97 %, so the 17-pile bound holds for one photo too"
+ },
  "pooled_17": {
+  "constant_method": "total weight / total count (ratio of sums); s is the spread of the per-pile ratios around their mean; the difference is negligible (s around the pooled constant 3.975 % vs 3.971 %)",
   "g_per_seed": 0.05331,
   "rel_sd_pct": 3.97,
   "bound_halfwidth_pct": 8.66,
@@ -383,7 +392,7 @@
    "gain_per_extra_pile_pct_points": 0.01
   }
  ],
- "bound_vs_piles_note": "treats s as known; gain = average gain per extra pile between the listed n. With 17 piles the true s is about 0.74 to 1.52 times the estimate (95 %, chi-square)",
+ "bound_vs_piles_note": "uses today's s estimate for every n; gain = average gain per extra pile between the listed n. With 17 piles the true s is about 0.74 to 1.52 times the estimate (95 %, chi-square)",
  "bound_floor_pct": 7.78,
  "floor_note": {
   "floor_is_for": "this setup (1 g kitchen scale, one seed lot), not for the method",
@@ -499,7 +508,9 @@
    0.0,
    1.3
   ],
-  "note": "complete design: 2 persons x 2 phones x 2 heights; heights are labelled normal/high (from the sticky notes), not measured; IMG_4183 has a tilt warning (markers differ 9.5 %) and is kept"
+  "reproducibility_sd_seeds": 0.0,
+  "reproducibility_note": "variance between cells minus within, (MS_b - MS_w) / n0; negative is set to 0: no person, phone or height part is left over",
+  "note": "all 8 cells of 2 persons x 2 phones x 2 heights have photos, but the cell iPhone 14 | Jia | normal has only 1 (IMG_2261 has no marker); heights are labelled normal/high (from the sticky notes), not measured; IMG_4183 has a tilt warning (markers differ 9.5 %; the app tells the user to retake it) and is kept"
  },
  "before_vs_after": [
   {
@@ -539,7 +550,7 @@
   }
  ],
  "minutes_per_pile": {
-  "definition": "elapsed time from the first photo of one pile to the first photo of the next: spreading, label photo, 2 photos, weighing, extras (R and T photos on P03 and P08) and breaks. Jia's photos: DateTimeOriginal; Hadi's main photos have none left (removed when cropped), so their times are the file time (EXIF DateTime)",
+  "definition": "elapsed time from the first photo of one pile to the first photo of the next (n piles give n-1 gaps; the last pile's own time is not measured): spreading, label photo, 2 photos, weighing, extras (R and T photos on P03 and P08) and breaks. Jia's photos: DateTimeOriginal; Hadi's main photos have none left (removed when cropped), so their times are the file time (EXIF DateTime)",
   "2026-10-19_main": {
    "n_piles": 8,
    "n_gaps": 7,
