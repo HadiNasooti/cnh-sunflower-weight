@@ -26,5 +26,5 @@ results.json, business_case.md).
 | 11 | Title: the repeat is now clean enough: 9 of 9 inside, Jia's grams per seed +1.5 % (95 % CI -2.7 to +5.7 %). Pile names T4-01 to T4-04. T4-03 before and after are both 18 g (written as "consistent with before"). T4-02: rounding cannot explain 2 g, still to explain |
 | 12 | P09 to P13 were analysed: 5 of 5 inside the bounds, mean absolute error 3.0 %, no trend with weight from 10 to 34 g. P14/P15: dropped on purpose; a bigger sample is split into two photos (the program counts up to 651 seeds, our largest tested photo) |
 | 13 | Item 4 "fix the camera height": our Gauge R&R shows height does not matter with the fixed scale (high minus normal 0.0 %), so the user needs no stand. Items 5 and 6 are done now. Items 1 and 3 are good ideas |
-| 14 | "Ask Hadi whether task 4 must be repeated": no, it holds. The R&R results are in. samples.csv now has 63 photo rows |
+| 14 | "Ask Hadi whether task 4 must be repeated": no, it holds. The R&R results are in. samples.csv now has 68 photo rows |
 | New | Business case slide (PLAN section 5) and end-user / traffic light slide (PLAN section 4) |
