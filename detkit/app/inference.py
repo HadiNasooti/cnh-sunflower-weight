@@ -20,8 +20,8 @@ from ..viz import draw_boxes
 from . import logic as L
 from . import proposals as P
 
-RESULT_COLUMNS = ["file", "counts", "count", "total_area_px", "weight_g", "low_g", "high_g",
-                  "measured_g", "error_pct", "note"]
+RESULT_COLUMNS = ["file", "light", "message", "weight_g", "low_g", "high_g", "range_pct", "scale_from",
+                  "counts", "count", "total_area_px", "measured_g", "error_pct", "note"]
 CONST_COLUMNS = ["crop", "g_per_kernel", "g_per_px2"]     # count_x_constant, area_x_constant
 SAMPLE_DIR = "models"                       # W/models/<name>.json = fitted student model (optional)
 
@@ -98,18 +98,19 @@ def dets_from_boxes(boxes: list[dict]) -> list[dict]:
 
 def detect_photo(path: Path, bundle, project, *, crop: str | None, score: float, tile: int, overlap: float,
                  max_side: int = 0, roi_text: str = "", std_mm_per_px: float | None = None,
-                 scale_info: dict | None = None) -> list[dict]:
+                 scale_info: dict | None = None, known_scale: float | None = None) -> list[dict]:
     """Tiled RF-DETR detections for one photo as ``[{bbox, score, label}]`` (project class names), boxes in
     original photo pixels. ``std_mm_per_px``: resize the photo to this scale (measured from the printed
     marker sheet, ``detkit/scale.py``) before detection; it replaces ``max_side``. The measured scale is
-    written into ``scale_info`` when a dict is given."""
+    written into ``scale_info`` when a dict is given. ``known_scale`` (mm per pixel found another way, here
+    from the seeds) is used only when no marker is found."""
     with Image.open(path) as im:
         im = im.convert("RGB")
         roi = P.parse_roi(roi_text, im.size)
         factor = 1.0
         if std_mm_per_px:
             from ..scale import standardise
-            im, factor, info = standardise(im, std_mm_per_px)
+            im, factor, info = standardise(im, std_mm_per_px, known_scale)
             if scale_info is not None:
                 scale_info.update(info)
             if roi and factor != 1.0:
@@ -188,8 +189,16 @@ def run_inference(paths: list[Path], per_photo: dict[str, dict], project, *, ckp
     """Run all photos. ``per_photo[file] = {crop, total_weight_g}`` (optional). ``on_photo(i, n, name)``
     is called before photo *i* (progress). Returns ``(rows, items, overlay_paths)``; *items* keep the
     detections for Save as samples."""
+    from .. import quality as Q
     cfg = W.load_config(project.workdir)
     model = load_weight_model(project.workdir, model_name, cfg)
+    seed_model = None                        # constants and bounds for counts made with the seeds as ruler
+    cls = W.MODELS.get(model_name)
+    if cfg.get("seed_scale_constants") and getattr(cls, "config_key", None) == "crop_count_constants":
+        seed_model = W.get_model(model_name, constants=cfg["seed_scale_constants"],
+                                 bounds=cfg.get("seed_scale_constants_bounds"))
+    seed_len = cfg.get("seed_length_mm") or {}
+    limits = cfg.get("quality") or {}
     bundle = P.load_bundle(ckpt, device)
     rows, items, overlays = [], [], []
     for i, p in enumerate(paths):
@@ -209,19 +218,47 @@ def run_inference(paths: list[Path], per_photo: dict[str, dict], project, *, ckp
             continue
         if not meta.get("crop") and dets and len(project.classes) > 1:
             meta["crop"] = dominant_class(dets)
+        crop = meta.get("crop")
+        scale_from = "off"
+        if std_mm_per_px:
+            scale_from = "markers" if sc.get("scale_source") == "markers" else "none"
+            s1 = Q.seed_scale(dets, crop, seed_len.get(crop)) if scale_from == "none" and crop else None
+            if s1:                                           # no marker: the seeds are the ruler (2 passes)
+                kw = dict(crop=crop, score=score, tile=tile, overlap=overlap, max_side=max_side,
+                          roi_text=roi_text, std_mm_per_px=std_mm_per_px)
+                sc = {}
+                dets = detect_photo(p, bundle, project, scale_info=sc, known_scale=s1, **kw)
+                s2 = Q.seed_scale(dets, crop, seed_len.get(crop))
+                if s2 and abs(s2 / s1 - 1) > 0.01:
+                    sc = {}
+                    dets = detect_photo(p, bundle, project, scale_info=sc, known_scale=s2, **kw)
+                scale_from = "seeds"
         if sc.get("scale_mm_per_px"):                        # boxes are in original pixels: their scale
             meta.setdefault("scale_mm_per_px", round(sc["scale_mm_per_px"], 5))
-        row = estimate_row(p.name, dets, meta, model, cfg)
+        use = seed_model if (scale_from == "seeds" and seed_model) else model
+        row = estimate_row(p.name, dets, meta, use, cfg)
+        qc = Q.check_photo(dets, crop, scale_from if scale_from != "off" else "markers",
+                           sc.get("marker_diff_pct"), limits)
         if std_mm_per_px:
-            if sc.get("scale_mm_per_px"):
-                sn = f"scale {sc['scale_mm_per_px']:.3f} mm/px, resized x{sc.get('std_factor', 1):.2f}"
+            if scale_from == "markers":
+                sn = f"scale {sc['scale_mm_per_px']:.3f} mm/px from the markers, resized x{sc.get('std_factor', 1):.2f}"
                 if sc.get("warning"):
                     sn += f"; WARNING {sc['warning']}"
-            else:                                            # the calibration needs the fixed scale
-                row["low_g"] = row["high_g"] = None
-                sn = ("NO MARKER FOUND: scale not fixed, weight not reliable (can be far too low); "
+            elif scale_from == "seeds":
+                sn = (f"no marker: scale {sc['scale_mm_per_px']:.3f} mm/px estimated from the seeds "
+                      f"(typical seed length {seed_len.get(crop)} mm)")
+            else:                                            # the calibration needs a fixed scale
+                row["weight_g"] = row["low_g"] = row["high_g"] = None
+                sn = ("NO MARKER FOUND and no seed length for this crop: scale not fixed, no weight; "
                       "take the photo again with the marker sheet")
             row["note"] = "; ".join(v for v in (row.get("note"), sn) if v)
+        if qc["light"] == Q.RED:
+            row["weight_g"] = row["low_g"] = row["high_g"] = None
+        row["light"] = f"{Q.DOT[qc['light']]} {qc['light']}"
+        row["message"] = " ".join(qc["messages"])
+        row["scale_from"] = scale_from
+        if row.get("weight_g") and row.get("high_g"):
+            row["range_pct"] = round(100 * (row["high_g"] / row["weight_g"] - 1), 1)
         rows.append(row)
         items.append({"path": str(p), "dets": dets, "meta": meta})
         overlays.append(str(overlay(p, dets, project.classes, Path(cache) / f"{p.stem}_pred.jpg")))

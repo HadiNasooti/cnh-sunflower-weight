@@ -7,8 +7,8 @@
   },
   "area_constants": {},
   "crop_count_constants": {
-    "sunflower": 0.052939411479942425,
-    "default": 0.052939411479942425
+    "sunflower": 0.05335658950716708,
+    "default": 0.05335658950716708
   },
   "crop_area_constants": {},
   "detector": {
@@ -37,20 +37,44 @@
   },
   "crop_count_constants_bounds": {
     "sunflower": {
-      "rel_halfwidth": 0.09983845781553496,
-      "rel_sd": 0.03980700132915064,
-      "n_piles": 8,
-      "n_photos": 16,
-      "t": 2.364624251592784,
+      "rel_halfwidth": 0.0866108551902837,
+      "rel_sd": 0.0397048970671376,
+      "n_piles": 17,
+      "n_photos": 34,
+      "t": 2.1199052992212546,
       "level": 0.95
     },
     "default": {
-      "rel_halfwidth": 0.09983845781553496,
-      "rel_sd": 0.03980700132915064,
-      "n_piles": 8,
-      "n_photos": 16,
-      "t": 2.364624251592784,
+      "rel_halfwidth": 0.0866108551902837,
+      "rel_sd": 0.0397048970671376,
+      "n_piles": 17,
+      "n_photos": 34,
+      "t": 2.1199052992212546,
       "level": 0.95
     }
-  }
+  },
+  "seed_scale_constants": {
+    "sunflower": 0.05384506300511527
+  },
+  "seed_scale_constants_bounds": {
+    "sunflower": {
+      "rel_halfwidth": 0.09448477886420588,
+      "rel_sd": 0.043314529235076865,
+      "n_piles": 17,
+      "n_photos": 34,
+      "t": 2.1199052992212546,
+      "level": 0.95
+    }
+  },
+  "seed_length_mm": {
+    "sunflower": 11.249
+  },
+  "quality": {
+    "max_marker_diff_pct": 5.0,
+    "max_overlap_share": 0.25,
+    "overlap_min": 0.2,
+    "max_count": 651,
+    "min_count": 20
+  },
+  "calibration_note": "22 Oct 2026: 17 piles (Hadi P01-P08, Jia T4-01 to T4-04 and P09-P13), 34 photos; built by analysis/calibrate_app_config.py"
 }

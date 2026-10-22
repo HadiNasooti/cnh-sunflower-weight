@@ -1,0 +1,60 @@
+file,folder,condition,light,expected,ok,overlap_share,count,marker_diff_pct,message
+IMG_4147.JPG,2026-10-19_main,main,green,green,True,0.022,182,,Good photo.
+IMG_4148.JPG,2026-10-19_main,main,green,green,True,0.011,187,,Good photo.
+IMG_4149.JPG,2026-10-19_main,main,green,green,True,0.0,226,0.41,Good photo.
+IMG_4150.JPG,2026-10-19_main,main,green,green,True,0.0,225,3.08,Good photo.
+IMG_4152.JPG,2026-10-19_main,main,green,green,True,0.0,277,,Good photo.
+IMG_4153.JPG,2026-10-19_main,main,green,green,True,0.0,273,0.03,Good photo.
+IMG_4155.JPG,2026-10-19_main,re_spread,green,green,True,0.0,275,,Good photo.
+IMG_4156.JPG,2026-10-19_main,re_spread,green,green,True,0.007,276,3.33,Good photo.
+IMG_4157.JPG,2026-10-19_main,touching,orange,orange,True,0.417,223,2.44,"Seeds too close together: spread them so that no seed touches another, and take the photo again."
+IMG_4158.JPG,2026-10-19_main,touching,orange,orange,True,0.509,232,1.44,"Seeds too close together: spread them so that no seed touches another, and take the photo again."
+IMG_4159.JPG,2026-10-19_main,main,green,green,True,0.0,299,2.2,Good photo.
+IMG_4160.JPG,2026-10-19_main,main,green,green,True,0.0,301,1.08,Good photo.
+IMG_4163.JPG,2026-10-19_main,main,green,green,True,0.022,359,3.02,Good photo.
+IMG_4164.JPG,2026-10-19_main,main,green,green,True,0.017,353,1.75,Good photo.
+IMG_4165.JPG,2026-10-19_main,main,green,green,True,0.011,352,0.94,Good photo.
+IMG_4166.JPG,2026-10-19_main,main,green,green,True,0.012,347,0.2,Good photo.
+IMG_4167.JPG,2026-10-19_main,main,green,green,True,0.014,418,3.5,Good photo.
+IMG_4168.JPG,2026-10-19_main,main,green,green,True,0.014,419,2.76,Good photo.
+IMG_4169.JPG,2026-10-19_main,main,green,green,True,0.009,464,2.03,Good photo.
+IMG_4170.JPG,2026-10-19_main,main,green,green,True,0.013,468,2.14,Good photo.
+IMG_4171.JPG,2026-10-19_main,touching,orange,orange,True,0.463,389,3.55,"Seeds too close together: spread them so that no seed touches another, and take the photo again."
+IMG_4172.JPG,2026-10-19_main,touching,orange,orange,True,0.452,389,1.98,"Seeds too close together: spread them so that no seed touches another, and take the photo again."
+IMG_4173.JPG,2026-10-19_main,re_spread,green,green,True,0.031,458,,Good photo.
+IMG_4174.JPG,2026-10-19_main,re_spread,green,green,True,0.039,464,2.58,Good photo.
+IMG_2293.jpg,2026-10-20_task4,Task4,green,green,True,0.101,207,0.84,Good photo.
+IMG_2295.jpg,2026-10-20_task4,Task4,green,green,True,0.103,203,3.17,Good photo.
+IMG_2285.jpg,2026-10-20_task4,Task4,green,green,True,0.101,238,0.27,Good photo.
+IMG_2286.jpg,2026-10-20_task4,Task4,green,green,True,0.11,236,0.3,Good photo.
+IMG_2302.jpg,2026-10-20_task4,Task4,green,green,True,0.131,327,0.97,Good photo.
+IMG_2303.jpg,2026-10-20_task4,Task4,green,green,True,0.145,331,1.52,Good photo.
+IMG_2304.jpg,2026-10-20_task4,Task4,green,green,True,0.159,410,,Good photo.
+IMG_2305.jpg,2026-10-20_task4,Task4,green,green,True,0.171,409,0.06,Good photo.
+IMG_2309.jpg,2026-10-21_extra_piles,main,green,green,True,0.132,477,0.86,Good photo.
+IMG_2310.jpg,2026-10-21_extra_piles,main,green,green,True,0.143,468,0.51,Good photo.
+IMG_2314.jpg,2026-10-21_extra_piles,main,green,green,True,0.093,518,0.28,Good photo.
+IMG_2315.jpg,2026-10-21_extra_piles,main,green,green,True,0.082,515,,Good photo.
+IMG_2319.jpg,2026-10-21_extra_piles,main,green,green,True,0.066,557,,Good photo.
+IMG_2322.jpg,2026-10-21_extra_piles,main,green,green,True,0.068,560,,Good photo.
+IMG_2327.jpg,2026-10-21_extra_piles,main,green,green,True,0.061,619,0.28,Good photo.
+IMG_2328.jpg,2026-10-21_extra_piles,main,green,green,True,0.065,619,3.6,Good photo.
+IMG_2331.jpg,2026-10-21_extra_piles,main,green,green,True,0.045,643,0.05,Good photo.
+IMG_2332.jpg,2026-10-21_extra_piles,main,green,green,True,0.069,651,0.44,Good photo.
+IMG_2261.jpg,2026-10-19_gauge_rr,gauge_rr,orange,orange,True,0.055,253,,"No marker found: the size was estimated from the seeds, so the range is wider. Put the marker sheet fully in the photo for a more precise result."
+IMG_2262.jpg,2026-10-19_gauge_rr,gauge_rr,green,green,True,0.075,293,1.21,Good photo.
+IMG_2263.jpg,2026-10-19_gauge_rr,gauge_rr,green,green,True,0.087,298,,Good photo.
+IMG_2264.jpg,2026-10-19_gauge_rr,gauge_rr,green,green,True,0.042,289,0.34,Good photo.
+IMG_2266.jpg,2026-10-19_gauge_rr,gauge_rr,green,green,True,0.073,288,0.73,Good photo.
+IMG_2269.jpg,2026-10-19_gauge_rr,gauge_rr,green,green,True,0.093,300,1.64,Good photo.
+IMG_2267.jpg,2026-10-19_gauge_rr,gauge_rr,green,green,True,0.093,290,0.86,Good photo.
+IMG_2268.jpg,2026-10-19_gauge_rr,gauge_rr,green,green,True,0.045,290,3.01,Good photo.
+IMG_4185.JPG,2026-10-19_gauge_rr,gauge_rr,green,green,True,0.079,290,1.31,Good photo.
+IMG_4186.JPG,2026-10-19_gauge_rr,gauge_rr,green,green,True,0.083,290,2.69,Good photo.
+IMG_4187.JPG,2026-10-19_gauge_rr,gauge_rr,green,green,True,0.084,287,1.66,Good photo.
+IMG_4188.JPG,2026-10-19_gauge_rr,gauge_rr,green,green,True,0.069,288,1.69,Good photo.
+IMG_4179.JPG,2026-10-19_gauge_rr,gauge_rr,green,green,True,0.088,294,0.06,Good photo.
+IMG_4180.JPG,2026-10-19_gauge_rr,gauge_rr,green,green,True,0.048,290,0.86,Good photo.
+IMG_4181.JPG,2026-10-19_gauge_rr,gauge_rr,green,green,True,0.072,290,1.41,Good photo.
+IMG_4182.JPG,2026-10-19_gauge_rr,gauge_rr,green,green,True,0.058,295,3.74,Good photo.
+IMG_4183.JPG,2026-10-19_gauge_rr,gauge_rr,orange,orange,True,0.074,285,9.49,"Phone tilted: hold it flat, straight above the seeds, and take the photo again."

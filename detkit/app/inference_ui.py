@@ -53,7 +53,10 @@ def build_inference_tab(project, wd: Path, ckpt: str | None, device: str) -> Non
     std0 = float(det.get("std_mm_per_px") or DEFAULT_TARGET_MM_PER_PX)
     classes = project.classes
 
+    from .. import quality as Q
     gr.Markdown("### Inference: photos -> boxes -> kernel count / area -> weight")
+    with gr.Accordion("Instructions for the photo", open=True):
+        gr.Markdown(Q.INSTRUCTIONS)
     gr.Markdown(TODO_TEXT)
     with gr.Row():
         with gr.Column(scale=2):
@@ -129,8 +132,9 @@ def build_inference_tab(project, wd: Path, ckpt: str | None, device: str) -> Non
             raise gr.Error(str(e))
         csv_path = I.write_results_csv(rows, cache / "results.csv")
         notes = sorted({r.get("note") for r in rows if r.get("weight_g") is None and r.get("note")})
-        msg = (f"{len(rows)} photo(s) processed with score >= {d[score]}, tile {int(d[tile])}."
-               + (" No weight: " + "; ".join(notes) if notes else ""))
+        lights = "  \n".join(f"**{r['file']}**: {r.get('light', '')} {r.get('message', '')}" for r in rows)
+        msg = (f"{len(rows)} photo(s) processed with score >= {d[score]}, tile {int(d[tile])}.  \n{lights}"
+               + ("  \nNo weight: " + "; ".join(notes) if notes else ""))
         return ovs, _df([[r.get(c) for c in I.RESULT_COLUMNS] for r in rows], I.RESULT_COLUMNS), str(csv_path), \
             msg, its
 

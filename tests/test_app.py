@@ -272,7 +272,10 @@ def test_estimate_row_baseline_todo_and_error():
 def test_results_csv():
     rows = [{"file": "a.jpg", "counts": "wheat 2", "count": 2, "weight_g": 0.08, "note": ""}]
     text = I.results_csv(rows)
-    assert text.splitlines()[0].startswith("file,counts,count") and "a.jpg,wheat 2,2" in text.splitlines()[1]
+    head = text.splitlines()[0].split(",")
+    assert head[:3] == ["file", "light", "message"] and {"counts", "count", "weight_g"} <= set(head)
+    line = dict(zip(head, text.splitlines()[1].split(",")))
+    assert line["file"] == "a.jpg" and line["counts"] == "wheat 2" and line["count"] == "2"
 
 
 def test_run_inference_and_save_samples_roundtrip(wd, tmp_path, monkeypatch):
