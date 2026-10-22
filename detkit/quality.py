@@ -26,7 +26,7 @@ DOT = {GREEN: "\U0001F7E2", ORANGE: "\U0001F7E0", RED: "\U0001F534"}
 
 INSTRUCTIONS = """**How to take the photo**
 1. Spread the seeds on white paper or a white table so that **no seed touches another**.
-2. Put the **printed marker sheet** next to the seeds (both squares fully visible, 3 cm from the seeds).
+2. Put the **printed marker sheet** next to the seeds (both markers fully visible, 3 cm from the seeds).
    No marker sheet? The app still works: it then uses the seeds as the ruler, and the range is a little wider.
 3. Hold the phone **flat, straight above** the seeds, at any height, with the normal 1x camera.
    All seeds and the markers must be in the photo; nothing else (no hands, notes or pens).
@@ -40,10 +40,12 @@ def long_side(d: dict) -> float:
     return max(x2 - x1, y2 - y1)
 
 
-def seed_scale(dets: list[dict], crop: str, seed_length_mm: float) -> float | None:
-    """mm per pixel from the seeds: typical seed length / median box long side (pixels) of the crop's boxes."""
+def seed_scale(dets: list[dict], crop: str, seed_length_mm: float,
+               min_count: int = QUALITY_DEFAULTS["min_count"]) -> float | None:
+    """mm per pixel from the seeds: typical seed length / median box long side (pixels) of the crop's boxes.
+    None when the seed length is unknown or there are fewer than ``min_count`` seeds."""
     sides = [long_side(d) for d in dets if d.get("label") == crop]
-    if len(sides) < QUALITY_DEFAULTS["min_count"] or not seed_length_mm:
+    if len(sides) < min_count or not seed_length_mm:
         return None
     return seed_length_mm / statistics.median(sides)
 
@@ -71,7 +73,9 @@ def check_photo(dets: list[dict], crop: str | None, scale_from: str, marker_diff
                 limits: dict | None = None) -> dict:
     """Light and sentences for one photo.
 
-    ``scale_from``: "markers", "seeds" (no marker; seeds used as the ruler) or "none" (no scale at all).
+    ``scale_from``: "markers", "seeds" (no marker; seeds used as the ruler), "few" (no marker and too few
+    seeds to use them as the ruler), "none" (no marker and the seed length of the crop is unknown) or "off"
+    (the fixed scale is switched off in the settings).
     Returns {"light", "message" (the most important sentence), "messages" (all), "overlap_share", "count"}.
     """
     lim = {**QUALITY_DEFAULTS, **(limits or {})}
@@ -79,9 +83,12 @@ def check_photo(dets: list[dict], crop: str | None, scale_from: str, marker_diff
     share = overlap_share(dets, crop, lim["overlap_min"]) if crop else 0.0
     red, orange = [], []
     if not crop or n == 0:
-        red.append("No seeds found: check that the seeds are in the photo and the crop is right.")
+        red.append("No seeds found: check that the seeds are in the photo.")
     if scale_from == "none" and not red:
         red.append("No marker found and the seed size of this crop is not known: "
+                   "put the marker sheet fully in the photo.")
+    if scale_from == "few" and not red:
+        red.append(f"No marker found and too few seeds ({n}) to use them as the ruler: "
                    "put the marker sheet fully in the photo.")
     if not red:
         if n < lim["min_count"]:
@@ -94,6 +101,9 @@ def check_photo(dets: list[dict], crop: str | None, scale_from: str, marker_diff
                           "split the sample into two photos and add the weights.")
         if marker_diff_pct is not None and marker_diff_pct > lim["max_marker_diff_pct"]:
             orange.append("Phone tilted: hold it flat, straight above the seeds, and take the photo again.")
+        if scale_from == "off":
+            orange.append("The fixed scale is switched off in the settings: the weight can be far off. "
+                          "Switch it on.")
         if scale_from == "seeds":
             orange.append("No marker found: the size was estimated from the seeds, so the range is wider. "
                           "Put the marker sheet fully in the photo for a more precise result.")

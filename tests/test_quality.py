@@ -87,3 +87,70 @@ def test_app_uses_the_seeds_when_no_marker(wd, tmp_path, monkeypatch):
     assert r["scale_from"] == "seeds" and r["light"].endswith("orange") and "No marker" in r["message"]
     assert r["weight_g"] == pytest.approx(30 * 0.06) and r["range_pct"] == pytest.approx(9.4)
     assert "estimated from the seeds" in r["note"]
+
+
+def _app(monkeypatch, n=30, side_fn=None):
+    from detkit.app import proposals as P
+    calls = []
+    monkeypatch.setattr(P, "load_bundle", lambda ckpt, device="auto": ("bundle", ckpt, device))
+
+    def fake(image, bundle, classes, crop, **kw):
+        calls.append(image.size)
+        side = side_fn(image, len(calls)) if side_fn else 100 * image.size[0] / 3000
+        return ([{"bbox": [i * 2 * side, 0, i * 2 * side + side, side / 2], "class": "sunflower",
+                  "origin": "rfdetr", "score": 0.9} for i in range(n)], {})
+
+    monkeypatch.setattr(P, "propose_rfdetr", fake)
+    return calls
+
+
+def _run(wd, src, tmp_path, std=0.110, name="plain.png"):
+    from detkit.app import inference as I
+    return I.run_inference([src / name], {name: {"crop": "sunflower", "total_weight_g": 2.0}}, wd, ckpt="ck",
+                           device="cpu", score=0.3, tile=800, overlap=0.2, max_side=0, roi_text="",
+                           model_name="crop_count_x_constant", cache=tmp_path / "c", std_mm_per_px=std)[0][0]
+
+
+def _plain(tmp_path, name="plain.png"):
+    src = tmp_path / "up"
+    src.mkdir(exist_ok=True)
+    Image.new("RGB", (3000, 2000), (255, 255, 255)).save(src / name)
+    return src
+
+
+def test_few_seeds_without_marker_is_red_with_the_right_reason(wd, tmp_path, monkeypatch):
+    _app(monkeypatch, n=10)
+    r = _run(wd, _plain(tmp_path), tmp_path)
+    assert r["scale_from"] == "few" and r["light"].endswith("red") and "too few seeds (10)" in r["message"]
+    assert r["weight_g"] is None and "too few seeds" in r["note"]
+
+
+def test_fixed_scale_off_is_orange(wd, tmp_path, monkeypatch):
+    _app(monkeypatch, n=30)
+    r = _run(wd, _plain(tmp_path), tmp_path, std=None)
+    assert r["scale_from"] == "off" and r["light"].endswith("orange") and "switched off" in r["message"]
+
+
+def test_seed_scale_refines_once_when_it_moves(wd, tmp_path, monkeypatch):
+    # first pass on the photo as it is: seeds 100 px -> 0.110 mm/px; at that size the detector returns
+    # boxes 5 % longer, so the scale moves by about 5 % and one more pass is made
+    calls = _app(monkeypatch, n=30, side_fn=lambda im, k: 100 * im.size[0] / 3000 * (1.0 if k == 1 else 1.05))
+    r = _run(wd, _plain(tmp_path), tmp_path)
+    assert len(calls) == 3 and r["scale_from"] == "seeds"
+
+
+def test_upright_copy_keeps_the_user_file_name(wd, tmp_path, monkeypatch):
+    _app(monkeypatch, n=30)
+    src = tmp_path / "up"
+    src.mkdir()
+    im = Image.new("RGB", (3000, 2000), (255, 255, 255))
+    ex = im.getexif()
+    ex[0x0112] = 6                                           # "rotate 90 degrees" in EXIF
+    im.save(src / "rot.jpg", exif=ex)
+    r = _run(wd, src, tmp_path, name="rot.jpg")
+    assert r["file"] == "rot.jpg" and r["measured_g"] == 2.0
+
+
+def test_quality_limits_from_the_config_are_used():
+    q = Q.check_photo(boxes(300), "sunflower", "markers", 1.0, {"max_count": 100})
+    assert q["light"] == Q.ORANGE and "split" in q["message"]

@@ -204,9 +204,10 @@ def run_inference(paths: list[Path], per_photo: dict[str, dict], project, *, ckp
     for i, p in enumerate(paths):
         if on_photo:
             on_photo(i, len(paths), p.name)
+        orig = p                                             # the user's file name (the upright copy has another)
         if std_mm_per_px:
             p = upright_copy(p, Path(cache) / "upright")
-        meta = {k: v for k, v in (per_photo.get(p.name) or {}).items() if v not in (None, "")}
+        meta = {k: v for k, v in (per_photo.get(orig.name) or {}).items() if v not in (None, "")}
         crop = meta.get("crop")
         sc: dict = {}
         try:
@@ -214,7 +215,7 @@ def run_inference(paths: list[Path], per_photo: dict[str, dict], project, *, ckp
                                 max_side=max_side, roi_text=roi_text, std_mm_per_px=std_mm_per_px,
                                 scale_info=sc)
         except ValueError as e:                              # e.g. single-class model needs the crop
-            rows.append({"file": p.name, "counts": "-", "count": None, "note": str(e)})
+            rows.append({"file": orig.name, "counts": "-", "count": None, "note": str(e)})
             continue
         if not meta.get("crop") and dets and len(project.classes) > 1:
             meta["crop"] = dominant_class(dets)
@@ -222,23 +223,32 @@ def run_inference(paths: list[Path], per_photo: dict[str, dict], project, *, ckp
         scale_from = "off"
         if std_mm_per_px:
             scale_from = "markers" if sc.get("scale_source") == "markers" else "none"
-            s1 = Q.seed_scale(dets, crop, seed_len.get(crop)) if scale_from == "none" and crop else None
+            min_n = int(limits.get("min_count", Q.QUALITY_DEFAULTS["min_count"]))
+            s1 = None
+            if scale_from == "none" and crop and seed_len.get(crop) and seed_model:
+                if max_side:                                 # the seed ruler needs the photo as it is
+                    sc = {}
+                    dets = detect_photo(p, bundle, project, crop=crop, score=score, tile=tile, overlap=overlap,
+                                        max_side=0, roi_text=roi_text, std_mm_per_px=std_mm_per_px, scale_info=sc)
+                s1 = Q.seed_scale(dets, crop, seed_len.get(crop), min_n)
+                if not s1:
+                    scale_from = "few"
             if s1:                                           # no marker: the seeds are the ruler (2 passes)
-                kw = dict(crop=crop, score=score, tile=tile, overlap=overlap, max_side=max_side,
+                kw = dict(crop=crop, score=score, tile=tile, overlap=overlap, max_side=0,
                           roi_text=roi_text, std_mm_per_px=std_mm_per_px)
                 sc = {}
                 dets = detect_photo(p, bundle, project, scale_info=sc, known_scale=s1, **kw)
-                s2 = Q.seed_scale(dets, crop, seed_len.get(crop))
+                s2 = Q.seed_scale(dets, crop, seed_len.get(crop), min_n)
                 if s2 and abs(s2 / s1 - 1) > 0.01:
                     sc = {}
                     dets = detect_photo(p, bundle, project, scale_info=sc, known_scale=s2, **kw)
                 scale_from = "seeds"
         if sc.get("scale_mm_per_px"):                        # boxes are in original pixels: their scale
             meta.setdefault("scale_mm_per_px", round(sc["scale_mm_per_px"], 5))
+            meta.setdefault("scale_source", "seeds" if scale_from == "seeds" else sc.get("scale_source"))
         use = seed_model if (scale_from == "seeds" and seed_model) else model
-        row = estimate_row(p.name, dets, meta, use, cfg)
-        qc = Q.check_photo(dets, crop, scale_from if scale_from != "off" else "markers",
-                           sc.get("marker_diff_pct"), limits)
+        row = estimate_row(orig.name, dets, meta, use, cfg)
+        qc = Q.check_photo(dets, crop, scale_from, sc.get("marker_diff_pct"), limits)
         if std_mm_per_px:
             if scale_from == "markers":
                 sn = f"scale {sc['scale_mm_per_px']:.3f} mm/px from the markers, resized x{sc.get('std_factor', 1):.2f}"
@@ -249,8 +259,9 @@ def run_inference(paths: list[Path], per_photo: dict[str, dict], project, *, ckp
                       f"(typical seed length {seed_len.get(crop)} mm)")
             else:                                            # the calibration needs a fixed scale
                 row["weight_g"] = row["low_g"] = row["high_g"] = None
-                sn = ("NO MARKER FOUND and no seed length for this crop: scale not fixed, no weight; "
-                      "take the photo again with the marker sheet")
+                why = "too few seeds to use them as the ruler" if scale_from == "few" else \
+                    "no seed length or seed constants for this crop"
+                sn = f"NO MARKER FOUND and {why}: scale not fixed, no weight; take the photo again with the marker sheet"
             row["note"] = "; ".join(v for v in (row.get("note"), sn) if v)
         if qc["light"] == Q.RED:
             row["weight_g"] = row["low_g"] = row["high_g"] = None
@@ -275,7 +286,7 @@ def save_samples(project, items: list[dict], proposer: str = "rfdetr") -> list[s
         name = L.import_photos([it["path"]], project.photos_dir)[0]
         with Image.open(project.photos_dir / name) as im:
             size = im.size
-        meta = {k: it["meta"].get(k) for k in ("crop", "total_weight_g", "pile_id", "scale_mm_per_px")
+        meta = {k: it["meta"].get(k) for k in ("crop", "total_weight_g", "pile_id", "scale_mm_per_px", "scale_source")
                 if it["meta"].get(k) is not None}
         boxes = [{"bbox": d["bbox"], "class": d["label"], "origin": "rfdetr", "score": d["score"]}
                  for d in it["dets"] if d["label"] in project.classes]
