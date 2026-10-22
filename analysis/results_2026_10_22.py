@@ -7,7 +7,7 @@ predictions.json), data/samples.csv, the note outlines (data/photos/<folder>/not
 Counting rule (same as the app): sunflower boxes only, photo resized to 0.110 mm per pixel from the markers.
 Boxes whose centre lies inside a sticky-note outline are dropped (the photos are not changed).
 
-Output (analysis/results/2026-10-22_analysis/): per_photo.csv, per_pile.csv, results.json, results.md.
+Output (analysis/results/2026-10-22_analysis/): per_photo.csv, per_pile.csv, results.json.
 Usage: python analysis/results_2026_10_22.py
 """
 from __future__ import annotations
@@ -83,6 +83,11 @@ def before_weight(notes: str, after: float | None) -> float | None:
     return None
 
 
+# seeds cut in half by Jia's own crop at the photo edge (found with tools/check_note_zones.py-style dark-spot
+# check and looked at one by one, 22 Oct); still counted when the visible part is detected
+SEEDS_CUT = {"IMG_2302.jpg": 1, "IMG_2305.jpg": 4, "IMG_2319.jpg": 2}
+FIT = {"2026-10-19_main"}          # piles the 19 Oct constant and bound were fitted on (in-sample)
+
 rows = list(csv.DictReader(open(ROOT / "data/samples.csv", encoding="utf-8-sig")))
 photos = []
 for folder in RUNS:
@@ -95,8 +100,9 @@ for folder in RUNS:
         n, dropped, n_all = count(std[f], poly)
         n_raw = count(raw[f], poly)[0] if f in raw else None
         w = float(r["total_weight_g"]) if r["total_weight_g"] else None
-        pred = n * G_PER_SEED
-        low, high = pred * (1 - HALF), pred * (1 + HALF)
+        scaled = bool(std[f].get("scale_mm_per_px"))     # the app refuses a photo without a marker
+        pred = n * G_PER_SEED if scaled else None
+        low, high = (pred * (1 - HALF), pred * (1 + HALF)) if scaled else (None, None)
         hm = re.search(r"camera height (\w+)", r["notes"])
         photos.append({
             "file": f, "folder": folder, "pile_id": r["pile_id"], "condition": r["condition"],
@@ -106,10 +112,12 @@ for folder in RUNS:
             "count_sunflower": n, "boxes_in_note_dropped": dropped, "count_all_classes": n_all,
             "count_sunflower_no_fixed_scale": n_raw,
             "weight_before_g": before_weight(r["notes"], w), "weight_after_g": w,
-            "predicted_g": round(pred, 2), "low_g": round(low, 2), "high_g": round(high, 2),
-            "error_g": round(pred - w, 2) if w else None,
-            "error_pct": round(100 * (pred - w) / w, 1) if w else None,
-            "inside_bounds": (low <= w <= high) if w else None,
+            "seeds_cut_by_crop": SEEDS_CUT.get(f, 0),
+            "predicted_g": round(pred, 2) if scaled else None, "low_g": round(low, 2) if scaled else None,
+            "high_g": round(high, 2) if scaled else None,
+            "error_g": round(pred - w, 2) if (w and scaled) else None,
+            "error_pct": round(100 * (pred - w) / w, 1) if (w and scaled) else None,
+            "inside_bounds": (low <= w <= high) if (w and scaled) else None,
             "g_per_seed": round(w / n, 5) if (w and n) else None,
         })
 
@@ -139,9 +147,11 @@ for v in piles.values():
                       "predicted_g": round(pred, 2), "error_pct_vs_after": round(100 * (pred - w) / w, 1),
                       "error_pct_vs_before": round(100 * (pred - wb) / wb, 1) if wb else None,
                       "inside_bounds": pred * (1 - HALF) <= w <= pred * (1 + HALF),
-                      "g_per_seed": round(w / c, 5)})
+                      "g_per_seed": round(w / c, 5), "_gps": w / c,
+                      "role": "fit (in-sample)" if v["folder"] in FIT else "test (not used in the fit)"})
 with open(OUT / "per_pile.csv", "w", newline="", encoding="utf-8") as fh:
-    wr = csv.DictWriter(fh, fieldnames=list(pile_rows[0]), lineterminator="\n")
+    wr = csv.DictWriter(fh, fieldnames=[k for k in pile_rows[0] if not k.startswith("_")], lineterminator="\n",
+                        extrasaction="ignore")
     wr.writeheader()
     wr.writerows(pile_rows)
 
@@ -153,7 +163,7 @@ def group(sel):
 def summary(ps, label):
     if not ps:
         return {"group": label, "n_piles": 0}
-    gps = np.array([p["g_per_seed"] for p in ps])
+    gps = np.array([p["_gps"] for p in ps])
     err = np.array([p["error_pct_vs_after"] for p in ps])
     n = len(gps)
     out = {"group": label, "n_piles": n, "g_per_seed_mean": round(float(gps.mean()), 5),
@@ -163,7 +173,7 @@ def summary(ps, label):
     if n > 1:
         se = gps.std(ddof=1) / math.sqrt(n)
         t = stats.t.ppf(0.975, n - 1)
-        out["g_per_seed_95ci"] = [round(float(gps.mean() - t * se), 5), round(float(gps.mean() + t * se), 5)]
+        out["g_per_seed_mean_95ci (confidence interval of the constant, not a prediction bound)"] = [round(float(gps.mean() - t * se), 5), round(float(gps.mean() + t * se), 5)]
     return out
 
 
@@ -171,22 +181,44 @@ main = group(lambda p: p["folder"] == "2026-10-19_main")
 t4 = group(lambda p: p["folder"] == "2026-10-20_task4")
 extra = group(lambda p: p["folder"] == "2026-10-21_extra_piles")
 results = {"constant_used_g_per_seed": G_PER_SEED, "bound_rel_halfwidth": HALF,
-           "groups": [summary(main, "Hadi P01-P08 (10-24 g)"), summary(t4, "Jia task 4 (11-23 g)"),
-                      summary(extra, "Jia P09-P13 (26-34 g)"), summary(main + t4 + extra, "all 17 piles")]}
+           "weight_rule": "after weight (PROCEDURE.md step 10, written 17 Oct before these data: photographed, then weighed)",
+           "groups": [summary(main, "Hadi P01-P08 (10-24 g): FIT, in-sample"),
+                      summary(t4, "Jia task 4 (11-23 g): test"),
+                      summary(extra, "Jia P09-P13 (26-34 g): test"),
+                      summary(t4 + extra, "Jia all 9 piles: test")]}
+# coverage: what does "k of n inside" tell? (exact binomial / Clopper-Pearson lower bound, one-sided 95 %)
+jia = t4 + extra
+k_in = sum(p["inside_bounds"] for p in jia)
+results["jia_coverage"] = {"inside": f"{k_in} of {len(jia)}",
+                           "prob_all_inside_if_true_coverage_95": round(0.95 ** len(jia), 2),
+                           "coverage_lower_bound_95": round(float(stats.beta.ppf(0.05, k_in, len(jia) - k_in + 1)), 2)
+                           if k_in == len(jia) else None}
+# same check with the BEFORE weight where one was written
+ins_b = []
+for p in jia:
+    wb = p["weight_before_g"] or p["weight_after_g"]
+    ins_b.append(p["predicted_g"] * (1 - HALF) <= wb <= p["predicted_g"] * (1 + HALF))
+results["jia_inside_with_before_weight"] = f"{sum(ins_b)} of {len(jia)}"
 
 # Welch t-test: is Jia's grams per seed different from Hadi's?
 for lab, g in (("task4", t4), ("extra", extra), ("jia_all", t4 + extra)):
     if len(g) > 1:
-        a = [p["g_per_seed"] for p in main]
-        b = [p["g_per_seed"] for p in g]
+        a = np.array([p["_gps"] for p in main])
+        b = np.array([p["_gps"] for p in g])
         tt = stats.ttest_ind(a, b, equal_var=False)
-        results[f"welch_hadi_vs_{lab}"] = {"diff_pct": round(100 * (np.mean(b) - np.mean(a)) / np.mean(a), 2),
+        va, vb = a.var(ddof=1) / len(a), b.var(ddof=1) / len(b)
+        dfw = (va + vb) ** 2 / (va ** 2 / (len(a) - 1) + vb ** 2 / (len(b) - 1))
+        half = stats.t.ppf(0.975, dfw) * math.sqrt(va + vb)
+        d = b.mean() - a.mean()
+        results[f"welch_hadi_vs_{lab}"] = {"diff_pct": round(100 * d / a.mean(), 2),
+                                            "diff_95ci_pct": [round(100 * (d - half) / a.mean(), 1),
+                                                              round(100 * (d + half) / a.mean(), 1)],
                                             "p_value": round(float(tt.pvalue), 3)}
 
 # trend of grams per seed with pile weight over all piles (does the constant hold for bigger piles?)
 allp = main + t4 + extra
 w = np.array([p["weight_after_g"] for p in allp])
-g = np.array([p["g_per_seed"] for p in allp])
+g = np.array([p["_gps"] for p in allp])
 lr = stats.linregress(w, g)
 results["trend_g_per_seed_vs_weight"] = {"slope_pct_per_10g": round(float(100 * lr.slope * 10 / g.mean()), 2),
                                          "r": round(float(lr.rvalue), 3), "p_value": round(float(lr.pvalue), 3)}
@@ -219,7 +251,7 @@ if rr:
         gr["no_fixed_scale_range_pct"] = round(float(100 * (rawc.max() - rawc.min()) / rawc.mean()), 2)
     sc = [p["scale_mm_per_px"] for p in rr if p["scale_mm_per_px"]]
     gr["scale_mm_per_px_range"] = [round(min(sc), 4), round(max(sc), 4)] if sc else None
-    results["gauge_rr"] = gr
+    results["gauge_rr_all_12_photos_incl_no_marker (do not use: IMG_2261 has no fixed scale)"] = gr
 
 # ---------------------------------------------------------------- effect of the note filter and of the fixed scale
 results["note_boxes_dropped"] = {p["file"]: p["boxes_in_note_dropped"] for p in photos if p["boxes_in_note_dropped"]}
@@ -235,7 +267,7 @@ print(json.dumps(results, indent=1))
 
 # ---------------------------------------------------------------- pooled model over all 17 piles, honest error, stop rule
 ALL = main + t4 + extra
-g = np.array([p["g_per_seed"] for p in ALL])
+g = np.array([p["_gps"] for p in ALL])
 c = np.array([p["mean_count"] for p in ALL])
 wt = np.array([p["weight_after_g"] for p in ALL])
 k_all = float(wt.sum() / c.sum())        # pooled grams per seed: total weight / total count (ratio estimator)
@@ -264,7 +296,16 @@ for k in (3, 4, 5, 6, 8, 10, 12, 15, 17, 20, 25, 30, 50):
 for a_, b_ in zip(curve, curve[1:]):
     b_["gain_per_extra_pile_pct_points"] = round((a_["bound_pct"] - b_["bound_pct"]) / (b_["n_piles"] - a_["n_piles"]), 3)
 results["bound_vs_piles"] = curve
+results["bound_vs_piles_note"] = ("treats s as known; gain = average gain per extra pile between the listed n. "
+                                  f"With {n} piles the true s is about {math.sqrt((n-1)/stats.chi2.ppf(0.975, n-1)):.2f} to "
+                                  f"{math.sqrt((n-1)/stats.chi2.ppf(0.025, n-1)):.2f} times the estimate (95 %, chi-square)")
 results["bound_floor_pct"] = round(100 * 1.959964 * s_rel, 2)
+bal_rel = np.mean([0.2887 / x for x in wt])          # 1 g scale step: sd 1/sqrt(12) g per reading
+results["floor_note"] = {"floor_is_for": "this setup (1 g kitchen scale, one seed lot), not for the method",
+                         "balance_rms_rel_pct": round(100 * float(np.sqrt(np.mean([(0.2887 / x) ** 2 for x in wt]))), 2),
+                         "floor_without_balance_pct_estimate": round(100 * 1.959964 * math.sqrt(max(s_rel ** 2 - float(np.mean([(0.2887 / x) ** 2 for x in wt])), 0)), 2)}
+results["pooling_note"] = ("pooling all 17 piles is conditional (STATUS 4b): task 4 shows no difference, but the "
+                           "Gauge R&R is incomplete (5 photos missing); the 19 Oct constant stays in the app until then")
 
 # Gauge R&R without the photo where no marker was found (the app would refuse it)
 ok = [p for p in rr if p["scale_mm_per_px"]]
@@ -287,13 +328,35 @@ if ok:
     cells = {}
     for p in ok:
         cells.setdefault((p["phone"], p["collector"], p["height_class"]), []).append(p["count_sunflower"])
-    within = [np.var(x, ddof=1) for x in cells.values() if len(x) > 1]
-    rep_sd = math.sqrt(np.mean(within)) if within else None
-    tot_sd = float(v.std(ddof=1))
-    results["gauge_rr_marker_ok"]["repeatability_sd_seeds"] = round(rep_sd, 2) if rep_sd else None
-    results["gauge_rr_marker_ok"]["total_sd_seeds"] = round(tot_sd, 2)
-    results["gauge_rr_marker_ok"]["reproducibility_sd_seeds"] = (
-        round(math.sqrt(max(tot_sd ** 2 - rep_sd ** 2, 0.0)), 2) if rep_sd else None)
+    # one-way ANOVA over the cells (person x phone x height); within = repeatability
+    groups_ = list(cells.values())
+    N, K = sum(map(len, groups_)), len(groups_)
+    grand = v.mean()
+    ss_b = sum(len(x) * (np.mean(x) - grand) ** 2 for x in groups_)
+    ss_w = sum(((np.array(x) - np.mean(x)) ** 2).sum() for x in groups_)
+    df_b, df_w = K - 1, N - K
+    ms_b, ms_w = ss_b / df_b, ss_w / df_w
+    rep_sd = math.sqrt(ms_w)
+    ci = [math.sqrt(ss_w / stats.chi2.ppf(0.975, df_w)), math.sqrt(ss_w / stats.chi2.ppf(0.025, df_w))]
+    gr2 = results["gauge_rr_marker_ok"]
+    gr2["cells"] = {" | ".join(k): x for k, x in cells.items()}
+    gr2["anova"] = {"ms_between": round(ms_b, 2), "ms_within": round(ms_w, 2), "df": [df_b, df_w],
+                    "p_value": round(float(stats.f.sf(ms_b / ms_w, df_b, df_w)), 2),
+                    "verdict": "no person, phone or height effect detectable (between-cell variance not larger than within)"}
+    gr2["repeatability_sd_seeds"] = round(rep_sd, 2)
+    gr2["repeatability_sd_95ci_seeds"] = [round(ci[0], 1), round(ci[1], 1)]
+    gr2["repeatability_rel_pct"] = round(100 * rep_sd / grand, 2)
+    # 95 % CIs of the person and phone differences (Welch), so the size an effect could still have is visible
+    for fac, (l1, l2) in (("collector", ("Jia", "Hadi")), ("phone", ("iPhone 14 1x", "iPhone 15 Pro 1x"))):
+        a = np.array([p["count_sunflower"] for p in ok if p[fac] == l1], float)
+        b = np.array([p["count_sunflower"] for p in ok if p[fac] == l2], float)
+        va, vb = a.var(ddof=1) / len(a), b.var(ddof=1) / len(b)
+        dfw = (va + vb) ** 2 / (va ** 2 / (len(a) - 1) + vb ** 2 / (len(b) - 1))
+        h = stats.t.ppf(0.975, dfw) * math.sqrt(va + vb)
+        d = a.mean() - b.mean()
+        gr2[f"diff_{l1}_minus_{l2}_pct_95ci"] = [round(100 * (d - h) / grand, 1), round(100 * d / grand, 1),
+                                                 round(100 * (d + h) / grand, 1)]
+    gr2["missing"] = "IMG_4179-4183 (iPhone 15 Pro, probably normal height) not yet in the repo; heights are labelled normal/high, not measured"
 
 # before or after weight: which one does the photo agree with? (piles with two different readings)
 ba = [p for p in pile_rows if p["weight_before_g"] and p["weight_before_g"] != p["weight_after_g"]]
@@ -308,7 +371,9 @@ import datetime as dt
 
 
 def stamp(folder, f):
-    return dt.datetime.strptime(Image.open(ROOT / "data/photos" / folder / f).getexif().get(306), "%Y:%m:%d %H:%M:%S")
+    ex = Image.open(ROOT / "data/photos" / folder / f).getexif()
+    v = ex.get_ifd(0x8769).get(36867) or ex.get(306)     # DateTimeOriginal, else DateTime
+    return dt.datetime.strptime(v, "%Y:%m:%d %H:%M:%S")
 
 
 times = {}
@@ -319,10 +384,14 @@ for folder in ("2026-10-19_main", "2026-10-20_task4", "2026-10-21_extra_piles"):
         first[r["pile_id"]] = min(first.get(r["pile_id"], t), t)
     ts = sorted(first.values())
     gaps = [(b - a).total_seconds() / 60 for a, b in zip(ts, ts[1:])]
-    times[folder] = {"n_piles": len(ts), "min_per_pile_mean": round(float(np.mean(gaps)), 1),
-                     "min_per_pile_range": [round(min(gaps), 1), round(max(gaps), 1)]}
-results["minutes_per_pile"] = times
+    times[folder] = {"n_piles": len(ts), "n_gaps": len(gaps), "min_between_piles_mean": round(float(np.mean(gaps)), 1),
+                     "min_between_piles_range": [round(min(gaps), 1), round(max(gaps), 1)]}
+results["minutes_per_pile"] = {"definition": "elapsed time from the first photo of one pile to the first photo of the next: "
+                               "spreading, label photo, 2 photos, weighing, extras (R and T photos on P03 and P08) and breaks",
+                               **times}
 
 (OUT / "results.json").write_text(json.dumps(results, indent=1))
-for k in ("pooled_17", "bound_vs_piles", "bound_floor_pct", "gauge_rr_marker_ok", "before_vs_after", "minutes_per_pile"):
+for k in ("groups", "jia_coverage", "jia_inside_with_before_weight", "welch_hadi_vs_task4", "welch_hadi_vs_jia_all",
+          "pooled_17", "bound_vs_piles_note", "bound_floor_pct", "floor_note", "gauge_rr_marker_ok", "before_vs_after",
+          "minutes_per_pile"):
     print(k, json.dumps(results[k]))

@@ -1,18 +1,18 @@
-folder,pile_id,collector,weight_before_g,weight_after_g,n_photos,mean_count,photo_diff_pct,predicted_g,error_pct_vs_after,error_pct_vs_before,inside_bounds,g_per_seed
-2026-10-19_main,P01,Hadi,,10.0,2,184.5,2.7,9.77,-2.3,,True,0.0542
-2026-10-19_main,P02,Hadi,,12.0,2,225.5,0.4,11.94,-0.5,,True,0.05322
-2026-10-19_main,P03,Hadi,,14.0,2,275.0,1.5,14.56,4.0,,True,0.05091
-2026-10-19_main,P04,Hadi,,16.0,2,300.0,0.7,15.88,-0.7,,True,0.05333
-2026-10-19_main,P05,Hadi,,18.0,2,356.0,1.7,18.85,4.7,,True,0.05056
-2026-10-19_main,P06,Hadi,,20.0,2,349.5,1.4,18.5,-7.5,,True,0.05722
-2026-10-19_main,P07,Hadi,,22.0,2,418.5,0.2,22.16,0.7,,True,0.05257
-2026-10-19_main,P08,Hadi,,24.0,2,466.0,0.9,24.67,2.8,,True,0.0515
-2026-10-20_task4,T4-01,Jia,10.0,11.0,2,202.5,2.5,10.72,-2.5,7.2,True,0.05432
-2026-10-20_task4,T4-02,Jia,14.0,12.0,2,236.5,1.3,12.52,4.3,-10.6,True,0.05074
-2026-10-20_task4,T4-03,Jia,18.0,18.0,2,328.5,0.9,17.39,-3.4,-3.4,True,0.05479
-2026-10-20_task4,T4-04,Jia,22.0,23.0,2,409.5,0.2,21.68,-5.7,-1.5,True,0.05617
-2026-10-21_extra_piles,P09,Jia,26.0,27.0,2,472.5,1.9,25.01,-7.4,-3.8,True,0.05714
-2026-10-21_extra_piles,P10,Jia,28.0,28.0,2,516.5,0.6,27.34,-2.3,-2.3,True,0.05421
-2026-10-21_extra_piles,P11,Jia,30.0,29.0,2,558.5,0.5,29.57,2.0,-1.4,True,0.05192
-2026-10-21_extra_piles,P12,Jia,32.0,32.0,2,619.0,0.0,32.77,2.4,2.4,True,0.0517
-2026-10-21_extra_piles,P13,Jia,34.0,34.0,2,647.0,1.2,34.25,0.7,0.7,True,0.05255
+folder,pile_id,collector,weight_before_g,weight_after_g,n_photos,mean_count,photo_diff_pct,predicted_g,error_pct_vs_after,error_pct_vs_before,inside_bounds,g_per_seed,role
+2026-10-19_main,P01,Hadi,,10.0,2,184.5,2.7,9.77,-2.3,,True,0.0542,fit (in-sample)
+2026-10-19_main,P02,Hadi,,12.0,2,225.5,0.4,11.94,-0.5,,True,0.05322,fit (in-sample)
+2026-10-19_main,P03,Hadi,,14.0,2,275.0,1.5,14.56,4.0,,True,0.05091,fit (in-sample)
+2026-10-19_main,P04,Hadi,,16.0,2,300.0,0.7,15.88,-0.7,,True,0.05333,fit (in-sample)
+2026-10-19_main,P05,Hadi,,18.0,2,356.0,1.7,18.85,4.7,,True,0.05056,fit (in-sample)
+2026-10-19_main,P06,Hadi,,20.0,2,349.5,1.4,18.5,-7.5,,True,0.05722,fit (in-sample)
+2026-10-19_main,P07,Hadi,,22.0,2,418.5,0.2,22.16,0.7,,True,0.05257,fit (in-sample)
+2026-10-19_main,P08,Hadi,,24.0,2,466.0,0.9,24.67,2.8,,True,0.0515,fit (in-sample)
+2026-10-20_task4,T4-01,Jia,10.0,11.0,2,202.5,2.5,10.72,-2.5,7.2,True,0.05432,test (not used in the fit)
+2026-10-20_task4,T4-02,Jia,14.0,12.0,2,236.5,1.3,12.52,4.3,-10.6,True,0.05074,test (not used in the fit)
+2026-10-20_task4,T4-03,Jia,18.0,18.0,2,328.5,0.9,17.39,-3.4,-3.4,True,0.05479,test (not used in the fit)
+2026-10-20_task4,T4-04,Jia,22.0,23.0,2,409.5,0.2,21.68,-5.7,-1.5,True,0.05617,test (not used in the fit)
+2026-10-21_extra_piles,P09,Jia,26.0,27.0,2,472.5,1.9,25.01,-7.4,-3.8,True,0.05714,test (not used in the fit)
+2026-10-21_extra_piles,P10,Jia,28.0,28.0,2,516.5,0.6,27.34,-2.3,-2.3,True,0.05421,test (not used in the fit)
+2026-10-21_extra_piles,P11,Jia,30.0,29.0,2,558.5,0.5,29.57,2.0,-1.4,True,0.05192,test (not used in the fit)
+2026-10-21_extra_piles,P12,Jia,32.0,32.0,2,619.0,0.0,32.77,2.4,2.4,True,0.0517,test (not used in the fit)
+2026-10-21_extra_piles,P13,Jia,34.0,34.0,2,647.0,1.2,34.25,0.7,0.7,True,0.05255,test (not used in the fit)
