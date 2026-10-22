@@ -75,18 +75,23 @@ rr = [r for r in rows if r["condition"] == "gauge_rr"]
 v = np.array([r["count_seed"] for r in rr], float)
 g3 = {"n": len(v), "min": int(v.min()), "max": int(v.max()), "mean": round(float(v.mean()), 1),
       "rel_sd_pct": round(float(100 * v.std(ddof=1) / v.mean()), 2)}
-vm = np.array([r["count_marker"] for r in rr if r["count_marker"]], float)
-g3["marker_same_photos_rel_sd_pct"] = round(float(100 * vm.std(ddof=1) / vm.mean()), 2)
-for fac, (a, b) in (("collector", ("Jia", "Hadi")), ("phone", ("iPhone 14 1x", "iPhone 15 Pro 1x")),
-                    ("height_class", ("high", "normal"))):
-    x = np.array([r["count_seed"] for r in rr if r[fac] == a], float)
-    y = np.array([r["count_seed"] for r in rr if r[fac] == b], float)
-    va, vb = x.var(ddof=1) / len(x), y.var(ddof=1) / len(y)
-    dfw = (va + vb) ** 2 / (va ** 2 / (len(x) - 1) + vb ** 2 / (len(y) - 1))
-    hw = stats.t.ppf(0.975, dfw) * math.sqrt(va + vb)
-    d = x.mean() - y.mean()
-    g3[f"{a}_minus_{b}_pct_95ci"] = [round(100 * (d - hw) / v.mean(), 1), round(100 * d / v.mean(), 1),
-                                     round(100 * (d + hw) / v.mean(), 1)]
+rr16 = [r for r in rr if r["count_marker"]]           # the 16 photos where the markers were found
+for key in ("count_seed", "count_marker"):
+    x16 = np.array([r[key] for r in rr16], float)
+    g3[f"same_16_photos_rel_sd_pct_{key}"] = round(float(100 * x16.std(ddof=1) / x16.mean()), 2)
+for key, sel in (("seed", rr), ("marker", rr16)):
+    col = "count_seed" if key == "seed" else "count_marker"
+    m = np.mean([r[col] for r in sel])
+    for fac, (a, b) in (("collector", ("Jia", "Hadi")), ("phone", ("iPhone 14 1x", "iPhone 15 Pro 1x")),
+                        ("height_class", ("high", "normal"))):
+        x = np.array([r[col] for r in sel if r[fac] == a], float)
+        y = np.array([r[col] for r in sel if r[fac] == b], float)
+        va, vb = x.var(ddof=1) / len(x), y.var(ddof=1) / len(y)
+        dfw = (va + vb) ** 2 / (va ** 2 / (len(x) - 1) + vb ** 2 / (len(y) - 1))
+        hw = stats.t.ppf(0.975, dfw) * math.sqrt(va + vb)
+        d = x.mean() - y.mean()
+        g3[f"{key}: {a}_minus_{b}_pct_95ci"] = [round(100 * (d - hw) / m, 1), round(100 * d / m, 1),
+                                                round(100 * (d + hw) / m, 1)]
 g3["IMG_2261_no_marker"] = next(r["count_seed"] for r in rr if r["file"] == "IMG_2261.jpg")
 out["3_gauge_rr_seed_scale"] = g3
 
@@ -98,7 +103,15 @@ for r in rows:
 out["4_seed_length_mm_by_folder"] = {k: desc(x) for k, x in lens.items()}
 sc = [(r["scale_diff_pct"], r["count_diff_pct"]) for r in cm]
 lr = stats.linregress([a for a, _ in sc], [b for _, b in sc])
-out["4_count_change_per_1pct_scale_error"] = {"slope": round(float(lr.slope), 3), "r": round(float(lr.rvalue), 2)}
+out["4_count_change_per_1pct_scale_error"] = {"slope": round(float(lr.slope), 3), "r": round(float(lr.rvalue), 2),
+                                              "note": "regression across photos, weak (r 0.39); see sensitivity.json "
+                                                      "for the controlled test with the scale set 5 % off"}
+out["4_note"] = ("seed lengths differ by session (main 11.25, Gauge R&R 11.48, Jia 11.75-11.88 mm); in the Gauge "
+                 "R&R both persons and both phones measure the same length, so it is a session effect (sheet, "
+                 "pile or seeds), not person or phone. Jia's grams per seed is only 1.5 % above Hadi's, so her "
+                 "seeds are probably not 5 % longer. A marker card printed short would fit the length, but it "
+                 "would push her count UP, not explain her -1.3 % bias. Direct test: measure her card. "
+                 "Medians include boxes on the sticky note (about 2 per photo, negligible).")
 
 (D / "summary.json").write_text(json.dumps(out, indent=1))
 print(json.dumps(out, indent=1))

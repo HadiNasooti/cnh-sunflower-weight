@@ -119,21 +119,37 @@
   "max": 295,
   "mean": 287.7,
   "rel_sd_pct": 1.24,
-  "marker_same_photos_rel_sd_pct": 1.16,
-  "Jia_minus_Hadi_pct_95ci": [
+  "same_16_photos_rel_sd_pct_count_seed": 1.22,
+  "same_16_photos_rel_sd_pct_count_marker": 1.16,
+  "seed: Jia_minus_Hadi_pct_95ci": [
    -0.4,
    0.8,
    2.1
   ],
-  "iPhone 14 1x_minus_iPhone 15 Pro 1x_pct_95ci": [
+  "seed: iPhone 14 1x_minus_iPhone 15 Pro 1x_pct_95ci": [
    -0.2,
    1.0,
    2.3
   ],
-  "high_minus_normal_pct_95ci": [
+  "seed: high_minus_normal_pct_95ci": [
    -1.5,
    -0.1,
    1.2
+  ],
+  "marker: Jia_minus_Hadi_pct_95ci": [
+   -1.4,
+   0.0,
+   1.5
+  ],
+  "marker: iPhone 14 1x_minus_iPhone 15 Pro 1x_pct_95ci": [
+   -1.1,
+   0.3,
+   1.7
+  ],
+  "marker: high_minus_normal_pct_95ci": [
+   -1.3,
+   0.0,
+   1.3
   ],
   "IMG_2261_no_marker": 292.0
  },
@@ -173,6 +189,8 @@
  },
  "4_count_change_per_1pct_scale_error": {
   "slope": 0.247,
-  "r": 0.39
- }
+  "r": 0.39,
+  "note": "regression across photos, weak (r 0.39); see sensitivity.json for the controlled test with the scale set 5 % off"
+ },
+ "4_note": "seed lengths differ by session (main 11.25, Gauge R&R 11.48, Jia 11.75-11.88 mm); in the Gauge R&R both persons and both phones measure the same length, so it is a session effect (sheet, pile or seeds), not person or phone. Jia's grams per seed is only 1.5 % above Hadi's, so her seeds are probably not 5 % longer. A marker card printed short would fit the length, but it would push her count UP, not explain her -1.3 % bias. Direct test: measure her card. Medians include boxes on the sticky note (about 2 per photo, negligible)."
 }

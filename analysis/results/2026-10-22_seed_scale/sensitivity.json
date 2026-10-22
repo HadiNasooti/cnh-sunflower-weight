@@ -1,0 +1,33 @@
+{
+ "photos": [
+  {
+   "file": "IMG_4149.JPG",
+   "count_scale_x0.95": 225,
+   "count_marker_scale": 226,
+   "count_scale_x1.05": 230,
+   "pct_per_1pct_scale": 0.221
+  },
+  {
+   "file": "IMG_4167.JPG",
+   "count_scale_x0.95": 417,
+   "count_marker_scale": 418,
+   "count_scale_x1.05": 417,
+   "pct_per_1pct_scale": 0.0
+  },
+  {
+   "file": "IMG_2303.jpg",
+   "count_scale_x0.95": 315,
+   "count_marker_scale": 330,
+   "count_scale_x1.05": 325,
+   "pct_per_1pct_scale": 0.303
+  },
+  {
+   "file": "IMG_2322.jpg",
+   "count_scale_x0.95": 553,
+   "count_marker_scale": 560,
+   "count_scale_x1.05": 566,
+   "pct_per_1pct_scale": 0.232
+  }
+ ],
+ "mean_pct_count_per_1pct_scale": 0.189
+}
