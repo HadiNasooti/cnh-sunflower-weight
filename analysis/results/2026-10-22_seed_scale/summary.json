@@ -1,15 +1,15 @@
 {
  "typical_seed_length_mm": {
   "typical_seed_length_mm_hadi_main": 11.249,
-  "typical_seed_length_mm_all_marker_photos": 11.4858,
+  "typical_seed_length_mm_all_marker_photos": 11.4847,
   "used": "hadi_main"
  },
  "1_count_diff_pct_vs_marker": {
   "all": {
    "n": 58,
-   "mean": -0.95,
-   "sd": 1.64,
-   "mean_abs": 1.41,
+   "mean": -0.9,
+   "sd": 1.67,
+   "mean_abs": 1.42,
    "min": -5.6,
    "max": 2.47
   },
@@ -31,11 +31,11 @@
   },
   "2026-10-20_task4": {
    "n": 8,
-   "mean": -1.44,
-   "sd": 1.24,
-   "mean_abs": 1.57,
+   "mean": -1.13,
+   "sd": 1.62,
+   "mean_abs": 1.63,
    "min": -3.33,
-   "max": 0.5
+   "max": 1.47
   },
   "2026-10-21_extra_piles": {
    "n": 10,
@@ -48,16 +48,16 @@
  },
  "1_pass1_only_count_diff_pct": {
   "n": 58,
-  "mean": -1.7,
-  "sd": 3.35,
-  "mean_abs": 2.03,
+  "mean": -1.67,
+  "sd": 3.36,
+  "mean_abs": 2.01,
   "min": -22.15,
   "max": 2.47
  },
  "1_scale_diff_pct_vs_marker": {
   "n": 58,
-  "mean": -2.3,
-  "sd": 2.61,
+  "mean": -2.29,
+  "sd": 2.6,
   "mean_abs": 2.74,
   "min": -6.87,
   "max": 4.43
@@ -91,26 +91,26 @@
  ],
  "2_bound_seed": {
   "n_piles": 17,
-  "g_per_seed": 0.05385,
-  "rel_sd_pct": 4.32,
-  "bound_pct": 9.42
+  "g_per_seed": 0.05381,
+  "rel_sd_pct": 4.25,
+  "bound_pct": 9.28
  },
  "2_bound_marker": {
   "n_piles": 17,
   "g_per_seed": 0.05336,
-  "rel_sd_pct": 3.97,
-  "bound_pct": 8.66
+  "rel_sd_pct": 3.99,
+  "bound_pct": 8.71
  },
  "2_jia_test_seed": {
   "hadi_bound_pct": 10.69,
-  "bias_pct": -2.86,
-  "mean_abs_err_pct": 3.59,
+  "bias_pct": -2.76,
+  "mean_abs_err_pct": 3.49,
   "inside": "9 of 9"
  },
  "2_jia_test_marker": {
   "hadi_bound_pct": 10.16,
-  "bias_pct": -1.33,
-  "mean_abs_err_pct": 3.42,
+  "bias_pct": -1.35,
+  "mean_abs_err_pct": 3.45,
   "inside": "9 of 9"
  },
  "3_gauge_rr_seed_scale": {
@@ -164,9 +164,9 @@
   },
   "2026-10-20_task4": {
    "n": 8,
-   "mean": 11.88,
+   "mean": 11.87,
    "sd": 0.1,
-   "mean_abs": 11.88,
+   "mean_abs": 11.87,
    "min": 11.72,
    "max": 12.04
   },
@@ -188,8 +188,8 @@
   }
  },
  "4_count_change_per_1pct_scale_error": {
-  "slope": 0.247,
-  "r": 0.39,
+  "slope": 0.233,
+  "r": 0.36,
   "note": "regression across photos, weak (r 0.39); see sensitivity.json for the controlled test with the scale set 5 % off"
  },
  "4_note": "seed lengths differ by session (main 11.25, Gauge R&R 11.48, Jia 11.75-11.88 mm); in the Gauge R&R both persons and both phones measure the same length, so it is a session effect (sheet, pile or seeds), not person or phone. Jia's grams per seed is only 1.5 % above Hadi's, so her seeds are probably not 5 % longer. A marker card printed short would fit the length, but it would push her count UP, not explain her -1.3 % bias. Direct test: measure her card. Medians include boxes on the sticky note (about 2 per photo, negligible)."

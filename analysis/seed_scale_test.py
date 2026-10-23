@@ -38,7 +38,7 @@ OUT = RES / "2026-10-22_seed_scale"
 TARGET = 0.110
 CROP = "sunflower"
 RUNS = {"2026-10-19_main": ["2026-10-22_detect_main"],
-        "2026-10-20_task4": ["2026-10-22_detect"],
+        "2026-10-20_task4": ["2026-10-22_detect", "2026-10-23_detect_2305"],
         "2026-10-21_extra_piles": ["2026-10-22_detect"],
         "2026-10-19_gauge_rr": ["2026-10-22_detect", "2026-10-22_detect_rr5"]}
 

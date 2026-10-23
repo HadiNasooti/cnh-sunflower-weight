@@ -105,7 +105,7 @@ Photo conditions: photos A and B = `main`, R = `re_spread`, T = `touching`.
    - green: good photo; range +-8.7 % with the markers;
    - orange: the weight is shown, the message says what to change (seeds too close together, phone tilted,
      more seeds than tested, too few seeds, or no marker). Without a marker the seeds are used as the ruler
-     (`scale_from` = seeds) and the range is +-9.4 %;
+     (`scale_from` = seeds) and the range is +-9.3 %;
    - red: no weight (no seeds found, or no marker and the seed size of the crop is not known).
    Limits come from our 59 photos (`analysis/validate_light.py`: all 53 normal photos green, the 6 known
    problem photos orange).

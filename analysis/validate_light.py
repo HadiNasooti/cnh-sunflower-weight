@@ -14,7 +14,7 @@ from detkit import quality as Q  # noqa: E402
 from detkit.scale import measure_scale  # noqa: E402
 from PIL import Image, ImageOps  # noqa: E402
 
-RUNS = {"2026-10-19_main": ["2026-10-22_detect_main"], "2026-10-20_task4": ["2026-10-22_detect"],
+RUNS = {"2026-10-19_main": ["2026-10-22_detect_main"], "2026-10-20_task4": ["2026-10-22_detect", "2026-10-23_detect_2305"],
         "2026-10-21_extra_piles": ["2026-10-22_detect"],
         "2026-10-19_gauge_rr": ["2026-10-22_detect", "2026-10-22_detect_rr5"]}
 cfg = json.loads((ROOT / "analysis/results/main_std/weight_config.json").read_text())

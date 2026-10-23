@@ -2,7 +2,8 @@
 
 Input: detector output of .github/workflows/detect.yml (analysis/results/2026-10-22_detect*/{std,raw}/<folder>/
 predictions.json), data/samples.csv, the note outlines (data/photos/<folder>/note_zones.json) and the constant of
-19 Oct (analysis/results/main_std/weight_config.json).
+19 Oct (analysis/results/main_std/weight_config_19oct_8piles.json; since 22 Oct the app config next to it holds
+the 17-pile constants).
 
 Counting rule (same as the app): sunflower boxes only, photo resized to 0.110 mm per pixel from the markers.
 Boxes whose centre lies inside a sticky-note outline are dropped (the photos are not changed).
@@ -26,7 +27,7 @@ RES = ROOT / "analysis/results"
 OUT = RES / "2026-10-22_analysis"
 CROP = "sunflower"
 
-cfg = json.loads((RES / "main_std/weight_config.json").read_text())
+cfg = json.loads((RES / "main_std/weight_config_19oct_8piles.json").read_text())   # the 19 Oct model (8 piles)
 G_PER_SEED = cfg["crop_count_constants"][CROP]                 # 0.05294 g per seed (Hadi P01-P08, 19 Oct)
 HALF = cfg["crop_count_constants_bounds"][CROP]["rel_halfwidth"]  # 0.0998 -> +-10.0 %
 
@@ -34,7 +35,7 @@ HALF = cfg["crop_count_constants_bounds"][CROP]["rel_halfwidth"]  # 0.0998 -> +-
 # (run on 22 Oct evening with the same model and settings) plus IMG_4187 as a control: it gives exactly the
 # same boxes as the first run.
 RUNS = {"2026-10-19_main": ["2026-10-22_detect_main"],
-        "2026-10-20_task4": ["2026-10-22_detect"],
+        "2026-10-20_task4": ["2026-10-22_detect", "2026-10-23_detect_2305"],
         "2026-10-21_extra_piles": ["2026-10-22_detect"],
         "2026-10-19_gauge_rr": ["2026-10-22_detect", "2026-10-22_detect_rr5"]}
 
@@ -99,7 +100,9 @@ def before_weight(notes: str, after: float | None) -> float | None:
 
 # seeds cut in half by Jia's own crop at the photo edge (found with tools/check_note_zones.py-style dark-spot
 # check and looked at one by one, 22 Oct); still counted when the visible part is detected
-SEEDS_CUT = {"IMG_2302.jpg": 1, "IMG_2305.jpg": 4, "IMG_2319.jpg": 2, "IMG_2332.jpg": 1}
+# IMG_2305 was cropped again on 23 Oct from Jia's original photo (no seed cut; run 2026-10-23_detect_2305).
+# IMG_2302: the seed is cut by the edge of the original photo itself. P11 and P13: no uncropped original exists.
+SEEDS_CUT = {"IMG_2302.jpg": 1, "IMG_2305.jpg": 0, "IMG_2319.jpg": 2, "IMG_2332.jpg": 1}
 FIT = {"2026-10-19_main"}          # piles the 19 Oct constant and bound were fitted on (in-sample)
 
 rows = list(csv.DictReader(open(ROOT / "data/samples.csv", encoding="utf-8-sig")))
@@ -330,7 +333,7 @@ results["bound_levels"] = {
     "app_bound_level": "one photo (photo-level spread of 16 photos, t with 8 piles)",
     "hadi_8_piles_pile_level_pct": round(100 * stats.t.ppf(0.975, len(g8) - 1) * s8 * math.sqrt(1 + 1 / len(g8)), 2),
     "note": "like-for-like change from 8 to 17 piles at pile level: this value -> pooled_17.bound_halfwidth_pct; "
-            "the photo-level spread over 17 piles is also about 3.97 %, so the 17-pile bound holds for one photo too"}
+            "the photo-level spread over the 34 photos is about the same as the pile-level spread, so the 17-pile bound holds for one photo too (the app config, built per photo, gives the same +-8.7 %)"}
 results["pooled_17"] = {
     "constant_method": "total weight / total count (ratio of sums); s is the spread of the per-pile ratios around "
                        "their mean; the difference is negligible (s around the pooled constant 3.975 % vs 3.971 %)",

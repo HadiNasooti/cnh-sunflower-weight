@@ -7,8 +7,8 @@
   },
   "area_constants": {},
   "crop_count_constants": {
-    "sunflower": 0.05335658950716708,
-    "default": 0.05335658950716708
+    "sunflower": 0.05336467735455221,
+    "default": 0.05336467735455221
   },
   "crop_area_constants": {},
   "detector": {
@@ -37,16 +37,16 @@
   },
   "crop_count_constants_bounds": {
     "sunflower": {
-      "rel_halfwidth": 0.0866108551902837,
-      "rel_sd": 0.0397048970671376,
+      "rel_halfwidth": 0.08708268192591419,
+      "rel_sd": 0.03992119595866307,
       "n_piles": 17,
       "n_photos": 34,
       "t": 2.1199052992212546,
       "level": 0.95
     },
     "default": {
-      "rel_halfwidth": 0.0866108551902837,
-      "rel_sd": 0.0397048970671376,
+      "rel_halfwidth": 0.08708268192591419,
+      "rel_sd": 0.03992119595866307,
       "n_piles": 17,
       "n_photos": 34,
       "t": 2.1199052992212546,
@@ -54,12 +54,12 @@
     }
   },
   "seed_scale_constants": {
-    "sunflower": 0.05384506300511527
+    "sunflower": 0.05381263164261292
   },
   "seed_scale_constants_bounds": {
     "sunflower": {
-      "rel_halfwidth": 0.09448477886420588,
-      "rel_sd": 0.043314529235076865,
+      "rel_halfwidth": 0.0931363332727282,
+      "rel_sd": 0.04269636314847456,
       "n_piles": 17,
       "n_photos": 34,
       "t": 2.1199052992212546,

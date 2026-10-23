@@ -19,14 +19,14 @@
   {
    "group": "Jia task 4 (11-23 g): test",
    "n_piles": 4,
-   "g_per_seed_mean": 0.05401,
-   "g_per_seed_rel_sd_pct": 4.28,
-   "bias_pct": -1.83,
-   "mape_pct": 3.97,
+   "g_per_seed_mean": 0.05404,
+   "g_per_seed_rel_sd_pct": 4.36,
+   "bias_pct": -1.9,
+   "mape_pct": 4.05,
    "inside_bounds": "4 of 4",
    "g_per_seed_mean_95ci (confidence interval of the constant, not a prediction bound)": [
-    0.05032,
-    0.05769
+    0.05029,
+    0.05779
    ]
   },
   {
@@ -45,14 +45,14 @@
   {
    "group": "Jia all 9 piles (11-34 g): test",
    "n_piles": 9,
-   "g_per_seed_mean": 0.05373,
-   "g_per_seed_rel_sd_pct": 4.0,
-   "bias_pct": -1.32,
-   "mape_pct": 3.41,
+   "g_per_seed_mean": 0.05374,
+   "g_per_seed_rel_sd_pct": 4.04,
+   "bias_pct": -1.36,
+   "mape_pct": 3.44,
    "inside_bounds": "9 of 9",
    "g_per_seed_mean_95ci (confidence interval of the constant, not a prediction bound)": [
     0.05207,
-    0.05538
+    0.05541
    ]
   }
  ],
@@ -64,12 +64,12 @@
  },
  "jia_inside_with_before_weight": "8 of 9",
  "welch_hadi_vs_task4": {
-  "diff_pct": 2.01,
+  "diff_pct": 2.08,
   "diff_95ci_pct": [
    -4.5,
-   8.5
+   8.7
   ],
-  "p_value": 0.472
+  "p_value": 0.464
  },
  "welch_hadi_vs_extra": {
   "diff_pct": 1.07,
@@ -80,17 +80,17 @@
   "p_value": 0.666
  },
  "welch_hadi_vs_jia_all": {
-  "diff_pct": 1.49,
+  "diff_pct": 1.52,
   "diff_95ci_pct": [
    -2.7,
    5.7
   ],
-  "p_value": 0.462
+  "p_value": 0.455
  },
  "trend_g_per_seed_vs_weight": {
-  "slope_pct_per_10g": 0.22,
-  "r": 0.043,
-  "p_value": 0.87,
+  "slope_pct_per_10g": 0.23,
+  "r": 0.044,
+  "p_value": 0.866,
   "caveat": "weight is on both axes (w/count against w), so a weighing error pushes the slope up; the slope is about 0, so the conclusion stands"
  },
  "gauge_rr_all_17_photos_incl_no_marker (do not use: IMG_2261 has no fixed scale)": {
@@ -208,6 +208,7 @@
   "IMG_2295.jpg": 3,
   "IMG_2286.jpg": 1,
   "IMG_2303.jpg": 1,
+  "IMG_2305.jpg": 1,
   "IMG_2262.jpg": 4,
   "IMG_2263.jpg": 6,
   "IMG_2264.jpg": 2,
@@ -220,7 +221,7 @@
   "IMG_4183.JPG": 2
  },
  "no_fixed_scale_vs_fixed_pct": {
-  "mean": -6.6,
+  "mean": -6.7,
   "min": -39.1,
   "max": 1.7,
   "n_photos": 42
@@ -234,23 +235,23 @@
   },
   "Jia": {
    "n_photos": 18,
-   "count": 0.9939,
-   "total_box_area_mm2": 0.9884,
-   "mean_box_area_mm2": 0.0742
+   "count": 0.9938,
+   "total_box_area_mm2": 0.9885,
+   "mean_box_area_mm2": 0.0732
   }
  },
  "bound_levels": {
   "app_bound_19oct_pct": 9.98,
   "app_bound_level": "one photo (photo-level spread of 16 photos, t with 8 piles)",
   "hadi_8_piles_pile_level_pct": 10.16,
-  "note": "like-for-like change from 8 to 17 piles at pile level: this value -> pooled_17.bound_halfwidth_pct; the photo-level spread over 17 piles is also about 3.97 %, so the 17-pile bound holds for one photo too"
+  "note": "like-for-like change from 8 to 17 piles at pile level: this value -> pooled_17.bound_halfwidth_pct; the photo-level spread over the 34 photos is about the same as the pile-level spread, so the 17-pile bound holds for one photo too (the app config, built per photo, gives the same +-8.7 %)"
  },
  "pooled_17": {
   "constant_method": "total weight / total count (ratio of sums); s is the spread of the per-pile ratios around their mean; the difference is negligible (s around the pooled constant 3.975 % vs 3.971 %)",
-  "g_per_seed": 0.05331,
-  "rel_sd_pct": 3.97,
-  "bound_halfwidth_pct": 8.66,
-  "lopo_mape_pct": 3.38,
+  "g_per_seed": 0.05332,
+  "rel_sd_pct": 3.99,
+  "bound_halfwidth_pct": 8.71,
+  "lopo_mape_pct": 3.4,
   "lopo_inside": "17 of 17",
   "lopo": [
    {
@@ -275,7 +276,7 @@
    },
    {
     "pile": "P05",
-    "err_pct": 5.7,
+    "err_pct": 5.8,
     "inside": true
    },
    {
@@ -305,12 +306,12 @@
    },
    {
     "pile": "T4-03",
-    "err_pct": -2.9,
+    "err_pct": -2.8,
     "inside": true
    },
    {
     "pile": "T4-04",
-    "err_pct": -5.4,
+    "err_pct": -5.7,
     "inside": true
    },
    {
@@ -330,7 +331,7 @@
    },
    {
     "pile": "P12",
-    "err_pct": 3.4,
+    "err_pct": 3.5,
     "inside": true
    },
    {
@@ -343,75 +344,75 @@
  "bound_vs_piles": [
   {
    "n_piles": 3,
-   "bound_pct": 19.73
+   "bound_pct": 19.83
   },
   {
    "n_piles": 4,
-   "bound_pct": 14.13,
-   "gain_per_extra_pile_pct_points": 5.6
+   "bound_pct": 14.2,
+   "gain_per_extra_pile_pct_points": 5.63
   },
   {
    "n_piles": 5,
-   "bound_pct": 12.08,
-   "gain_per_extra_pile_pct_points": 2.05
+   "bound_pct": 12.14,
+   "gain_per_extra_pile_pct_points": 2.06
   },
   {
    "n_piles": 6,
-   "bound_pct": 11.02,
+   "bound_pct": 11.08,
    "gain_per_extra_pile_pct_points": 1.06
   },
   {
    "n_piles": 8,
-   "bound_pct": 9.96,
-   "gain_per_extra_pile_pct_points": 0.53
+   "bound_pct": 10.01,
+   "gain_per_extra_pile_pct_points": 0.535
   },
   {
    "n_piles": 10,
-   "bound_pct": 9.42,
+   "bound_pct": 9.47,
    "gain_per_extra_pile_pct_points": 0.27
   },
   {
    "n_piles": 12,
-   "bound_pct": 9.1,
-   "gain_per_extra_pile_pct_points": 0.16
+   "bound_pct": 9.14,
+   "gain_per_extra_pile_pct_points": 0.165
   },
   {
    "n_piles": 15,
-   "bound_pct": 8.8,
+   "bound_pct": 8.84,
    "gain_per_extra_pile_pct_points": 0.1
   },
   {
    "n_piles": 17,
-   "bound_pct": 8.66,
-   "gain_per_extra_pile_pct_points": 0.07
+   "bound_pct": 8.71,
+   "gain_per_extra_pile_pct_points": 0.065
   },
   {
    "n_piles": 20,
-   "bound_pct": 8.52,
-   "gain_per_extra_pile_pct_points": 0.047
+   "bound_pct": 8.56,
+   "gain_per_extra_pile_pct_points": 0.05
   },
   {
    "n_piles": 25,
-   "bound_pct": 8.36,
+   "bound_pct": 8.4,
    "gain_per_extra_pile_pct_points": 0.032
   },
   {
    "n_piles": 30,
-   "bound_pct": 8.26,
+   "bound_pct": 8.3,
    "gain_per_extra_pile_pct_points": 0.02
   },
   {
    "n_piles": 50,
-   "bound_pct": 8.06,
+   "bound_pct": 8.1,
    "gain_per_extra_pile_pct_points": 0.01
   }
  ],
  "bound_vs_piles_note": "uses today's s estimate for every n; gain = average gain per extra pile between the listed n. With 17 piles the true s is about 0.74 to 1.52 times the estimate (95 %, chi-square)",
- "bound_floor_pct": 7.78,
+ "bound_floor_pct": 7.82,
  "floor_note": {
   "floor_is_for": "this setup (1 g kitchen scale, one seed lot), not for the method",
   "balance_rms_rel_pct": 1.73,
-  "floor_without_balance_pct_estimate": 7.0
+  "floor_without_balance_pct_estimate": 7.05
  },
  "pooling_note": "pooling all 17 piles is conditional (STATUS 4b): pool only if task 4 and the Gauge R&R show no person or phone difference; see gauge_rr_marker_ok for the complete R&R",
  "gauge_rr_marker_ok": {
@@ -545,7 +546,7 @@
    "pile": "T4-04",
    "before": 22.0,
    "after": 23.0,
-   "predicted": 21.68,
+   "predicted": 21.63,
    "closer_to": "before"
   },
   {

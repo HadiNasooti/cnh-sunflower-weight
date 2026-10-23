@@ -2,7 +2,7 @@
  "inputs": {
   "rate_eur_per_h": 48.2,
   "rate_source": "Eurostat 2024, Belgium (example rate)",
-  "s_rel_pct": 3.97,
+  "s_rel_pct": 3.99,
   "n_piles_now": 17,
   "minutes_per_pile": {
    "Hadi P01-P08, 10-24 g": 12.7,
@@ -43,104 +43,104 @@
  "bound_vs_piles": [
   {
    "n_piles": 3,
-   "bound_pct": 19.72,
-   "gain_of_next_pile_pct_points": 5.598,
+   "bound_pct": 19.82,
+   "gain_of_next_pile_pct_points": 5.627,
    "hours": 0.6,
    "cost_eur": 31
   },
   {
    "n_piles": 4,
-   "bound_pct": 14.13,
-   "gain_of_next_pile_pct_points": 2.051,
+   "bound_pct": 14.2,
+   "gain_of_next_pile_pct_points": 2.061,
    "hours": 0.8,
    "cost_eur": 41
   },
   {
    "n_piles": 5,
-   "bound_pct": 12.07,
-   "gain_of_next_pile_pct_points": 1.052,
+   "bound_pct": 12.14,
+   "gain_of_next_pile_pct_points": 1.057,
    "hours": 1.1,
    "cost_eur": 51
   },
   {
    "n_piles": 6,
-   "bound_pct": 11.02,
-   "gain_of_next_pile_pct_points": 0.638,
+   "bound_pct": 11.08,
+   "gain_of_next_pile_pct_points": 0.641,
    "hours": 1.3,
    "cost_eur": 61
   },
   {
    "n_piles": 8,
-   "bound_pct": 9.96,
-   "gain_of_next_pile_pct_points": 0.307,
+   "bound_pct": 10.01,
+   "gain_of_next_pile_pct_points": 0.309,
    "hours": 1.7,
    "cost_eur": 82
   },
   {
    "n_piles": 10,
-   "bound_pct": 9.42,
-   "gain_of_next_pile_pct_points": 0.18,
+   "bound_pct": 9.47,
+   "gain_of_next_pile_pct_points": 0.181,
    "hours": 2.1,
    "cost_eur": 102
   },
   {
    "n_piles": 12,
-   "bound_pct": 9.09,
-   "gain_of_next_pile_pct_points": 0.118,
+   "bound_pct": 9.14,
+   "gain_of_next_pile_pct_points": 0.119,
    "hours": 2.5,
    "cost_eur": 122
   },
   {
    "n_piles": 15,
-   "bound_pct": 8.79,
+   "bound_pct": 8.84,
    "gain_of_next_pile_pct_points": 0.072,
    "hours": 3.2,
    "cost_eur": 153
   },
   {
    "n_piles": 17,
-   "bound_pct": 8.66,
+   "bound_pct": 8.7,
    "gain_of_next_pile_pct_points": 0.055,
    "hours": 3.6,
    "cost_eur": 173
   },
   {
    "n_piles": 20,
-   "bound_pct": 8.51,
-   "gain_of_next_pile_pct_points": 0.038,
+   "bound_pct": 8.56,
+   "gain_of_next_pile_pct_points": 0.039,
    "hours": 4.2,
    "cost_eur": 204
   },
   {
    "n_piles": 25,
-   "bound_pct": 8.36,
+   "bound_pct": 8.4,
    "gain_of_next_pile_pct_points": 0.024,
    "hours": 5.3,
    "cost_eur": 255
   },
   {
    "n_piles": 30,
-   "bound_pct": 8.25,
+   "bound_pct": 8.3,
    "gain_of_next_pile_pct_points": 0.016,
    "hours": 6.3,
    "cost_eur": 306
   },
   {
    "n_piles": 50,
-   "bound_pct": 8.06,
+   "bound_pct": 8.1,
    "gain_of_next_pile_pct_points": 0.006,
    "hours": 10.6,
    "cost_eur": 510
   },
   {
    "n_piles": 100,
-   "bound_pct": 7.92,
+   "bound_pct": 7.96,
    "gain_of_next_pile_pct_points": 0.001,
    "hours": 21.2,
    "cost_eur": 1020
   }
  ],
- "floor_pct": 7.78,
+ "floor_pct": 7.82,
  "piles_for_target_bound": {
   "12": {
    "piles": 6,
@@ -148,42 +148,42 @@
    "cost_eur": 61
   },
   "10": {
-   "piles": 8,
-   "hours": 1.7,
-   "cost_eur": 82
+   "piles": 9,
+   "hours": 1.9,
+   "cost_eur": 92
   },
   "9": {
-   "piles": 13,
-   "hours": 2.8,
-   "cost_eur": 133
+   "piles": 14,
+   "hours": 3.0,
+   "cost_eur": 143
   },
   "8.75": {
-   "piles": 16,
-   "hours": 3.4,
-   "cost_eur": 163
+   "piles": 17,
+   "hours": 3.6,
+   "cost_eur": 173
   },
   "8.5": {
-   "piles": 21,
-   "hours": 4.4,
-   "cost_eur": 214
+   "piles": 22,
+   "hours": 4.7,
+   "cost_eur": 224
   },
   "8.25": {
-   "piles": 31,
-   "hours": 6.6,
-   "cost_eur": 316
+   "piles": 33,
+   "hours": 7.0,
+   "cost_eur": 337
   },
   "8": {
-   "piles": 63,
-   "hours": 13.3,
-   "cost_eur": 643
+   "piles": 77,
+   "hours": 16.3,
+   "cost_eur": 786
   }
  },
  "stop_rule": {
   "rule": "stop when one more pile improves the bound by less than 0.2 percentage points",
   "n_stop": 10,
-  "bound_at_stop_pct": 9.42,
+  "bound_at_stop_pct": 9.47,
   "cost_of_next_pile_eur": 10.2,
-  "eur_per_0p1_pct_point_at_stop": 5.67
+  "eur_per_0p1_pct_point_at_stop": 5.64
  },
  "s_uncertainty": {
   "factor_95ci": [
@@ -191,14 +191,14 @@
    1.52
   ],
   "bound_at_17_piles_pct_range": [
-   6.4,
+   6.5,
    13.2
   ]
  },
  "error_budget_pct": {
-  "total_between_piles": 3.97,
+  "total_between_piles": 3.99,
   "balance_1g_step": 1.73,
   "photo_mean_of_2": 0.93,
-  "seed_weight_and_rest": 3.45
+  "seed_weight_and_rest": 3.47
  }
 }

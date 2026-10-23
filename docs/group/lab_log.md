@@ -59,3 +59,9 @@ Option (b) chosen: 7 more piles P09 to P15 (26 to 38 g). Jia collects them with 
 
 # Jia's weighing (reported Thu 22 Oct, 23:57)
 Task 4 and P09 to P11 were weighed in a container (tared). From P12 on Jia weighed the seeds directly on the scale; since then the before and after readings are the same (P12, P13). She thinks the container and its TARE may explain the 2 g difference of T4-02 (14 g before, 12 g after), but cannot confirm it.
+
+# Checks by Jia (Fri 23 Oct)
+- Coin test after TARE: one 20 cent coin (5.74 g nominal) reads 6 g; one 50 cent coin (7.80 g nominal) reads 8 g. The scale rounds to the nearest gram; it does not cut off.
+- Her printed marker squares measured with a ruler: all 50 mm.
+- Original photos of task 4 uploaded to Drive. IMG_2305 was cropped again from its original (no seed cut). The "original" files of P09 to P13 are the same pixels as the cropped ones (no uncropped version exists). In IMG_2302 the cut seed is cut by the edge of the original photo itself.
+- P14: two photos taken, but the seeds touch; spread out they would not fit in the photo. Not used for calibration; the app result is in analysis/results/2026-10-23_p14_app_test.
