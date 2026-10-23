@@ -56,3 +56,6 @@ The analysis was re-run with the exact commands at the top of analysis/build_pro
 
 # Decision (Mon 19 Oct, evening)
 Option (b) chosen: 7 more piles P09 to P15 (26 to 38 g). Jia collects them with Hadi's scale and ruler and her own iPhone 14, after her task 4. Plan and analysis rules in STATUS_AND_PLAN section 4b.
+
+# Jia's weighing (reported Thu 22 Oct, 23:57)
+Task 4 and P09 to P11 were weighed in a container (tared). From P12 on Jia weighed the seeds directly on the scale; since then the before and after readings are the same (P12, P13). She thinks the container and its TARE may explain the 2 g difference of T4-02 (14 g before, 12 g after), but cannot confirm it.
