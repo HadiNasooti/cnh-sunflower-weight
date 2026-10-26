@@ -10,5 +10,11 @@ constants). These photos are NOT used for calibration.
 | P14 a | orange | 775 | 41.4 g (37.8 to 44.9 g) | Seeds too close together; more seeds than we tested (775, tested up to 651): split the sample |
 | P14 b | orange | 773 | 41.2 g (37.7 to 44.8 g) | the same two sentences |
 
-Both photos get the two right warnings. The weight of P14 was not written down; the shown range is not valid
-here (touching seeds, more seeds than tested, low-resolution copies resized x3).
+Both photos get the two right warnings. The shown range is not valid here (touching seeds, more seeds than
+tested, low-resolution copies resized x3).
+
+Real weight (added 26 Oct): Jia weighed P14 at 36 g (kitchen scale, 1 g steps). So the estimate was
++15.0 % (photo a) and +14.4 % (photo b) too high, and 36 g is OUTSIDE both shown ranges. The grams per seed
+implied by the count would be 36 / 775 = 0.0465 g (model: 0.0534 g). We cannot tell from these copies whether
+the count is too high (touching seeds) or the seeds are lighter. This is exactly the case the orange light
+warns about: do not trust the number, spread the seeds and split the sample.

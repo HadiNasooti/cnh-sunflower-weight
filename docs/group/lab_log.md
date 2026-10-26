@@ -65,3 +65,8 @@ Task 4 and P09 to P11 were weighed in a container (tared). From P12 on Jia weigh
 - Her printed marker squares measured with a ruler: all 50 mm.
 - Original photos of task 4 uploaded to Drive. IMG_2305 was cropped again from its original (no seed cut). The "original" files of P09 to P13 are the same pixels as the cropped ones (no uncropped version exists). In IMG_2302 the cut seed is cut by the edge of the original photo itself.
 - P14: two photos taken, but the seeds touch; spread out they would not fit in the photo. Not used for calibration; the app result is in analysis/results/2026-10-23_p14_app_test.
+
+
+## 26 Oct 2026: P14 weight
+
+Jia weighed P14: 36 g. The app showed 41.4 g and 41.2 g with an orange light (seeds too close, more seeds than tested); real weight outside both ranges (+15.0 % and +14.4 %). The orange warning was right. Not used for calibration. Details: analysis/results/2026-10-23_p14_app_test/README.md.
